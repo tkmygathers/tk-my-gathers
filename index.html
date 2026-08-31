@@ -234,13 +234,14 @@ img{display:block;max-width:100%}
     </div>
     <div class="top-actions">
       <button class="icon-btn" onclick="showPage('messages')" aria-label="メッセージ">✉</button>
-      <button class="avatar-btn" onclick="showPage('profile')">TK</button>
+      <button class="avatar-btn" id="accountAvatarBtn" onclick="openAccountSwitcher()">修</button>
     </div>
   </div>
 </header>
 
 <section id="home" class="page active">
   <div class="hero">
+    <div style="display:inline-flex;padding:5px 8px;border-radius:999px;background:#EEE8DD;color:var(--copper);font-size:10px;font-weight:800;margin-bottom:8px">DEMO · しゅうぞう / けんと</div>
     <h1>おすすめ</h1>
     <p>気になった集まりを保存したり、そのまま参加できます。</p>
   </div>
@@ -438,6 +439,25 @@ img{display:block;max-width:100%}
 <div class="sheet"><div class="handle"></div><div class="sheet-head"><div><div class="sheet-title">楽しかった！を送る</div><div class="sheet-sub">同じ集まりに参加した人に1回ずつ送れます。</div></div><button class="close-btn" onclick="closeModal('funModal')">×</button></div><div id="funPeopleList" class="list"></div></div>
 </div>
 
+
+<!-- demo account switcher -->
+<div id="accountModal" class="modal" onclick="backdropClose(event,'accountModal')">
+<div class="sheet">
+<div class="handle"></div>
+<div class="sheet-head">
+  <div>
+    <div class="sheet-title">デモアカウント</div>
+    <div class="sheet-sub">操作するユーザーを切り替えます。</div>
+  </div>
+  <button class="close-btn" onclick="closeModal('accountModal')">×</button>
+</div>
+<div id="accountList" class="list" style="margin-top:12px"></div>
+<div class="muted" style="margin-top:12px;line-height:1.55">
+  このデモ版は同じブラウザ内でアカウントを切り替えて試す仕様です。別端末どうしで同じデータをリアルタイム共有するには、次の段階でSupabase接続が必要です。
+</div>
+</div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
@@ -462,25 +482,30 @@ sauna:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http:/
 };
 const defaults={
 homeFilter:"all",discoverDateFilter:"weekend",discoverCategory:null,selectedMembers:[],cat:"ゲーム・遊び",sub:"麻雀",eventImage:null,currentEventId:null,currentChatUserId:null,currentFunEvent:null,
-me:{id:"me",name:"タケル",handle:"@takeru_92",bio:"やりたいことから、つながっていく。麻雀、飲み会、BBQ、サウナあたり。",area:"東京・渋谷区",avatar:null,followers:56,following:42,fun:1280,interests:["麻雀","飲み会","BBQ","サウナ","ボードゲーム","カフェ巡り"]},
+currentUserId:"shuzo",
+accounts:{
+shuzo:{id:"shuzo",name:"しゅうぞう",handle:"@shuzo",bio:"やりたいことから、つながっていく。麻雀、飲み会、BBQ、サウナあたり。",area:"東京",avatar:null,followers:12,following:9,fun:18,interests:["麻雀","飲み会","BBQ","サウナ","ボードゲーム"]},
+kento:{id:"kento",name:"けんと",handle:"@kento",bio:"気軽に遊べる集まりに参加したい。スポーツとごはん系が好き。",area:"東京",avatar:null,followers:10,following:11,fun:12,interests:["キャッチボール","飲み会","BBQ","カフェ巡り"]}
+},
 people:[
-{id:"kenta",name:"Kenta",handle:"@kenta_24",fun:42,mutual:true},
+{id:"shuzo",name:"しゅうぞう",handle:"@shuzo",fun:18,mutual:true},
+{id:"kento",name:"けんと",handle:"@kento",fun:12,mutual:true},
 {id:"misaki",name:"ミサキ",handle:"@misaki_31",fun:31,mutual:true},
 {id:"yuta",name:"ユウタ",handle:"@yuuta_88",fun:27,mutual:true},
 {id:"sho",name:"ショウ",handle:"@sho_throw",fun:15,mutual:true},
 {id:"ryo",name:"Ryo",handle:"@ryo_sauna",fun:36,mutual:true}
 ],
 events:[
-{id:1,title:"代々木公園でBBQしよう！",category:"おでかけ",sub:"BBQ",owner:"yuta",date:"2026-09-06",time:"11:00",place:"代々木公園 BBQエリア",people:6,capacity:10,budget:"4,000円",visibility:"公開",note:"友達連れも歓迎。手ぶらで楽しめる感じにしたいです。",image:svgFallback.bbq,joined:false,saved:true,mine:false,status:"upcoming",participants:["yuta","kenta","misaki","sho","ryo","me"],comments:[{user:"yuta",text:"食材はこっちである程度まとめます！",time:"09:12"},{user:"misaki",text:"飲み物持っていきます〜",time:"09:20"}],funSent:[]},
-{id:2,title:"麻雀やろうぜ！初心者歓迎",category:"ゲーム・遊び",sub:"麻雀",owner:"kenta",date:"2026-09-07",time:"19:00",place:"渋谷区・雀荘BIRD",people:3,capacity:4,budget:"2,500円",visibility:"相互フォローのみ",note:"初心者でも大丈夫です。あと1人で始められます。",image:svgFallback.mahjong,joined:false,saved:false,mine:false,status:"upcoming",participants:["kenta","misaki","yuta"],comments:[{user:"kenta",text:"19時集合でお願いします！",time:"18:32"}],funSent:[]},
-{id:3,title:"金曜の夜に乾杯しよー！",category:"食事・飲み",sub:"飲み会",owner:"misaki",date:"2026-09-11",time:"20:00",place:"渋谷区・道玄坂",people:5,capacity:8,budget:"4,500円",visibility:"公開",note:"仕事終わりに軽く行ける人募集。",image:svgFallback.drink,joined:true,saved:true,mine:false,status:"upcoming",participants:["misaki","me","kenta","yuta","sho"],comments:[{user:"me",text:"20時ちょい過ぎるかも！",time:"08:44"},{user:"misaki",text:"全然OK！",time:"08:48"}],funSent:[]},
-{id:4,title:"キャッチボールしませんか？",category:"スポーツ",sub:"キャッチボール",owner:"sho",date:"2026-09-12",time:"10:00",place:"駒沢オリンピック公園",people:2,capacity:4,budget:"無料",visibility:"選択した人だけ",note:"軽く体を動かしたい人向け。",image:svgFallback.sport,joined:false,saved:false,mine:false,status:"upcoming",participants:["sho","kenta"],comments:[],funSent:[]},
-{id:5,title:"サウナでととのう",category:"リラックス",sub:"サウナ",owner:"ryo",date:"2026-08-20",time:"18:30",place:"改良湯（渋谷）",people:4,capacity:4,budget:"2,000円",visibility:"公開",note:"終わったら軽くご飯でも。",image:svgFallback.sauna,joined:true,saved:true,mine:false,status:"history",participants:["ryo","me","kenta","sho"],comments:[{user:"ryo",text:"昨日はありがとう！",time:"21:00"}],funSent:["kenta"]},
-{id:6,title:"ボードゲーム会",category:"ゲーム・遊び",sub:"ボードゲーム",owner:"me",date:"2026-08-10",time:"14:00",place:"中野",people:5,capacity:6,budget:"2,000円",visibility:"相互フォローのみ",note:"初心者でも遊びやすいゲーム中心。",image:null,joined:true,saved:true,mine:true,status:"history",participants:["me","misaki","yuta","sho","ryo"],comments:[{user:"misaki",text:"またやりたい！",time:"18:22"}],funSent:[]}
+{id:1,title:"代々木公園でBBQしよう！",category:"おでかけ",sub:"BBQ",owner:"yuta",date:"2026-09-06",time:"11:00",place:"代々木公園 BBQエリア",people:6,capacity:10,budget:"4,000円",visibility:"公開",note:"友達連れも歓迎。手ぶらで楽しめる感じにしたいです。",image:svgFallback.bbq,joined:false,saved:true,mine:false,status:"upcoming",participants:["yuta","kento","misaki","sho","ryo","shuzo"],comments:[{user:"yuta",text:"食材はこっちである程度まとめます！",time:"09:12"},{user:"misaki",text:"飲み物持っていきます〜",time:"09:20"}],funSent:[]},
+{id:2,title:"麻雀やろうぜ！初心者歓迎",category:"ゲーム・遊び",sub:"麻雀",owner:"kento",date:"2026-09-07",time:"19:00",place:"渋谷区・雀荘BIRD",people:3,capacity:4,budget:"2,500円",visibility:"相互フォローのみ",note:"初心者でも大丈夫です。あと1人で始められます。",image:svgFallback.mahjong,joined:false,saved:false,mine:false,status:"upcoming",participants:["kento","misaki","yuta"],comments:[{user:"kento",text:"19時集合でお願いします！",time:"18:32"}],funSent:[]},
+{id:3,title:"金曜の夜に乾杯しよー！",category:"食事・飲み",sub:"飲み会",owner:"misaki",date:"2026-09-11",time:"20:00",place:"渋谷区・道玄坂",people:5,capacity:8,budget:"4,500円",visibility:"公開",note:"仕事終わりに軽く行ける人募集。",image:svgFallback.drink,joined:true,saved:true,mine:false,status:"upcoming",participants:["misaki","shuzo","kento","yuta","sho"],comments:[{user:"shuzo",text:"20時ちょい過ぎるかも！",time:"08:44"},{user:"misaki",text:"全然OK！",time:"08:48"}],funSent:[]},
+{id:4,title:"キャッチボールしませんか？",category:"スポーツ",sub:"キャッチボール",owner:"sho",date:"2026-09-12",time:"10:00",place:"駒沢オリンピック公園",people:2,capacity:4,budget:"無料",visibility:"選択した人だけ",note:"軽く体を動かしたい人向け。",image:svgFallback.sport,joined:false,saved:false,mine:false,status:"upcoming",participants:["sho","kento"],comments:[],funSent:[]},
+{id:5,title:"サウナでととのう",category:"リラックス",sub:"サウナ",owner:"ryo",date:"2026-08-20",time:"18:30",place:"改良湯（渋谷）",people:4,capacity:4,budget:"2,000円",visibility:"公開",note:"終わったら軽くご飯でも。",image:svgFallback.sauna,joined:true,saved:true,mine:false,status:"history",participants:["ryo","shuzo","kento","sho"],comments:[{user:"ryo",text:"昨日はありがとう！",time:"21:00"}],funSent:["kento"]},
+{id:6,title:"ボードゲーム会",category:"ゲーム・遊び",sub:"ボードゲーム",owner:"shuzo",date:"2026-08-10",time:"14:00",place:"中野",people:5,capacity:6,budget:"2,000円",visibility:"相互フォローのみ",note:"初心者でも遊びやすいゲーム中心。",image:null,joined:true,saved:true,mine:true,status:"history",participants:["shuzo","misaki","yuta","sho","ryo"],comments:[{user:"misaki",text:"またやりたい！",time:"18:22"}],funSent:[]}
 ],
 messages:{
-misaki:[{from:"misaki",text:"金曜の飲み会、あと2人くらい来れそう？",time:"09:30"},{from:"me",text:"一人声かけてみる！",time:"09:34"}],
-kenta:[{from:"kenta",text:"麻雀の開始時間を19:30にずらすかも",time:"08:15"}],
+misaki:[{from:"misaki",text:"金曜の飲み会、あと2人くらい来れそう？",time:"09:30"},{from:"shuzo",text:"一人声かけてみる！",time:"09:34"}],
+kento:[{from:"kento",text:"麻雀の開始時間を19:30にずらすかも",time:"08:15"}],
 yuta:[{from:"yuta",text:"BBQの食材、何か食べたいものある？",time:"昨日"}]
 }
 };
@@ -488,9 +513,30 @@ const clone=x=>JSON.parse(JSON.stringify(x));
 let state=(()=>{try{return JSON.parse(localStorage.getItem(KEY))||clone(defaults)}catch(e){return clone(defaults)}})();
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 const escjs=s=>String(s??"").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
-function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
-function person(id){if(id==="me")return state.me;return state.people.find(p=>p.id===id)||{id,name:"User",handle:"@user",fun:0,mutual:false}}
-function mutuals(){return state.people.filter(p=>p.mutual)}
+function save(){
+  syncActiveAccountToPeople();
+  localStorage.setItem(KEY,JSON.stringify(state));
+  renderAll();
+}
+function meId(){return state.currentUserId||"shuzo"}
+function me(){return state.accounts[meId()]}
+function person(id){
+  if(state.accounts && state.accounts[id]) return state.accounts[id];
+  return state.people.find(p=>p.id===id)||{id,name:"User",handle:"@user",fun:0,mutual:false}
+}
+function mutuals(){return state.people.filter(p=>p.mutual&&p.id!==meId())}
+function syncActiveAccountToPeople(){
+  const a=me();
+  const p=state.people.find(x=>x.id===a.id);
+  if(p){p.name=a.name;p.handle=a.handle;p.fun=a.fun;p.avatar=a.avatar;p.mutual=true}
+}
+function ensureAccountState(){
+  if(!state.accounts){
+    state.currentUserId="shuzo";
+    state.accounts=clone(defaults.accounts);
+  }
+  if(!state.currentUserId)state.currentUserId="shuzo";
+}
 function avatarHtml(p){return p.avatar?`<img src="${p.avatar}" alt="">`:esc(p.name.slice(0,2))}
 function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav-btn[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===id));if(id==="messages"){closeChat()}window.scrollTo({top:0,behavior:"smooth"})}
 function openModal(id){$(id).classList.add("open")}
@@ -521,23 +567,23 @@ function renderDiscover(){const q=$("discoverSearch").value.trim().toLowerCase()
 $("discoverSearch").addEventListener("input",renderDiscover)
 document.querySelectorAll(".date-btn").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".date-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");state.discoverDateFilter=btn.dataset.datefilter;$("dateInputWrap").classList.toggle("show",btn.dataset.datefilter==="custom");renderDiscover()}))
 $("discoverDate").addEventListener("change",()=>{state.discoverDateFilter="custom";renderDiscover()})
-function renderMessages(){const ids=Object.keys(state.messages);$("messageList").innerHTML=ids.map(id=>{const p=person(id),last=state.messages[id][state.messages[id].length-1];return `<button class="message-card" onclick="openChat('${id}')" style="width:100%;text-align:left"><div class="message-user"><div class="mini-avatar">${avatarHtml(p)}</div><div style="min-width:0"><div class="friend-name">${esc(p.name)}</div><div class="message-preview">${esc(last.text)}</div></div></div><div class="muted">${esc(last.time)}</div></button>`}).join("")}
+function renderMessages(){const ids=Object.keys(state.messages).filter(id=>id!==meId());$("messageList").innerHTML=ids.map(id=>{const p=person(id),last=state.messages[id][state.messages[id].length-1];return `<button class="message-card" onclick="openChat('${id}')" style="width:100%;text-align:left"><div class="message-user"><div class="mini-avatar">${avatarHtml(p)}</div><div style="min-width:0"><div class="friend-name">${esc(p.name)}</div><div class="message-preview">${esc(last.text)}</div></div></div><div class="muted">${esc(last.time)}</div></button>`}).join("")}
 function startChat(id){closeModal("eventModal");showPage("messages");openChat(id)}
 function openChat(id){state.currentChatUserId=id;$("messageListView").style.display="none";$("chatView").classList.add("active");const p=person(id);$("chatName").textContent=p.name;$("chatHandle").textContent=p.handle;renderChat()}
 function closeChat(){$("messageListView").style.display="block";$("chatView").classList.remove("active");state.currentChatUserId=null}
-function renderChat(){const id=state.currentChatUserId;if(!id)return;const msgs=state.messages[id]||[];$("chatMessages").innerHTML=msgs.map(m=>`<div class="bubble ${m.from==="me"?"me":"them"}">${esc(m.text)}<div style="font-size:9px;opacity:.7;margin-top:3px">${esc(m.time)}</div></div>`).join("")}
-$("chatForm").addEventListener("submit",e=>{e.preventDefault();const t=$("chatInput").value.trim();if(!t||!state.currentChatUserId)return;if(!state.messages[state.currentChatUserId])state.messages[state.currentChatUserId]=[];state.messages[state.currentChatUserId].push({from:"me",text:t,time:"たった今"});$("chatInput").value="";save();renderChat()})
-function renderProfile(){const m=state.me;$("profileName").textContent=m.name;$("profileHandle").textContent=m.handle;$("profileBio").textContent=m.bio;$("profileArea").textContent=m.area;$("followersCount").textContent=m.followers;$("followingCount").textContent=m.following;$("mutualCount").textContent=mutuals().length;$("myFunTotal").textContent=m.fun;$("profileAvatar").innerHTML=m.avatar?`<img src="${m.avatar}" alt="">`:esc(m.name.slice(0,2));$("interestGrid").innerHTML=m.interests.map(x=>`<button class="interest-chip light" onclick="prefill('${escjs(x)}')">${esc(x)}</button>`).join("");$("upcoming").innerHTML=profileList(state.events.filter(e=>e.joined&&e.status==="upcoming"),"まだ参加予定はありません",false);$("created").innerHTML=profileList(state.events.filter(e=>e.mine),"まだ自分の募集はありません",false);$("history").innerHTML=profileList(state.events.filter(e=>e.status==="history"&&e.participants.includes("me")),"まだ履歴はありません",true)}
+function renderChat(){const id=state.currentChatUserId;if(!id)return;const msgs=state.messages[id]||[];$("chatMessages").innerHTML=msgs.map(m=>`<div class="bubble ${m.from===meId()?"me":"them"}">${esc(m.text)}<div style="font-size:9px;opacity:.7;margin-top:3px">${esc(m.time)}</div></div>`).join("")}
+$("chatForm").addEventListener("submit",e=>{e.preventDefault();const t=$("chatInput").value.trim();if(!t||!state.currentChatUserId)return;if(!state.messages[state.currentChatUserId])state.messages[state.currentChatUserId]=[];state.messages[state.currentChatUserId].push({from:meId(),text:t,time:"たった今"});$("chatInput").value="";save();renderChat()})
+function renderProfile(){const m=me();$("profileName").textContent=m.name;$("profileHandle").textContent=m.handle;$("profileBio").textContent=m.bio;$("profileArea").textContent=m.area;$("followersCount").textContent=m.followers;$("followingCount").textContent=m.following;$("mutualCount").textContent=mutuals().length;$("myFunTotal").textContent=m.fun;$("profileAvatar").innerHTML=m.avatar?`<img src="${m.avatar}" alt="">`:esc(m.name.slice(0,2));$("interestGrid").innerHTML=m.interests.map(x=>`<button class="interest-chip light" onclick="prefill('${escjs(x)}')">${esc(x)}</button>`).join("");$("upcoming").innerHTML=profileList(state.events.filter(e=>e.joined&&e.status==="upcoming"),"まだ参加予定はありません",false);$("created").innerHTML=profileList(state.events.filter(e=>e.mine),"まだ自分の募集はありません",false);$("history").innerHTML=profileList(state.events.filter(e=>e.status==="history"&&e.participants.includes(meId())),"まだ履歴はありません",true)}
 function profileList(list,empty,historyMode){if(!list.length)return `<div class="panel" style="padding:18px;text-align:center;color:var(--muted)">${empty}</div>`;return `<div class="list">${list.map(e=>`<div class="friend"><div class="friend-left" onclick="openEvent(${e.id})" style="cursor:pointer"><div class="mini-avatar">${esc(e.sub.slice(0,2))}</div><div><div class="friend-name">${esc(e.title)}</div><div class="muted">${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</div></div></div>${historyMode?`<button class="fun-btn" onclick="openFun(${e.id})">楽しかった！</button>`:`<div class="muted">${e.people}/${e.capacity}人</div>`}</div>`).join("")}</div>`}
 function switchProfileTab(id){document.querySelectorAll(".profile-tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("active",p.id===id))}
-function openProfileEdit(){const m=state.me;$("editName").value=m.name;$("editHandle").value=m.handle;$("editBio").value=m.bio;$("editArea").value=m.area;$("profileImagePreview").style.display=m.avatar?"block":"none";if(m.avatar)$("profileImagePreview").src=m.avatar;openModal("profileEditModal")}
-$("profileEditForm").addEventListener("submit",e=>{e.preventDefault();state.me.name=$("editName").value.trim();state.me.handle=$("editHandle").value.trim();state.me.bio=$("editBio").value.trim();state.me.area=$("editArea").value.trim();save();closeModal("profileEditModal");toast("プロフィールを更新しました")})
-$("profileImageInput").addEventListener("change",e=>readFile(e.target.files[0],data=>{state.me.avatar=data;$("profileImagePreview").src=data;$("profileImagePreview").style.display="block"}))
-function clearProfileImage(){state.me.avatar=null;$("profileImagePreview").style.display="none"}
+function openProfileEdit(){const m=me();$("editName").value=m.name;$("editHandle").value=m.handle;$("editBio").value=m.bio;$("editArea").value=m.area;$("profileImagePreview").style.display=m.avatar?"block":"none";if(m.avatar)$("profileImagePreview").src=m.avatar;openModal("profileEditModal")}
+$("profileEditForm").addEventListener("submit",e=>{e.preventDefault();me().name=$("editName").value.trim();me().handle=$("editHandle").value.trim();me().bio=$("editBio").value.trim();me().area=$("editArea").value.trim();save();closeModal("profileEditModal");toast("プロフィールを更新しました")})
+$("profileImageInput").addEventListener("change",e=>readFile(e.target.files[0],data=>{me().avatar=data;$("profileImagePreview").src=data;$("profileImagePreview").style.display="block"}))
+function clearProfileImage(){me().avatar=null;$("profileImagePreview").style.display="none"}
 function openWant(){openModal("wantModal")}
-$("wantForm").addEventListener("submit",e=>{e.preventDefault();const x=$("wantName").value.trim();if(!x)return;if(!state.me.interests.includes(x))state.me.interests.push(x);$("wantName").value="";save();closeModal("wantModal")})
+$("wantForm").addEventListener("submit",e=>{e.preventDefault();const x=$("wantName").value.trim();if(!x)return;if(!me().interests.includes(x))me().interests.push(x);$("wantName").value="";save();closeModal("wantModal")})
 function showMutuals(){$("mutualList").innerHTML=mutuals().map(p=>`<div class="friend"><div class="friend-left"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(p.handle)} · 楽しかった！ ${p.fun}</div></div></div><button class="small-btn" onclick="startChat('${p.id}');closeModal('mutualModal')">メッセージ</button></div>`).join("");openModal("mutualModal")}
-function openOtherProfile(id){if(id==="me"){showPage("profile");return}const p=person(id);toast(`${p.name} のプロフィール画面は次の段階で独立ページ化できます`)}
+function openOtherProfile(id){if(id===meId()){showPage("profile");return}const p=person(id);toast(`${p.name} のプロフィール画面は次の段階で独立ページ化できます`)}
 function openCreate(){setDefaultDate();renderCategories();renderSubs();renderMemberPicker();$("eventImagePreview").style.display=state.eventImage?"block":"none";if(state.eventImage)$("eventImagePreview").src=state.eventImage;openModal("createModal")}
 function setDefaultDate(){if(!$("eventDate").value){const d=new Date();d.setDate(d.getDate()+1);$("eventDate").value=d.toISOString().slice(0,10)}if(!$("eventTime").value)$("eventTime").value="19:00"}
 function renderCategories(){$("categoryGrid").innerHTML=Object.keys(categories).map(c=>`<button type="button" class="category-btn ${state.cat===c?"active":""}" onclick="selectCat('${escjs(c)}')">${esc(c)}</button>`).join("")}
@@ -551,23 +597,61 @@ document.querySelectorAll('input[name="vis"]').forEach(r=>r.addEventListener("ch
 $("eventImageInput").addEventListener("change",e=>readFile(e.target.files[0],data=>{state.eventImage=data;$("eventImagePreview").src=data;$("eventImagePreview").style.display="block"}))
 function clearEventImage(){state.eventImage=null;$("eventImagePreview").style.display="none"}
 function readFile(file,cb){if(!file)return;const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(file)}
-$("createForm").addEventListener("submit",e=>{e.preventDefault();let sub=state.sub;const custom=$("customTitle").value.trim();if(state.cat==="その他・オリジナル"||$("customBox").classList.contains("show"))sub=custom;if(!sub){toast("やりたいことを選んでください");return}const vis=document.querySelector('input[name="vis"]:checked').value;if(vis==="選択した人だけ"&&!state.selectedMembers.length){toast("相互フォローから1人以上選択してください");return}state.events.unshift({id:Date.now(),title:sub,category:state.cat,sub,owner:"me",date:$("eventDate").value,time:$("eventTime").value,place:$("eventPlace").value.trim(),people:1,capacity:Number($("capacity").value),budget:$("budget").value.trim()||"未設定",visibility:vis,note:$("eventNote").value.trim()||"気軽に参加できる募集です。",image:state.eventImage,joined:true,saved:true,mine:true,status:"upcoming",participants:["me"],comments:[],funSent:[],members:[...state.selectedMembers]});state.eventImage=null;state.selectedMembers=[];state.cat="ゲーム・遊び";state.sub="麻雀";e.target.reset();save();closeModal("createModal");showPage("home");toast("プランを作成しました")})
+$("createForm").addEventListener("submit",e=>{e.preventDefault();let sub=state.sub;const custom=$("customTitle").value.trim();if(state.cat==="その他・オリジナル"||$("customBox").classList.contains("show"))sub=custom;if(!sub){toast("やりたいことを選んでください");return}const vis=document.querySelector('input[name="vis"]:checked').value;if(vis==="選択した人だけ"&&!state.selectedMembers.length){toast("相互フォローから1人以上選択してください");return}state.events.unshift({id:Date.now(),title:sub,category:state.cat,sub,owner:meId(),date:$("eventDate").value,time:$("eventTime").value,place:$("eventPlace").value.trim(),people:1,capacity:Number($("capacity").value),budget:$("budget").value.trim()||"未設定",visibility:vis,note:$("eventNote").value.trim()||"気軽に参加できる募集です。",image:state.eventImage,joined:true,saved:true,mine:true,status:"upcoming",participants:[meId()],comments:[],funSent:[],members:[...state.selectedMembers]});state.eventImage=null;state.selectedMembers=[];state.cat="ゲーム・遊び";state.sub="麻雀";e.target.reset();save();closeModal("createModal");showPage("home");toast("プランを作成しました")})
 function prefill(x){const f=Object.entries(categories).find(([c,l])=>l.includes(x));if(f){state.cat=f[0];state.sub=x}else{state.cat="その他・オリジナル";state.sub=""}openCreate();if(!f){$("customTitle").value=x;$("customBox").classList.add("show")}}
 function openPlanner(){openModal("plannerModal")}
 $("plannerForm").addEventListener("submit",e=>{e.preventDefault();const a=$("planActivity").value.trim(),p=Number($("planPeople").value),b=Number($("planBudget").value),area=$("planArea").value.trim(),prio=$("planPriority").value;if(!a||!area)return;const plans=[{name:"アクセス重視",price:Math.round(b*.95/100)*100,place:`${area}の駅近エリア`,prep:"予約・人数確定",note:`${prio}を優先して移動を少なくする想定。`},{name:"コスパ重視",price:Math.round(b*.8/100)*100,place:`${area}の周辺エリア`,prep:"候補比較・予約",note:`${p}人で予算を抑えやすい構成。`},{name:"手軽さ重視",price:Math.round(b*1.05/100)*100,place:`${area}の予約しやすい施設`,prep:"予約のみ",note:"準備物を減らして幹事の負担を軽くする想定。"}];window._plans={plans,a,p,b,area,prio};$("planResults").innerHTML=plans.map((x,i)=>`<div class="plan-card"><div class="plan-top"><div class="plan-title">${esc(x.name)}</div><div class="plan-price">約 ${x.price.toLocaleString()}円/人</div></div><div class="plan-points"><div>やること：${esc(a)}</div><div>候補エリア：${esc(x.place)}</div><div>人数：${p}人</div><div>幹事の準備：${esc(x.prep)}</div><div>${esc(x.note)}</div></div><button class="plan-use" type="button" onclick="usePlan(${i})">このプランで募集を作る</button></div>`).join("")})
 function usePlan(i){const d=window._plans;if(!d)return;const x=d.plans[i];const f=Object.entries(categories).find(([c,l])=>l.some(v=>d.a.includes(v)||v.includes(d.a)));if(f){state.cat=f[0];state.sub=f[1].find(v=>d.a.includes(v)||v.includes(d.a))||f[1][0]}else{state.cat="その他・オリジナル";state.sub=""}closeModal("plannerModal");openCreate();$("eventPlace").value=x.place;$("budget").value=`${x.price.toLocaleString()}円`;$("eventNote").value=x.note;if(state.cat==="その他・オリジナル"){$("customTitle").value=d.a;$("customBox").classList.add("show")}toast("募集フォームに反映しました")}
 function toggleSave(id){const e=state.events.find(x=>x.id===id);e.saved=!e.saved;save();toast(e.saved?"保存しました":"保存を解除しました")}
-function toggleJoin(id){const e=state.events.find(x=>x.id===id);if(e.joined){e.joined=false;e.people=Math.max(0,e.people-1);e.participants=e.participants.filter(x=>x!=="me");toast("参加を取り消しました")}else if(e.people<e.capacity){e.joined=true;e.people++;if(!e.participants.includes("me"))e.participants.push("me");toast("参加予定に追加しました")}else toast("満員です");save()}
+function toggleJoin(id){const e=state.events.find(x=>x.id===id);if(e.joined){e.joined=false;e.people=Math.max(0,e.people-1);e.participants=e.participants.filter(x=>x!==meId());toast("参加を取り消しました")}else if(e.people<e.capacity){e.joined=true;e.people++;if(!e.participants.includes(meId()))e.participants.push(meId());toast("参加予定に追加しました")}else toast("満員です");save()}
 function removeEvent(id){state.events=state.events.filter(e=>e.id!==id);save();toast("募集を削除しました")}
 function openEvent(id){state.currentEventId=id;const e=state.events.find(x=>x.id===id),u=person(e.owner);$("detailTitle").textContent=e.title;$("detailSub").textContent=`${u.name} · ${dateLabel(e.date)} ${e.time}`;$("detailCover").innerHTML=`<img src="${eventImageSrc(e)}" alt="">`;$("detailMeta").innerHTML=`<div class="meta-line">場所　${esc(e.place)}</div><div class="meta-line">人数　${e.people}/${e.capacity}人</div><div class="meta-line">予算　${esc(e.budget)}</div><div class="meta-line">公開範囲　${esc(e.visibility)}</div><div class="event-note">${esc(e.note)}</div>`;renderEventDetail();openModal("eventModal")}
-function renderEventDetail(){const e=state.events.find(x=>x.id===state.currentEventId);if(!e)return;$("commentList").innerHTML=(e.comments||[]).map(c=>{const p=person(c.user);return `<div class="comment-card"><div class="comment-user"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(c.time)}</div></div></div><div class="comment-text">${esc(c.text)}</div></div>`}).join("")||`<div class="muted" style="text-align:center;padding:16px">まだコメントはありません</div>`;$("participantList").innerHTML=e.participants.map(id=>{const p=person(id);return `<div class="friend"><div class="friend-left"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(p.handle)}</div></div></div>${id!=="me"?`<button class="small-btn" onclick="startChat('${id}')">連絡</button>`:""}</div>`}).join("")}
+function renderEventDetail(){const e=state.events.find(x=>x.id===state.currentEventId);if(!e)return;$("commentList").innerHTML=(e.comments||[]).map(c=>{const p=person(c.user);return `<div class="comment-card"><div class="comment-user"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(c.time)}</div></div></div><div class="comment-text">${esc(c.text)}</div></div>`}).join("")||`<div class="muted" style="text-align:center;padding:16px">まだコメントはありません</div>`;$("participantList").innerHTML=e.participants.map(id=>{const p=person(id);return `<div class="friend"><div class="friend-left"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(p.handle)}</div></div></div>${id!==meId()?`<button class="small-btn" onclick="startChat('${id}')">連絡</button>`:""}</div>`}).join("")}
 function switchDetailTab(id){document.querySelectorAll(".detail-tab").forEach(b=>b.classList.toggle("active",b.dataset.detailtab===id));document.querySelectorAll(".detail-panel").forEach(p=>p.classList.toggle("active",p.id===id))}
-$("commentForm").addEventListener("submit",e=>{e.preventDefault();const t=$("commentInput").value.trim();if(!t)return;const ev=state.events.find(x=>x.id===state.currentEventId);if(!ev.saved&&!ev.joined&&!ev.mine){toast("保存または参加するとコメントできます");return}ev.comments.push({user:"me",text:t,time:"たった今"});$("commentInput").value="";save();renderEventDetail()})
+$("commentForm").addEventListener("submit",e=>{e.preventDefault();const t=$("commentInput").value.trim();if(!t)return;const ev=state.events.find(x=>x.id===state.currentEventId);if(!ev.saved&&!ev.joined&&!ev.mine){toast("保存または参加するとコメントできます");return}ev.comments.push({user:meId(),text:t,time:"たった今"});$("commentInput").value="";save();renderEventDetail()})
 function openFun(id){state.currentFunEvent=id;renderFunPeople();openModal("funModal")}
-function renderFunPeople(){const e=state.events.find(x=>x.id===state.currentFunEvent);const sent=e.funSent||[];$("funPeopleList").innerHTML=e.participants.filter(id=>id!=="me").map(id=>{const p=person(id),done=sent.includes(id);return `<div class="friend"><div class="friend-left"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">楽しかった！ ${p.fun}</div></div></div><button class="fun-btn ${done?"sent":""}" ${done?"disabled":""} onclick="sendFun('${id}')">${done?"送信済み":"楽しかった！"}</button></div>`}).join("")}
-function sendFun(id){const e=state.events.find(x=>x.id===state.currentFunEvent);if(!e||e.status!=="history"||!e.participants.includes(id)||id==="me")return;if(!e.funSent)e.funSent=[];if(e.funSent.includes(id))return;e.funSent.push(id);person(id).fun++;save();renderFunPeople();toast(`${person(id).name} に送りました`)}
+function renderFunPeople(){const e=state.events.find(x=>x.id===state.currentFunEvent);const sent=e.funSent||[];$("funPeopleList").innerHTML=e.participants.filter(id=>id!==meId()).map(id=>{const p=person(id),done=sent.includes(id);return `<div class="friend"><div class="friend-left"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">楽しかった！ ${p.fun}</div></div></div><button class="fun-btn ${done?"sent":""}" ${done?"disabled":""} onclick="sendFun('${id}')">${done?"送信済み":"楽しかった！"}</button></div>`}).join("")}
+function sendFun(id){const e=state.events.find(x=>x.id===state.currentFunEvent);if(!e||e.status!=="history"||!e.participants.includes(id)||id===meId())return;if(!e.funSent)e.funSent=[];if(e.funSent.includes(id))return;e.funSent.push(id);person(id).fun++;save();renderFunPeople();toast(`${person(id).name} に送りました`)}
+
+function openAccountSwitcher(){
+  renderAccountSwitcher();
+  openModal("accountModal");
+}
+function renderAccountSwitcher(){
+  const ids=["shuzo","kento"];
+  $("accountList").innerHTML=ids.map(id=>{
+    const a=state.accounts[id];
+    const active=id===meId();
+    return `<button class="friend" style="width:100%;text-align:left" onclick="switchAccount('${id}')">
+      <div class="friend-left">
+        <div class="mini-avatar">${avatarHtml(a)}</div>
+        <div>
+          <div class="friend-name">${esc(a.name)} ${active?'<span style="color:var(--copper);font-size:10px">操作中</span>':''}</div>
+          <div class="muted">${esc(a.handle)} · 楽しかった！ ${a.fun}</div>
+        </div>
+      </div>
+      <span class="small-btn">${active?'選択中':'切り替え'}</span>
+    </button>`
+  }).join("");
+}
+function switchAccount(id){
+  if(!state.accounts[id])return;
+  state.currentUserId=id;
+  closeModal("accountModal");
+  localStorage.setItem(KEY,JSON.stringify(state));
+  renderAll();
+  updateAccountUI();
+  showPage("home");
+  toast(`${state.accounts[id].name} に切り替えました`);
+}
+function updateAccountUI(){
+  const a=me();
+  const btn=$("accountAvatarBtn");
+  if(btn)btn.textContent=a.name.slice(0,1);
+}
+
 function renderAll(){renderHome();renderDiscoverGenres();renderDiscover();renderMessages();renderProfile();renderCategories();renderSubs();renderMemberPicker()}
-renderAll();setDefaultDate();
+ensureAccountState();renderAll();updateAccountUI();setDefaultDate();
 </script>
 </body>
 </html>
