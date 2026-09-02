@@ -465,6 +465,81 @@ body{align-items:flex-start!important}
   .sheet{width:100%!important;max-height:94vh!important}
 }
 
+
+/* ===== V11: TK identity layer ===== */
+.tk-now-block{
+  margin:10px 13px 3px;
+  padding:13px;
+  background:linear-gradient(180deg,#fffdfa,#fbf6f1);
+  border:1px solid var(--app-line);
+  border-radius:16px;
+}
+.tk-now-head{
+  display:flex;justify-content:space-between;align-items:flex-end;gap:10px;
+  margin-bottom:11px;
+}
+.tk-now-head>div{display:grid;gap:3px}
+.tk-eyebrow{
+  font-size:8px;letter-spacing:.18em;font-weight:800;color:var(--app-accent)
+}
+.tk-now-head strong{font-size:15px;color:#1b2932}
+.tk-now-head>button{
+  border:0;background:transparent;color:#817970;font-size:9.5px;padding:3px 0
+}
+.tk-mood-row{
+  display:flex;gap:8px;overflow:auto;padding-bottom:10px;scrollbar-width:none
+}
+.tk-mood-row::-webkit-scrollbar{display:none}
+.tk-mood-row button{
+  flex:0 0 auto;min-width:76px;height:70px;border-radius:13px;
+  border:1px solid #e6ded5;background:#fff;
+  color:#514d48;font-size:10px;font-weight:750;
+  display:grid;place-items:center;align-content:center;gap:6px;
+}
+.tk-mood-row button span{
+  width:29px;height:29px;border-radius:50%;
+  display:grid;place-items:center;background:var(--app-chip);
+  color:#24353e;font-size:11px;font-weight:850
+}
+.tk-mood-row button.active{
+  border-color:#e9bdca;background:var(--app-accent-soft);color:var(--app-accent)
+}
+.tk-mood-row button.active span{
+  background:var(--app-accent);color:#fff
+}
+.tk-shortcuts{
+  display:grid;grid-template-columns:1fr 1fr;gap:7px
+}
+.tk-shortcuts button{
+  border:1px solid #e6ded5;background:#fff;border-radius:12px;
+  min-height:56px;padding:8px 9px;display:flex;align-items:center;gap:8px;text-align:left
+}
+.tk-shortcuts button>span{
+  width:30px;height:30px;border-radius:10px;flex:0 0 auto;
+  display:grid;place-items:center;background:#f2eee8;
+  color:var(--app-accent);font-size:10px;font-weight:850
+}
+.tk-shortcuts button div{display:grid;gap:2px}
+.tk-shortcuts b{font-size:10.5px;color:#26333b}
+.tk-shortcuts small{font-size:8.5px;color:#8a837b}
+.tk-shortcuts button:active{transform:scale(.99)}
+@media(max-width:360px){
+  .tk-shortcuts{grid-template-columns:1fr}
+  .tk-mood-row button{min-width:70px}
+}
+
+
+.tk-empty{
+  margin:0 13px 10px;padding:24px 16px;text-align:center;
+  border:1px dashed #ddd4ca;border-radius:14px;background:#fffdfa;
+  display:grid;gap:6px
+}
+.tk-empty strong{font-size:12px;color:#27343c}
+.tk-empty span{font-size:9.5px;color:#8b837a}
+.tk-empty button{
+  justify-self:center;margin-top:5px;border:0;border-radius:999px;
+  background:var(--app-accent);color:#fff;padding:8px 13px;font-size:9.5px;font-weight:750
+}
 </style>
 </head>
 <body>
@@ -506,6 +581,32 @@ body{align-items:flex-start!important}
       <button class="home-feed-tab" data-homefilter="weekend">今週末</button>
       <button class="home-feed-tab" data-homefilter="weekday">平日夜</button>
       <button class="home-feed-tab" data-homefilter="new">新着</button>
+    </div>
+
+    <div class="tk-now-block">
+      <div class="tk-now-head">
+        <div>
+          <span class="tk-eyebrow">TK PICK</span>
+          <strong>今、なにしたい？</strong>
+        </div>
+        <button onclick="openCreate()">自分で募集する ›</button>
+      </div>
+
+      <div id="tkMoodRow" class="tk-mood-row">
+        <button onclick="selectMood('drink',this)"><span>杯</span>飲みたい</button>
+        <button onclick="selectMood('mahjong',this)"><span>麻</span>麻雀したい</button>
+        <button onclick="selectMood('sport',this)"><span>球</span>軽く運動</button>
+        <button onclick="selectMood('cafe',this)"><span>珈</span>カフェ</button>
+        <button onclick="selectMood('bbq',this)"><span>火</span>BBQ</button>
+        <button onclick="selectMood('anything',this)"><span>＋</span>誰かと何か</button>
+      </div>
+
+      <div class="tk-shortcuts">
+        <button onclick="applyTkShortcut('oneMore')"><span>1</span><div><b>あと1人募集</b><small>すぐ集まりたい</small></div></button>
+        <button onclick="applyTkShortcut('today')"><span>今</span><div><b>今日いける</b><small>今日の募集だけ</small></div></button>
+        <button onclick="applyTkShortcut('weekend')"><span>週</span><div><b>今週末</b><small>土日の予定を探す</small></div></button>
+        <button onclick="applyTkShortcut('friends')"><span>友</span><div><b>友達のやりたいこと</b><small>つながりから探す</small></div></button>
+      </div>
     </div>
 
     <div class="home-section-row">
@@ -748,7 +849,7 @@ body{align-items:flex-start!important}
 
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v10_mobile_ui";
+const KEY="tk_my_gathers_v11_identity";
 const quickTagOptions=["新規歓迎","初参加歓迎","1人参加OK","初心者歓迎","途中参加OK","当日参加OK","友達連れOK","少人数","ゆるめ","相談しながら決めたい"];
 const categories={
 "食事・飲み":["飲み会","ランチ","夜ごはん","カフェ","ラーメン","焼肉","食べ歩き","スイーツ巡り","せんべろ","はしご酒"],
@@ -768,7 +869,7 @@ sport:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http:/
 sauna:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#1d3030"/><stop offset="1" stop-color="#765a43"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><text x="50%" y="52%" text-anchor="middle" fill="white" font-size="70" font-family="sans-serif" font-weight="700">SAUNA</text></svg>`)
 };
 const defaults={
-homeFilter:"all",discoverDateFilter:"weekend",discoverCategory:null,selectedMembers:[],selectedTags:[],cat:"ゲーム・遊び",sub:"麻雀",eventImage:null,currentEventId:null,currentChatUserId:null,currentFunEvent:null,
+homeFilter:"all",tkSpecialFilter:null,discoverDateFilter:"weekend",discoverCategory:null,selectedMembers:[],selectedTags:[],cat:"ゲーム・遊び",sub:"麻雀",eventImage:null,currentEventId:null,currentChatUserId:null,currentFunEvent:null,
 currentUserId:"shuzo",
 accounts:{
 shuzo:{id:"shuzo",name:"しゅうぞう",handle:"@shuzo",bio:"やりたいことから、つながっていく。麻雀、飲み会、BBQ、サウナあたり。",area:"東京",avatar:null,followers:12,following:9,fun:18,interests:["麻雀","飲み会","BBQ","サウナ","ボードゲーム"]},
@@ -859,8 +960,46 @@ function eventCard(e){
     </div>
   </article>`
 }
-function renderHome(){let list=state.events.filter(e=>e.status==="upcoming");if(state.homeFilter==="weekend")list=list.filter(e=>["6","0"].includes(String(new Date(e.date+"T00:00:00").getDay())));if(state.homeFilter==="weekday")list=list.filter(e=>{const d=new Date(e.date+"T00:00:00").getDay();return d>=1&&d<=5&&Number(e.time.split(":")[0])>=18});if(state.homeFilter==="new")list=[...list].reverse();$("feed").innerHTML=list.map(eventCard).join("")}
-$("homeChips").addEventListener("click",e=>{const c=e.target.closest(".home-feed-tab");if(!c)return;state.homeFilter=c.dataset.homefilter;document.querySelectorAll("#homeChips .home-feed-tab").forEach(x=>x.classList.toggle("active",x===c));renderHome()})
+function renderHome(){
+  let list=state.events.filter(e=>e.status==="upcoming");
+
+  if(state.tkSpecialFilter==="oneMore"){
+    list=list.filter(e=>(e.capacity-e.people)===1);
+  }else if(state.tkSpecialFilter==="today"){
+    const today=new Date().toISOString().slice(0,10);
+    list=list.filter(e=>e.date===today);
+  }else if(state.tkSpecialFilter==="weekend"){
+    list=list.filter(e=>{
+      const d=new Date(e.date+"T00:00:00").getDay();
+      return d===0||d===6;
+    });
+  }else if(state.tkSpecialFilter==="friends"){
+    list=list.filter(e=>e.owner!==meId() && e.visibility!=="公開");
+  }else if(state.tkSpecialFilter && state.tkSpecialFilter.startsWith("mood:")){
+    const mood=state.tkSpecialFilter.split(":")[1];
+    const moodMap={
+      drink:e=>e.category==="食事・飲み" || ["飲み会","夜ごはん"].includes(e.sub),
+      mahjong:e=>e.sub==="麻雀",
+      sport:e=>e.category==="スポーツ",
+      cafe:e=>e.sub==="カフェ" || (e.title||"").includes("カフェ"),
+      bbq:e=>e.sub==="BBQ",
+      anything:e=>true
+    };
+    if(moodMap[mood]) list=list.filter(moodMap[mood]);
+  }else{
+    if(state.homeFilter==="weekend")list=list.filter(e=>["6","0"].includes(String(new Date(e.date+"T00:00:00").getDay())));
+    if(state.homeFilter==="weekday")list=list.filter(e=>{
+      const d=new Date(e.date+"T00:00:00").getDay();
+      return d>=1&&d<=5&&Number(e.time.split(":")[0])>=18
+    });
+    if(state.homeFilter==="new")list=[...list].reverse();
+  }
+
+  $("feed").innerHTML=list.length
+    ? list.map(eventCard).join("")
+    : `<div class="tk-empty"><strong>まだこの条件の募集はありません</strong><span>自分で募集を作ってみる？</span><button onclick="openCreate()">募集を作成</button></div>`;
+}
+$("homeChips").addEventListener("click",e=>{const c=e.target.closest(".home-feed-tab");if(!c)return;state.tkSpecialFilter=null;clearTkMoodSelection();state.homeFilter=c.dataset.homefilter;document.querySelectorAll("#homeChips .home-feed-tab").forEach(x=>x.classList.toggle("active",x===c));renderHome()})
 function renderDiscoverGenres(){$("genreGrid").innerHTML=Object.keys(categories).slice(0,7).map((c,i)=>`<button class="genre" onclick="setDiscoverCategory('${escjs(c)}')"><div><div class="gicon">${String(i+1).padStart(2,"0")}</div><span>${esc(c)}</span></div></button>`).join("")}
 function setDiscoverCategory(c){state.discoverCategory=c;renderDiscover()}
 function clearDiscoverFilters(){state.discoverCategory=null;state.discoverDateFilter=null;document.querySelectorAll(".date-btn").forEach(b=>b.classList.remove("active"));$("dateInputWrap").classList.remove("show");renderDiscover()}
@@ -997,6 +1136,26 @@ function searchTag(tag){
   $("discoverSearch").value=tag==="平日夜"?"":tag;
   if(tag==="平日夜"){state.discoverDateFilter=null}
   renderDiscover();
+}
+
+
+function clearTkMoodSelection(){
+  document.querySelectorAll("#tkMoodRow button").forEach(b=>b.classList.remove("active"));
+}
+function selectMood(mood,btn){
+  state.tkSpecialFilter="mood:"+mood;
+  clearTkMoodSelection();
+  if(btn)btn.classList.add("active");
+  document.querySelectorAll("#homeChips .home-feed-tab").forEach(x=>x.classList.remove("active"));
+  renderHome();
+  document.querySelector(".home-recruit-head")?.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function applyTkShortcut(type){
+  state.tkSpecialFilter=type;
+  clearTkMoodSelection();
+  document.querySelectorAll("#homeChips .home-feed-tab").forEach(x=>x.classList.remove("active"));
+  renderHome();
+  document.querySelector(".home-recruit-head")?.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 function renderAll(){renderHome();renderDiscoverGenres();renderDiscover();renderMessages();renderProfile();renderCategories();renderSubs();renderMemberPicker()}
