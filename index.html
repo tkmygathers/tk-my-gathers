@@ -627,6 +627,22 @@ body{align-items:flex-start!important}
   padding:4px 7px;border-radius:999px
 }
 
+
+/* ===== V13 SUPABASE EVENTS ===== */
+.db-status{
+  margin:4px 13px 9px;
+  min-height:18px;
+  font-size:8.5px;
+  color:#8a827a;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.db-status:empty{display:none}
+.db-status .db-dot{
+  width:6px;height:6px;border-radius:50%;background:#b41042;opacity:.75
+}
+
 </style>
 </head>
 <body>
@@ -708,6 +724,7 @@ body{align-items:flex-start!important}
       <button onclick="showPage('discover')">すべて見る ›</button>
     </div>
 
+    <div id="dbStatus" class="db-status"></div>
     <div class="feed mobile-feed" id="feed"></div>
 
     <div class="popular-block">
@@ -980,7 +997,7 @@ body{align-items:flex-start!important}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v12_supabase_auth";
+const KEY="tk_my_gathers_v13_supabase_events";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
@@ -1087,29 +1104,154 @@ function toast(t){const el=$("toast");el.textContent=t;el.classList.add("show");
 function dateLabel(d){const x=new Date(d+"T00:00:00");return `${x.getMonth()+1}/${x.getDate()}`}
 function tagClass(cat){return cat==="食事・飲み"?"copper":cat==="ゲーム・遊び"?"plum":""}
 function eventImageSrc(e){if(e.image)return e.image;if(e.sub==="BBQ")return svgFallback.bbq;if(e.sub==="麻雀")return svgFallback.mahjong;if(e.category==="食事・飲み")return svgFallback.drink;if(e.category==="スポーツ")return svgFallback.sport;if(e.category==="リラックス")return svgFallback.sauna;return svgFallback.mahjong}
+
+function eventIdArg(id){
+  return `'${String(id).replace(/\\/g,"\\\\").replace(/'/g,"\\'")}'`;
+}
+function visibilityLabel(v){
+  return ({
+    public:"公開",
+    friends_of_friends:"フォローのフォローまで",
+    following:"フォローまで",
+    mutual:"相互フォローまで",
+    selected:"選択した人だけ"
+  })[v]||v||"公開";
+}
+function remoteProfileToPerson(p){
+  if(!p)return null;
+  const item={
+    id:p.id,
+    name:p.display_name||p.username||"ユーザー",
+    handle:"@"+(p.username||"user"),
+    avatar:p.avatar_url||null,
+    fun:0,
+    mutual:false
+  };
+  const old=state.people.find(x=>x.id===item.id);
+  if(old)Object.assign(old,item);
+  else state.people.push(item);
+
+  if(state.accounts[item.id]){
+    Object.assign(state.accounts[item.id],{
+      name:item.name,
+      handle:item.handle,
+      avatar:item.avatar
+    });
+  }
+  return item;
+}
+function mapSupabaseEvent(row){
+  if(row.profiles)remoteProfileToPerson(row.profiles);
+  return {
+    id:"db_"+row.id,
+    dbId:row.id,
+    title:row.title||row.activity||"募集",
+    category:row.category||"その他・オリジナル",
+    sub:row.activity||row.title||"募集",
+    owner:row.owner_id,
+    date:row.event_date||new Date().toISOString().slice(0,10),
+    time:(row.start_time||"00:00").slice(0,5),
+    place:row.place||"場所未定",
+    people:1,
+    capacity:Number(row.capacity||4),
+    budget:row.budget||"未設定",
+    visibility:visibilityLabel(row.visibility),
+    note:row.description||"気軽に参加できる募集です。",
+    image:row.image_url||null,
+    joined:row.owner_id===meId(),
+    saved:false,
+    mine:row.owner_id===meId(),
+    status:row.status==="completed"?"history":row.status,
+    participants:[row.owner_id],
+    comments:[],
+    funSent:[],
+    tags:Array.isArray(row.tags)?row.tags:[],
+    members:[],
+    source:"supabase"
+  };
+}
+function setDbStatus(text){
+  const el=$("dbStatus");
+  if(!el)return;
+  el.innerHTML=text?`<span class="db-dot"></span><span>${esc(text)}</span>`:"";
+}
+async function loadEventsFromSupabase(){
+  setDbStatus("募集データを読み込んでいます…");
+  try{
+    const {data,error}=await sb
+      .from("events")
+      .select(`
+        id,
+        owner_id,
+        title,
+        category,
+        activity,
+        event_date,
+        start_time,
+        end_time,
+        place,
+        capacity,
+        budget,
+        description,
+        image_url,
+        tags,
+        visibility,
+        status,
+        created_at,
+        profiles:owner_id (
+          id,
+          username,
+          display_name,
+          avatar_url
+        )
+      `)
+      .order("created_at",{ascending:false});
+
+    if(error)throw error;
+
+    if(Array.isArray(data)&&data.length){
+      const remote=data.map(mapSupabaseEvent);
+      const localOnly=state.events.filter(e=>e.source!=="supabase");
+      state.events=[...remote,...localOnly];
+      localStorage.setItem(KEY,JSON.stringify(state));
+      setDbStatus(`${remote.length}件の募集をSupabaseから表示中`);
+    }else{
+      state.events=state.events.filter(e=>e.source!=="supabase");
+      setDbStatus("Supabaseの募集はまだ0件です。現在はデモ募集を表示しています");
+    }
+    renderHome();
+    renderDiscover();
+    if(currentAuthUser)renderProfile();
+  }catch(error){
+    console.error("Supabase events load:",error);
+    setDbStatus("Supabaseの読み込みに失敗したため、デモ募集を表示しています");
+  }
+}
+
 function eventCard(e){
   const u=person(e.owner);
   const mine=e.owner===meId();
+  const arg=eventIdArg(e.id);
   return `<article class="card">
-    <div class="event-image" onclick="openEvent(${e.id})" style="cursor:pointer"><img src="${eventImageSrc(e)}" alt="${esc(e.sub)}"></div>
+    <div class="event-image" onclick="openEvent(${arg})" style="cursor:pointer"><img src="${eventImageSrc(e)}" alt="${esc(e.sub)}"></div>
     <div class="card-body">
       <div class="userline">
         <div class="user-left">
-          <button class="mini-avatar" onclick="openOtherProfile('${e.owner}')" style="border:0;padding:0">${avatarHtml(u)}</button>
+          <button class="mini-avatar" onclick="openOtherProfile('${escjs(e.owner)}')" style="border:0;padding:0">${avatarHtml(u)}</button>
           <div><div class="user-name">${esc(u.name)}</div></div>
         </div>
         <div class="muted" style="font-size:8.5px">${esc(e.visibility)}</div>
       </div>
-      <div class="ref-card-title" onclick="openEvent(${e.id})" style="cursor:pointer">${esc(e.title)}</div>
+      <div class="ref-card-title" onclick="openEvent(${arg})" style="cursor:pointer">${esc(e.title)}</div>
       <div class="ref-card-meta">${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</div>
       <div class="ref-card-meta">${e.people}/${e.capacity}人 · ${esc(e.budget)}</div>
       <div class="event-tags">${(e.tags||[]).slice(0,3).map(t=>`<span class="event-tag">${esc(t)}</span>`).join("")}</div>
     </div>
     <div class="actions">
-      <button class="action ${e.saved?"saved":""}" onclick="toggleSave(${e.id})">${e.saved?"保存済":"保存"}</button>
-      <button class="action" onclick="openEvent(${e.id})">コメント</button>
-      <button class="action" onclick="startChat('${e.owner}')">連絡</button>
-      ${mine?`<button class="action primary" onclick="removeEvent(${e.id})">削除</button>`:`<button class="action primary" onclick="toggleJoin(${e.id})">${e.joined?"参加中":"参加する"}</button>`}
+      <button class="action ${e.saved?"saved":""}" onclick="toggleSave(${arg})">${e.saved?"保存済":"保存"}</button>
+      <button class="action" onclick="openEvent(${arg})">コメント</button>
+      <button class="action" onclick="startChat('${escjs(e.owner)}')">連絡</button>
+      ${mine?`<button class="action primary" onclick="removeEvent(${arg})">削除</button>`:`<button class="action primary" onclick="toggleJoin(${arg})">${e.joined?"参加中":"参加する"}</button>`}
     </div>
   </article>`
 }
@@ -1157,7 +1299,7 @@ function renderDiscoverGenres(){$("genreGrid").innerHTML=Object.keys(categories)
 function setDiscoverCategory(c){state.discoverCategory=c;renderDiscover()}
 function clearDiscoverFilters(){state.discoverCategory=null;state.discoverDateFilter=null;document.querySelectorAll(".date-btn").forEach(b=>b.classList.remove("active"));$("dateInputWrap").classList.remove("show");renderDiscover()}
 function isWeekendDate(d){const day=new Date(d+"T00:00:00").getDay();return day===0||day===6}
-function renderDiscover(){const q=$("discoverSearch").value.trim().toLowerCase();let list=state.events.filter(e=>e.status==="upcoming");if(state.discoverCategory)list=list.filter(e=>e.category===state.discoverCategory);if(q)list=list.filter(e=>[e.title,e.sub,e.place,person(e.owner).name].join(" ").toLowerCase().includes(q));if(state.discoverDateFilter==="today"){const today=new Date().toISOString().slice(0,10);list=list.filter(e=>e.date===today)}if(state.discoverDateFilter==="weekend")list=list.filter(e=>isWeekendDate(e.date));if(state.discoverDateFilter==="custom"&&$("discoverDate").value)list=list.filter(e=>e.date===$("discoverDate").value);$("discoverList").innerHTML=list.length?list.map(e=>`<div class="friend"><div class="friend-left"><div class="mini-avatar">${esc(e.sub.slice(0,2))}</div><div><div class="friend-name">${esc(e.title)}</div><div class="muted">${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</div></div></div><button class="small-btn" onclick="openEvent(${e.id})">見る</button></div>`).join(""):`<div class="panel" style="padding:18px;text-align:center;color:var(--muted)">該当する募集がありません</div>`}
+function renderDiscover(){const q=$("discoverSearch").value.trim().toLowerCase();let list=state.events.filter(e=>e.status==="upcoming");if(state.discoverCategory)list=list.filter(e=>e.category===state.discoverCategory);if(q)list=list.filter(e=>[e.title,e.sub,e.place,person(e.owner).name].join(" ").toLowerCase().includes(q));if(state.discoverDateFilter==="today"){const today=new Date().toISOString().slice(0,10);list=list.filter(e=>e.date===today)}if(state.discoverDateFilter==="weekend")list=list.filter(e=>isWeekendDate(e.date));if(state.discoverDateFilter==="custom"&&$("discoverDate").value)list=list.filter(e=>e.date===$("discoverDate").value);$("discoverList").innerHTML=list.length?list.map(e=>`<div class="friend"><div class="friend-left"><div class="mini-avatar">${esc(e.sub.slice(0,2))}</div><div><div class="friend-name">${esc(e.title)}</div><div class="muted">${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</div></div></div><button class="small-btn" onclick="openEvent(${eventIdArg(e.id)})">見る</button></div>`).join(""):`<div class="panel" style="padding:18px;text-align:center;color:var(--muted)">該当する募集がありません</div>`}
 $("discoverSearch").addEventListener("input",renderDiscover)
 document.querySelectorAll(".date-btn").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".date-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");state.discoverDateFilter=btn.dataset.datefilter;$("dateInputWrap").classList.toggle("show",btn.dataset.datefilter==="custom");renderDiscover()}))
 $("discoverDate").addEventListener("change",()=>{state.discoverDateFilter="custom";renderDiscover()})
@@ -1420,6 +1562,7 @@ async function activateSupabaseUser(user){
   renderAll();
   updateAccountUI();
   hideAuthGate();
+  await loadEventsFromSupabase();
 }
 async function logoutSupabase(){
   closeModal("accountModal");
@@ -1430,6 +1573,7 @@ async function logoutSupabase(){
   save();
   hideAuthGate();
   showPage("home");
+  await loadEventsFromSupabase();
   toast("ログアウトしました。ゲストとして閲覧できます");
 }
 $("loginForm").addEventListener("submit",async e=>{
@@ -1485,6 +1629,7 @@ async function initSupabaseAuth(){
   }else{
     currentAuthUser=null;
     hideAuthGate();
+    await loadEventsFromSupabase();
   }
 
   sb.auth.onAuthStateChange(async(event,session)=>{
