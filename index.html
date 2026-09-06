@@ -2097,7 +2097,7 @@ body{align-items:flex-start!important}
 
 
 /* =========================================================
-   V23.1 — CHARCOAL × COBALT BLUE
+   V23.1.1 — CHARCOAL × COBALT BLUE
    UI COLOR REFRESH ONLY
    ========================================================= */
 
@@ -3829,22 +3829,22 @@ html,body{
     <div class="discover-filter-section">
       <div class="discover-filter-label">日付</div>
       <div class="discover-filter-options">
-        <button data-filter-date="all" onclick="setDiscoverDate('all')">指定なし</button>
-        <button data-filter-date="today" onclick="setDiscoverDate('today')">今日</button>
-        <button data-filter-date="weekend" onclick="setDiscoverDate('weekend')">今週末</button>
-        <button data-filter-date="weeknight" onclick="setDiscoverDate('weeknight')">平日夜</button>
+        <button type="button" data-filter-date="all" onclick="setDiscoverDate('all')">指定なし</button>
+        <button type="button" data-filter-date="today" onclick="setDiscoverDate('today')">今日</button>
+        <button type="button" data-filter-date="weekend" onclick="setDiscoverDate('weekend')">今週末</button>
+        <button type="button" data-filter-date="weeknight" onclick="setDiscoverDate('weeknight')">平日夜</button>
       </div>
     </div>
 
     <div class="discover-filter-section">
       <div class="discover-filter-label">カテゴリ</div>
       <div class="discover-filter-options">
-        <button data-filter-category="すべて" onclick="setDiscoverCategory('すべて')">すべて</button>
-        <button data-filter-category="食事・飲み" onclick="setDiscoverCategory('食事・飲み')">食事・飲み</button>
-        <button data-filter-category="スポーツ" onclick="setDiscoverCategory('スポーツ')">スポーツ</button>
-        <button data-filter-category="ゲーム・遊び" onclick="setDiscoverCategory('ゲーム・遊び')">ゲーム・遊び</button>
-        <button data-filter-category="おでかけ" onclick="setDiscoverCategory('おでかけ')">おでかけ</button>
-        <button data-filter-category="カルチャー・趣味" onclick="setDiscoverCategory('カルチャー・趣味')">カルチャー・趣味</button>
+        <button type="button" data-filter-category="すべて" onclick="setDiscoverCategory('すべて')">すべて</button>
+        <button type="button" data-filter-category="食事・飲み" onclick="setDiscoverCategory('食事・飲み')">食事・飲み</button>
+        <button type="button" data-filter-category="スポーツ" onclick="setDiscoverCategory('スポーツ')">スポーツ</button>
+        <button type="button" data-filter-category="ゲーム・遊び" onclick="setDiscoverCategory('ゲーム・遊び')">ゲーム・遊び</button>
+        <button type="button" data-filter-category="おでかけ" onclick="setDiscoverCategory('おでかけ')">おでかけ</button>
+        <button type="button" data-filter-category="カルチャー・趣味" onclick="setDiscoverCategory('カルチャー・趣味')">カルチャー・趣味</button>
       </div>
     </div>
 
@@ -3859,8 +3859,8 @@ html,body{
     </label>
 
     <div class="discover-filter-actions">
-      <button class="discover-reset-btn" onclick="resetDiscoverFilters()">リセット</button>
-      <button class="discover-apply-btn" onclick="applyDiscoverFilters()">この条件で探す</button>
+      <button id="discoverResetBtn" type="button" class="discover-reset-btn">リセット</button>
+      <button id="discoverApplyBtn" type="button" class="discover-apply-btn">この条件で探す</button>
     </div>
   </div>
 </div>
@@ -4709,12 +4709,46 @@ function resetDiscoverFilters(){
 function applyDiscoverFilters(){
   ensureDiscoverState();
 
-  state.discoverFilters.area=($("discoverArea")?.value||"").trim();
-  state.discoverFilters.openOnly=$("discoverOpenOnly")?.checked!==false;
+  // 画面上で選択されている値を最終的な正として読み取る
+  const activeDate=document.querySelector("[data-filter-date].active");
+  const activeCategory=document.querySelector("[data-filter-category].active");
+
+  state.discoverFilters.date=
+    activeDate?.dataset?.filterDate ||
+    state.discoverFilters.date ||
+    "all";
+
+  state.discoverFilters.category=
+    activeCategory?.dataset?.filterCategory ||
+    state.discoverFilters.category ||
+    "すべて";
+
+  state.discoverFilters.area=
+    ($("discoverArea")?.value||"").trim();
+
+  state.discoverFilters.openOnly=
+    $("discoverOpenOnly") ? $("discoverOpenOnly").checked : true;
 
   save();
-  closeModal("discoverFilterModal");
+
+  // 先に再描画してからモーダルを閉じる
   renderDiscover();
+  closeModal("discoverFilterModal");
+
+  const resultText=$("discoverCount")?.textContent||"検索結果を更新しました";
+  toast(resultText);
+
+  // 探す画面を確実に表示
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  $("discover")?.classList.add("active");
+
+  // 検索結果の上部へ戻す
+  requestAnimationFrame(()=>{
+    $("discoverCount")?.scrollIntoView({
+      behavior:"smooth",
+      block:"start"
+    });
+  });
 }
 function toLocalDay(dateStr){
   if(!dateStr)return null;
@@ -5262,6 +5296,20 @@ function renderChat(){
 $("discoverQuery").addEventListener("input",()=>{
   renderDiscover();
 });
+
+
+$("discoverApplyBtn").addEventListener("click",e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  applyDiscoverFilters();
+});
+
+$("discoverResetBtn").addEventListener("click",e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  resetDiscoverFilters();
+});
+
 
 $("dmUserSearch").addEventListener("input",e=>{
   renderDmUserPicker(e.target.value);
