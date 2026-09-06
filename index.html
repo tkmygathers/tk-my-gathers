@@ -3990,6 +3990,178 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V23.6 — DETAIL COMMENT BOARD
+   ========================================================= */
+
+.v23-6-board{
+  margin-top:18px;
+  padding-top:16px;
+  border-top:1px solid #E6ECF3;
+}
+
+.v23-6-board-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.v23-6-board-label{
+  display:block;
+  margin-bottom:2px;
+  color:#1769E0;
+  font-size:6.5px;
+  font-weight:900;
+  letter-spacing:.15em;
+}
+
+.v23-6-board-head h4{
+  margin:0;
+  color:#1B2430;
+  font-size:15px;
+  line-height:1.2;
+}
+
+.v23-6-board-count{
+  color:#98A2B3;
+  font-size:8px;
+  font-weight:700;
+}
+
+.v23-6-board-list{
+  display:grid;
+  gap:8px;
+  max-height:320px;
+  overflow:auto;
+  padding-right:2px;
+  scrollbar-width:thin;
+}
+
+.v23-6-board-comment{
+  padding:10px 11px;
+  border:1px solid #E1E7EF;
+  border-radius:12px;
+  background:#F8FAFD;
+}
+
+.v23-6-board-comment-head{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.v23-6-board-comment-head .mini-avatar{
+  width:27px;
+  height:27px;
+  flex:0 0 auto;
+}
+
+.v23-6-board-comment-user{
+  display:grid;
+  min-width:0;
+}
+
+.v23-6-board-comment-user b{
+  color:#344054;
+  font-size:8.5px;
+  line-height:1.2;
+}
+
+.v23-6-board-comment-user span{
+  margin-top:2px;
+  color:#98A2B3;
+  font-size:7px;
+}
+
+.v23-6-board-comment-text{
+  margin-top:8px;
+  color:#344054;
+  font-size:9px;
+  line-height:1.65;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+
+.v23-6-board-empty{
+  padding:16px 12px;
+  border:1px dashed #D8E0EA;
+  border-radius:12px;
+  color:#98A2B3;
+  background:#FBFCFE;
+  text-align:center;
+  font-size:8.5px;
+  line-height:1.6;
+}
+
+.v23-6-board-form{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:7px;
+  margin-top:10px;
+}
+
+.v23-6-board-form input{
+  min-width:0;
+  height:39px;
+  padding:0 11px;
+  border:1px solid #D8E0EA;
+  border-radius:11px;
+  outline:none;
+  background:#fff;
+  color:#1B2430;
+  font:inherit;
+  font-size:9px;
+}
+
+.v23-6-board-form input:focus{
+  border-color:#9ABCF4;
+  box-shadow:0 0 0 3px rgba(23,105,224,.08);
+}
+
+.v23-6-board-form button{
+  min-width:62px;
+  height:39px;
+  padding:0 12px;
+  border:1px solid #1769E0;
+  border-radius:11px;
+  background:#1769E0;
+  color:#fff;
+  font-size:8.5px;
+  font-weight:850;
+}
+
+.v23-6-board-form input:disabled,
+.v23-6-board-form button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.v23-6-board-help{
+  margin-top:7px;
+  color:#98A2B3;
+  font-size:7.5px;
+  line-height:1.5;
+}
+
+@media (max-width:360px){
+  .v23-6-board-list{
+    max-height:280px;
+  }
+
+  .v23-6-board-form{
+    grid-template-columns:1fr 58px;
+    gap:5px;
+  }
+
+  .v23-6-board-form button{
+    min-width:58px;
+    padding:0 8px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4538,7 +4710,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v23_5_1_restore_card_detail";
+const KEY="tk_my_gathers_v23_6_detail_board_comments";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
@@ -5193,6 +5365,136 @@ function resolveEventByAnyId(id){
   )||null;
 }
 
+function resolveEventByAnyId(id){
+  return state.events.find(
+    e=>String(e.id)===String(id) || String(e.dbId||"")===String(id)
+  )||null;
+}
+
+
+async function cardDetailToggleSave(id){
+  await toggleSave(id);
+  openCardDetail(id);
+}
+async function cardDetailToggleJoin(id){
+  await toggleJoin(id);
+  openCardDetail(id);
+}
+
+function cardDetailCommentPlaceholder(e){
+  if(!currentAuthUser)return "コメントするにはログインしてください";
+  if(!canCurrentUserComment(e))return "保存または参加するとコメントできます";
+  return "コメントを書く";
+}
+
+function renderCardDetailComments(e){
+  const list=$("cardDetailCommentList");
+  const input=$("cardDetailCommentInput");
+  const submit=$("cardDetailCommentSubmit");
+
+  if(!list || !e)return;
+
+  if(!currentAuthUser && e.source==="supabase"){
+    list.innerHTML=`
+      <div class="v23-6-board-empty">
+        コメントを見るにはログインしてください。
+      </div>
+    `;
+  }else{
+    const comments=e.comments||[];
+
+    list.innerHTML=comments.length
+      ? comments.map(c=>{
+          const p=person(c.user);
+          return `
+            <article class="v23-6-board-comment">
+              <div class="v23-6-board-comment-head">
+                <div class="mini-avatar">${avatarHtml(p)}</div>
+                <div class="v23-6-board-comment-user">
+                  <b>${esc(p.name)}</b>
+                  <span>${esc(c.time||"")}</span>
+                </div>
+              </div>
+              <div class="v23-6-board-comment-text">${esc(c.text)}</div>
+            </article>
+          `;
+        }).join("")
+      : `
+        <div class="v23-6-board-empty">
+          まだコメントはありません。最初のコメントを書いてみよう。
+        </div>
+      `;
+  }
+
+  if(input && submit){
+    const allowed=canCurrentUserComment(e);
+    input.disabled=!allowed;
+    submit.disabled=!allowed;
+    input.placeholder=cardDetailCommentPlaceholder(e);
+  }
+}
+
+async function submitCardDetailComment(event,id){
+  event.preventDefault();
+
+  if(!requireAuth("コメントするにはログインしてください。"))return;
+
+  const e=resolveEventByAnyId(id);
+  if(!e)return;
+
+  if(!canCurrentUserComment(e)){
+    toast("保存または参加するとコメントできます");
+    return;
+  }
+
+  const input=$("cardDetailCommentInput");
+  const submit=$("cardDetailCommentSubmit");
+  const text=(input?.value||"").trim();
+
+  if(!text)return;
+
+  if(submit)submit.disabled=true;
+
+  try{
+    if(e.source==="supabase" && e.dbId){
+      const {error}=await sb
+        .from("comments")
+        .insert({
+          event_id:e.dbId,
+          user_id:currentAuthUser.id,
+          body:text
+        });
+
+      if(error)throw error;
+
+      if(input)input.value="";
+      await loadEventComments(e);
+      await loadNotifications();
+      renderCardDetailComments(e);
+      toast("コメントを投稿しました");
+
+    }else{
+      e.comments=e.comments||[];
+      e.comments.push({
+        user:meId(),
+        text,
+        time:"たった今"
+      });
+
+      if(input)input.value="";
+      save();
+      renderCardDetailComments(e);
+      toast("コメントを投稿しました");
+    }
+
+  }catch(error){
+    console.error("card detail comment:",error);
+    toast("コメントを投稿できませんでした");
+  }finally{
+    renderCardDetailComments(e);
+  }
+}
+
 function openCardDetail(id){
   const e=resolveEventByAnyId(id);
 
@@ -5200,6 +5502,8 @@ function openCardDetail(id){
     toast("募集を読み込めませんでした");
     return;
   }
+
+  state.currentEventId=e.id;
 
   const u=person(e.owner);
   const mine=e.owner===(currentAuthUser?.id||meId());
@@ -5245,18 +5549,53 @@ function openCardDetail(id){
         </div>
 
         <div class="v23-5-1-detail-actions">
-          <button class="${e.saved?"saved":""}" onclick="toggleSave(${arg});openCardDetail(${arg})">${e.saved?"保存済み":"保存"}</button>
+          <button class="${e.saved?"saved":""}" onclick="cardDetailToggleSave(${arg})">${e.saved?"保存済み":"保存"}</button>
           ${mine
             ? `<button class="danger" onclick="closeModal('cardDetailModal');removeEvent(${arg})">削除</button>`
-            : `<button class="primary ${e.joined?"joined":""}" onclick="toggleJoin(${arg});openCardDetail(${arg})">${e.joined?"参加中":"参加する"}</button>`}
+            : `<button class="primary ${e.joined?"joined":""}" onclick="cardDetailToggleJoin(${arg})">${e.joined?"参加中":"参加する"}</button>`}
         </div>
+
+        <section class="v23-6-board">
+          <div class="v23-6-board-head">
+            <div>
+              <span class="v23-6-board-label">BOARD</span>
+              <h4>コメント</h4>
+            </div>
+            <span class="v23-6-board-count">${(e.comments||[]).length}件</span>
+          </div>
+
+          <div id="cardDetailCommentList" class="v23-6-board-list">
+            <div class="v23-6-board-empty">コメントを読み込んでいます…</div>
+          </div>
+
+          <form class="v23-6-board-form" onsubmit="submitCardDetailComment(event,${arg})">
+            <input
+              id="cardDetailCommentInput"
+              type="text"
+              maxlength="500"
+              placeholder="${esc(cardDetailCommentPlaceholder(e))}"
+            >
+            <button id="cardDetailCommentSubmit" type="submit">投稿</button>
+          </form>
+
+          ${
+            currentAuthUser && !canCurrentUserComment(e)
+              ? `<div class="v23-6-board-help">保存または参加すると、この掲示板にコメントできます。</div>`
+              : ""
+          }
+        </section>
       </div>
     </article>
   `;
 
   openModal("cardDetailModal");
-}
 
+  renderCardDetailComments(e);
+
+  if(e.source==="supabase"){
+    loadEventComments(e);
+  }
+}
 function eventCard(e){
   const u=person(e.owner);
   const mine=e.owner===(currentAuthUser?.id||meId());
@@ -6641,6 +6980,7 @@ async function loadEventComments(ev){
     ev.comments=[];
     if(list)list.innerHTML=`<div class="comment-state">コメントを見るにはログインしてください。</div>`;
     updateCommentComposer(ev);
+    renderCardDetailComments(ev);
     return;
   }
 
@@ -6677,10 +7017,13 @@ async function loadEventComments(ev){
     }));
 
     renderEventDetail();
+    renderCardDetailComments(ev);
 
   }catch(error){
     console.error("load comments:",error);
     if(list)list.innerHTML=`<div class="comment-state">コメントを読み込めませんでした。</div>`;
+    const board=$("cardDetailCommentList");
+    if(board)board.innerHTML=`<div class="v23-6-board-empty">コメントを読み込めませんでした。</div>`;
   }
 }
 function updateCommentComposer(ev){
