@@ -540,6 +540,80 @@ body{align-items:flex-start!important}
   justify-self:center;margin-top:5px;border:0;border-radius:999px;
   background:var(--app-accent);color:#fff;padding:8px 13px;font-size:9.5px;font-weight:750
 }
+
+/* ===== V12 SUPABASE AUTH ===== */
+.auth-gate{
+  position:fixed;inset:0;z-index:9999;background:#f7f3ee;
+  display:grid;place-items:center;padding:22px;
+}
+.auth-gate.hidden{display:none}
+.auth-card{
+  width:min(100%,390px);background:#fffdfa;border:1px solid #e5ddd4;
+  border-radius:24px;padding:23px;box-shadow:0 24px 70px rgba(34,31,28,.12)
+}
+.auth-brand{display:flex;align-items:center;gap:12px}
+.auth-tk{
+  font-family:Georgia,"Times New Roman",serif;font-size:34px;color:#142b3a;
+  width:52px;position:relative;letter-spacing:-7px
+}
+.auth-tk span{
+  position:absolute;width:7px;height:7px;border-radius:50%;
+  background:var(--app-accent,#aa103e);top:5px;right:2px
+}
+.auth-brand-name{
+  font-family:Georgia,"Times New Roman",serif;font-size:12px;font-weight:800;
+  letter-spacing:.17em;color:#172735
+}
+.auth-brand-copy{margin-top:3px;font-size:9px;color:#8a827a}
+.auth-lead{display:grid;gap:7px;margin:26px 0 18px}
+.auth-lead strong{font-size:22px;line-height:1.35;color:#172735}
+.auth-lead span{font-size:11px;line-height:1.7;color:#80786f}
+.auth-tabs{
+  display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #e5ddd4;margin-bottom:18px
+}
+.auth-tabs button{
+  border:0;background:transparent;padding:11px;font-size:11px;font-weight:800;color:#918880;
+  border-bottom:2px solid transparent;margin-bottom:-1px
+}
+.auth-tabs button.active{color:var(--app-accent,#aa103e);border-color:var(--app-accent,#aa103e)}
+.auth-form{display:grid;gap:8px}
+.auth-form label{font-size:9px;font-weight:800;color:#5b554f;margin-top:4px}
+.auth-form input{
+  width:100%;box-sizing:border-box;border:1px solid #ddd5cc;background:white;border-radius:11px;
+  padding:12px 13px;font:inherit;font-size:12px;outline:none;color:#172735
+}
+.auth-form input:focus{border-color:#b86a80;box-shadow:0 0 0 3px rgba(170,16,62,.07)}
+.auth-main-btn{
+  margin-top:8px;border:0;border-radius:11px;background:var(--app-accent,#aa103e);
+  color:white;padding:12px;font-weight:800;font-size:11px
+}
+.auth-main-btn:disabled{opacity:.55}
+.auth-note{font-size:9px;line-height:1.6;color:#8b837b;margin:2px 0 0}
+.auth-message{
+  min-height:18px;margin-top:12px;padding:0;font-size:10px;line-height:1.6;color:#7b736b
+}
+.auth-message.error{color:#a51a3e}
+.auth-message.success{color:#17624f}
+.auth-account-card{
+  display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--app-line,#e7dfd6);
+  background:#fff;border-radius:14px
+}
+.auth-account-avatar{
+  width:42px;height:42px;border-radius:50%;background:#173c3a;color:#fff;
+  display:grid;place-items:center;font-weight:800;overflow:hidden
+}
+.auth-account-avatar img{width:100%;height:100%;object-fit:cover}
+.auth-account-info{min-width:0}
+.auth-account-info b{display:block;font-size:12px;color:#1f2d35}
+.auth-account-info span{display:block;font-size:9px;color:#827a72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.auth-logout-btn{margin-top:12px;background:#fff!important;color:#9d173b!important;border:1px solid #e5c8d1!important}
+
+
+/* v12.1 auth tab fix */
+.auth-form[hidden]{
+  display:none !important;
+}
+
 </style>
 </head>
 <body>
@@ -827,29 +901,76 @@ body{align-items:flex-start!important}
 </div>
 
 
-<!-- demo account switcher -->
+<!-- real account menu -->
 <div id="accountModal" class="modal" onclick="backdropClose(event,'accountModal')">
 <div class="sheet">
 <div class="handle"></div>
 <div class="sheet-head">
   <div>
-    <div class="sheet-title">デモアカウント</div>
-    <div class="sheet-sub">操作するユーザーを切り替えます。</div>
+    <div class="sheet-title">アカウント</div>
+    <div class="sheet-sub">Supabaseでログイン中のアカウントです。</div>
   </div>
   <button class="close-btn" onclick="closeModal('accountModal')">×</button>
 </div>
 <div id="accountList" class="list" style="margin-top:12px"></div>
-<div class="muted" style="margin-top:12px;line-height:1.55">
-  このデモ版は同じブラウザ内でアカウントを切り替えて試す仕様です。別端末どうしで同じデータをリアルタイム共有するには、次の段階でSupabase接続が必要です。
+<button type="button" class="submit auth-logout-btn" onclick="logoutSupabase()">ログアウト</button>
 </div>
 </div>
+
+<!-- authentication gate -->
+<div id="authGate" class="auth-gate">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="auth-tk">TK<span></span></div>
+      <div>
+        <div class="auth-brand-name">TK MY GATHERS</div>
+        <div class="auth-brand-copy">やりたいことから、集まる。</div>
+      </div>
+    </div>
+
+    <div class="auth-lead">
+      <strong>東京で、気の合う仲間と。</strong>
+      <span>ログインして募集を見つけたり、やりたいことを募集できます。</span>
+    </div>
+
+    <div class="auth-tabs">
+      <button type="button" id="loginTab" class="active" onclick="switchAuthMode('login')">ログイン</button>
+      <button type="button" id="signupTab" onclick="switchAuthMode('signup')">新規登録</button>
+    </div>
+
+    <form id="loginForm" class="auth-form">
+      <label>メールアドレス</label>
+      <input id="loginEmail" type="email" autocomplete="email" required placeholder="you@example.com">
+      <label>パスワード</label>
+      <input id="loginPassword" type="password" autocomplete="current-password" required minlength="6" placeholder="パスワード">
+      <button type="submit" class="auth-main-btn">ログイン</button>
+    </form>
+
+    <form id="signupForm" class="auth-form" hidden aria-hidden="true">
+      <label>表示名</label>
+      <input id="signupName" required maxlength="30" placeholder="例：しゅうぞう">
+      <label>メールアドレス</label>
+      <input id="signupEmail" type="email" autocomplete="email" required placeholder="you@example.com">
+      <label>パスワード</label>
+      <input id="signupPassword" type="password" autocomplete="new-password" required minlength="8" placeholder="8文字以上">
+      <button type="submit" class="auth-main-btn">アカウントを作成</button>
+      <p class="auth-note">登録後、確認メールのリンクを押すとログインできるようになります。</p>
+    </form>
+
+    <div id="authMessage" class="auth-message"></div>
+  </div>
 </div>
 
 <div id="toast" class="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v11_identity";
+const KEY="tk_my_gathers_v12_supabase_auth";
+const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let currentAuthUser=null;
 const quickTagOptions=["新規歓迎","初参加歓迎","1人参加OK","初心者歓迎","途中参加OK","当日参加OK","友達連れOK","少人数","ゆるめ","相談しながら決めたい"];
 const categories={
 "食事・飲み":["飲み会","ランチ","夜ごはん","カフェ","ラーメン","焼肉","食べ歩き","スイーツ巡り","せんべろ","はしご酒"],
@@ -1018,11 +1139,52 @@ function renderProfile(){const m=me();$("profileName").textContent=m.name;$("pro
 function profileList(list,empty,historyMode){if(!list.length)return `<div class="panel" style="padding:18px;text-align:center;color:var(--muted)">${empty}</div>`;return `<div class="list">${list.map(e=>`<div class="friend"><div class="friend-left" onclick="openEvent(${e.id})" style="cursor:pointer"><div class="mini-avatar">${esc(e.sub.slice(0,2))}</div><div><div class="friend-name">${esc(e.title)}</div><div class="muted">${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</div></div></div>${historyMode?`<button class="fun-btn" onclick="openFun(${e.id})">楽しかった！</button>`:`<div class="muted">${e.people}/${e.capacity}人</div>`}</div>`).join("")}</div>`}
 function switchProfileTab(id){document.querySelectorAll(".profile-tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("active",p.id===id))}
 function openProfileEdit(){const m=me();$("editName").value=m.name;$("editHandle").value=m.handle;$("editBio").value=m.bio;$("editArea").value=m.area;$("profileImagePreview").style.display=m.avatar?"block":"none";if(m.avatar)$("profileImagePreview").src=m.avatar;openModal("profileEditModal")}
-$("profileEditForm").addEventListener("submit",e=>{e.preventDefault();me().name=$("editName").value.trim();me().handle=$("editHandle").value.trim();me().bio=$("editBio").value.trim();me().area=$("editArea").value.trim();save();closeModal("profileEditModal");toast("プロフィールを更新しました")})
+$("profileEditForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const m=me();
+  const newName=$("editName").value.trim();
+  const rawHandle=$("editHandle").value.trim().replace(/^@/,"").replace(/\s+/g,"_");
+  const newBio=$("editBio").value.trim();
+  const newArea=$("editArea").value.trim();
+
+  if(currentAuthUser){
+    const {error}=await sb.from("profiles").update({
+      display_name:newName,
+      username:rawHandle,
+      bio:newBio,
+      area:newArea,
+      interests:m.interests||[]
+    }).eq("id",currentAuthUser.id);
+    if(error){toast("プロフィール更新に失敗しました");console.error(error);return}
+  }
+
+  m.name=newName;
+  m.handle="@"+rawHandle;
+  m.bio=newBio;
+  m.area=newArea;
+  save();
+  renderProfile();
+  updateAccountUI();
+  closeModal("profileEditModal");
+  toast("プロフィールを更新しました");
+})
 $("profileImageInput").addEventListener("change",e=>readFile(e.target.files[0],data=>{me().avatar=data;$("profileImagePreview").src=data;$("profileImagePreview").style.display="block"}))
 function clearProfileImage(){me().avatar=null;$("profileImagePreview").style.display="none"}
 function openWant(){openModal("wantModal")}
-$("wantForm").addEventListener("submit",e=>{e.preventDefault();const x=$("wantName").value.trim();if(!x)return;if(!me().interests.includes(x))me().interests.push(x);$("wantName").value="";save();closeModal("wantModal")})
+$("wantForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const x=$("wantName").value.trim();
+  if(!x)return;
+  if(!me().interests.includes(x))me().interests.push(x);
+  if(currentAuthUser){
+    const {error}=await sb.from("profiles").update({interests:me().interests}).eq("id",currentAuthUser.id);
+    if(error)console.error(error);
+  }
+  $("wantName").value="";
+  save();
+  renderProfile();
+  closeModal("wantModal");
+})
 function showMutuals(){$("mutualList").innerHTML=mutuals().map(p=>`<div class="friend"><div class="friend-left"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(p.handle)} · 楽しかった！ ${p.fun}</div></div></div><button class="small-btn" onclick="startChat('${p.id}');closeModal('mutualModal')">メッセージ</button></div>`).join("");openModal("mutualModal")}
 function openOtherProfile(id){if(id===meId()){showPage("profile");return}const p=person(id);toast(`${p.name} のプロフィール画面は次の段階で独立ページ化できます`)}
 function openCreate(){setDefaultDate();renderCategories();renderSubs();renderMemberPicker();renderQuickTags();$("eventImagePreview").style.display=state.eventImage?"block":"none";if(state.eventImage)$("eventImagePreview").src=state.eventImage;openModal("createModal")}
@@ -1072,36 +1234,21 @@ function openAccountSwitcher(){
   openModal("accountModal");
 }
 function renderAccountSwitcher(){
-  const ids=["shuzo","kento"];
-  $("accountList").innerHTML=ids.map(id=>{
-    const a=state.accounts[id];
-    const active=id===meId();
-    return `<button class="friend" style="width:100%;text-align:left" onclick="switchAccount('${id}')">
-      <div class="friend-left">
-        <div class="mini-avatar">${avatarHtml(a)}</div>
-        <div>
-          <div class="friend-name">${esc(a.name)} ${active?'<span style="color:var(--copper);font-size:10px">操作中</span>':''}</div>
-          <div class="muted">${esc(a.handle)} · 楽しかった！ ${a.fun}</div>
-        </div>
+  const a=me();
+  const email=currentAuthUser?.email||"";
+  $("accountList").innerHTML=`
+    <div class="auth-account-card">
+      <div class="auth-account-avatar">${a.avatar?`<img src="${a.avatar}" alt="">`:esc((a.name||"U").slice(0,1))}</div>
+      <div class="auth-account-info">
+        <b>${esc(a.name||"ユーザー")}</b>
+        <span>${esc(a.handle||"")} ${email?`· ${esc(email)}`:""}</span>
       </div>
-      <span class="small-btn">${active?'選択中':'切り替え'}</span>
-    </button>`
-  }).join("");
-}
-function switchAccount(id){
-  if(!state.accounts[id])return;
-  state.currentUserId=id;
-  closeModal("accountModal");
-  localStorage.setItem(KEY,JSON.stringify(state));
-  renderAll();
-  updateAccountUI();
-  showPage("home");
-  toast(`${state.accounts[id].name} に切り替えました`);
+    </div>`;
 }
 function updateAccountUI(){
   const a=me();
   const btn=$("accountAvatarBtn");
-  if(btn)btn.textContent=a.name.slice(0,1);
+  if(btn)btn.textContent=(a?.name||"U").slice(0,1);
 }
 
 
@@ -1158,8 +1305,162 @@ function applyTkShortcut(type){
   document.querySelector(".home-recruit-head")?.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
+
+function switchAuthMode(mode){
+  const login=mode==="login";
+  $("loginTab").classList.toggle("active",login);
+  $("signupTab").classList.toggle("active",!login);
+  $("loginForm").hidden=!login;
+  $("signupForm").hidden=login;
+  $("loginForm").setAttribute("aria-hidden",String(!login));
+  $("signupForm").setAttribute("aria-hidden",String(login));
+  setAuthMessage("");
+}
+function setAuthMessage(text,type=""){
+  const el=$("authMessage");
+  el.textContent=text;
+  el.className="auth-message"+(type?" "+type:"");
+}
+function showAuthGate(){
+  $("authGate").classList.remove("hidden");
+  document.body.style.overflow="hidden";
+}
+function hideAuthGate(){
+  $("authGate").classList.add("hidden");
+  document.body.style.overflow="";
+}
+function authFriendlyMessage(error){
+  const msg=(error?.message||"").toLowerCase();
+  if(msg.includes("invalid login credentials"))return "メールアドレスかパスワードが違います。";
+  if(msg.includes("email not confirmed"))return "確認メールのリンクを押してからログインしてください。";
+  if(msg.includes("user already registered"))return "このメールアドレスはすでに登録されています。";
+  if(msg.includes("password"))return "パスワードを確認してください。";
+  return error?.message||"エラーが発生しました。";
+}
+async function loadSupabaseProfile(user){
+  const {data,error}=await sb.from("profiles").select("*").eq("id",user.id).maybeSingle();
+  if(error){console.error("profile load:",error);return null}
+  return data;
+}
+function upsertLocalAuthAccount(user,profile){
+  const id=user.id;
+  const username=profile?.username||("user_"+id.slice(0,8));
+  const displayName=profile?.display_name||user.user_metadata?.display_name||"新しいユーザー";
+  const existing=state.accounts[id]||{};
+  state.accounts[id]={
+    id,
+    name:displayName,
+    handle:"@"+username,
+    bio:profile?.bio||existing.bio||"",
+    area:profile?.area||existing.area||"東京",
+    avatar:profile?.avatar_url||existing.avatar||null,
+    followers:existing.followers||0,
+    following:existing.following||0,
+    fun:existing.fun||0,
+    interests:Array.isArray(profile?.interests)?profile.interests:(existing.interests||[])
+  };
+  if(!state.people.some(p=>p.id===id)){
+    state.people.unshift({id,name:displayName,handle:"@"+username,fun:0,mutual:false});
+  }else{
+    const p=state.people.find(p=>p.id===id);
+    p.name=displayName;p.handle="@"+username;
+  }
+  state.currentUserId=id;
+  save();
+}
+async function activateSupabaseUser(user){
+  currentAuthUser=user;
+  let profile=await loadSupabaseProfile(user);
+
+  // Trigger creation can take a moment immediately after signup.
+  if(!profile){
+    await new Promise(r=>setTimeout(r,450));
+    profile=await loadSupabaseProfile(user);
+  }
+
+  upsertLocalAuthAccount(user,profile);
+  renderAll();
+  updateAccountUI();
+  hideAuthGate();
+}
+async function logoutSupabase(){
+  closeModal("accountModal");
+  const {error}=await sb.auth.signOut();
+  if(error){toast("ログアウトできませんでした");return}
+  currentAuthUser=null;
+  state.currentUserId="shuzo";
+  save();
+  showAuthGate();
+  switchAuthMode("login");
+  setAuthMessage("ログアウトしました。");
+}
+$("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const button=e.submitter;
+  button.disabled=true;
+  setAuthMessage("ログインしています…");
+  const email=$("loginEmail").value.trim();
+  const password=$("loginPassword").value;
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  button.disabled=false;
+  if(error){setAuthMessage(authFriendlyMessage(error),"error");return}
+  await activateSupabaseUser(data.user);
+  toast("ログインしました");
+});
+$("signupForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const button=e.submitter;
+  button.disabled=true;
+  setAuthMessage("アカウントを作成しています…");
+  const display_name=$("signupName").value.trim();
+  const email=$("signupEmail").value.trim();
+  const password=$("signupPassword").value;
+  const {data,error}=await sb.auth.signUp({
+    email,
+    password,
+    options:{
+      data:{display_name},
+      emailRedirectTo:"https://tkmygathers.github.io/tk-my-gathers/"
+    }
+  });
+  button.disabled=false;
+  if(error){setAuthMessage(authFriendlyMessage(error),"error");return}
+  if(data.session && data.user){
+    await activateSupabaseUser(data.user);
+    toast("アカウントを作成しました");
+  }else{
+    switchAuthMode("login");
+    $("loginEmail").value=email;
+    setAuthMessage("確認メールを送りました。メール内のリンクを押したあと、この画面からログインしてください。","success");
+  }
+});
+async function initSupabaseAuth(){
+  if(!window.supabase){
+    showAuthGate();
+    setAuthMessage("Supabaseの読み込みに失敗しました。ページを再読み込みしてください。","error");
+    return;
+  }
+  const {data:{session},error}=await sb.auth.getSession();
+  if(error)console.error(error);
+  if(session?.user){
+    await activateSupabaseUser(session.user);
+  }else{
+    showAuthGate();
+  }
+
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(event==="SIGNED_IN" && session?.user){
+      await activateSupabaseUser(session.user);
+    }
+    if(event==="SIGNED_OUT"){
+      currentAuthUser=null;
+      showAuthGate();
+    }
+  });
+}
+
 function renderAll(){renderHome();renderDiscoverGenres();renderDiscover();renderMessages();renderProfile();renderCategories();renderSubs();renderMemberPicker()}
-ensureAccountState();renderAll();renderQuickTags();renderHomeCategories();updateAccountUI();setDefaultDate();
+ensureAccountState();renderAll();renderQuickTags();renderHomeCategories();updateAccountUI();setDefaultDate();initSupabaseAuth();
 </script>
 </body>
 </html>
