@@ -3660,6 +3660,88 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V23.5 — STICKY HEADER / SIMPLE SEARCH
+   ========================================================= */
+
+.topbar{
+  position:sticky !important;
+  top:0 !important;
+  z-index:900 !important;
+  background:rgba(255,255,255,.98) !important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid #E1E7EF !important;
+}
+
+.shell{
+  overflow:visible !important;
+}
+
+/* keep content from visually colliding with the sticky header */
+.page{
+  scroll-margin-top:72px;
+}
+
+
+/* =========================================================
+   V23.5 — SIMPLE DISCOVER / NO DETAIL
+   ========================================================= */
+
+.discover-search-only{
+  grid-template-columns:1fr !important;
+}
+
+.discover-simple .discover-summary-row{
+  margin-top:10px !important;
+}
+
+.discover-card-title-static,
+.v22-title-static{
+  width:100%;
+  margin-top:8px;
+  color:#1B2430;
+  text-align:left;
+  font-weight:850;
+  line-height:1.35;
+}
+
+.discover-card-title-static{
+  font-size:13px;
+}
+
+.v22-title-static{
+  font-size:16px;
+  line-height:1.42;
+}
+
+.discover-card-actions-simple{
+  grid-template-columns:1fr 1.25fr !important;
+}
+
+.home-v22 .v23-5-actions{
+  display:grid !important;
+  grid-template-columns:1fr 1.35fr !important;
+  gap:7px !important;
+  margin-top:13px !important;
+  padding-top:12px !important;
+  border-top:1px solid #E9EEF5 !important;
+}
+
+.home-v22 .v23-5-actions .v22-action-button{
+  width:100% !important;
+  min-width:0 !important;
+  white-space:nowrap !important;
+}
+
+@media (max-width:360px){
+  .home-v22 .v23-5-actions{
+    grid-template-columns:.95fr 1.25fr !important;
+    gap:5px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -3776,7 +3858,8 @@ html,body{
 
 
 
-<section id="discover" class="page discover-v23">
+
+<section id="discover" class="page discover-v23 discover-simple">
   <div class="discover-head-row">
     <div>
       <div class="eyebrow">DISCOVER</div>
@@ -3784,75 +3867,20 @@ html,body{
     </div>
   </div>
 
-  <div class="discover-search-row">
+  <div class="discover-search-row discover-search-only">
     <div class="discover-searchbox">
       <span class="discover-search-icon">⌕</span>
       <input id="discoverQuery" type="search" placeholder="募集名・場所・カテゴリで検索">
     </div>
-    <button id="discoverFilterOpenBtn" type="button" class="discover-filter-btn" onclick="toggleDiscoverFilters()">絞り込み</button>
   </div>
 
-  <div id="discoverFilterPanel" class="discover-inline-filter" hidden>
-    <div class="discover-inline-head">
-      <div>
-        <strong>絞り込み</strong>
-        <span>条件を選んで探す</span>
-      </div>
-      <button type="button" class="discover-inline-close" onclick="closeDiscoverFilters()">×</button>
-    </div>
-
-    <div class="discover-filter-section">
-      <div class="discover-filter-label">日付</div>
-      <div class="discover-filter-options">
-        <button type="button" data-filter-date="all" onclick="setDiscoverDate('all')">指定なし</button>
-        <button type="button" data-filter-date="today" onclick="setDiscoverDate('today')">今日</button>
-        <button type="button" data-filter-date="weekend" onclick="setDiscoverDate('weekend')">今週末</button>
-        <button type="button" data-filter-date="weeknight" onclick="setDiscoverDate('weeknight')">平日夜</button>
-      </div>
-    </div>
-
-    <div class="discover-filter-section">
-      <div class="discover-filter-label">カテゴリ</div>
-      <div class="discover-filter-options">
-        <button type="button" data-filter-category="すべて" onclick="setDiscoverCategory('すべて')">すべて</button>
-        <button type="button" data-filter-category="食事・飲み" onclick="setDiscoverCategory('食事・飲み')">食事・飲み</button>
-        <button type="button" data-filter-category="スポーツ" onclick="setDiscoverCategory('スポーツ')">スポーツ</button>
-        <button type="button" data-filter-category="ゲーム・遊び" onclick="setDiscoverCategory('ゲーム・遊び')">ゲーム・遊び</button>
-        <button type="button" data-filter-category="おでかけ" onclick="setDiscoverCategory('おでかけ')">おでかけ</button>
-        <button type="button" data-filter-category="カルチャー・趣味" onclick="setDiscoverCategory('カルチャー・趣味')">カルチャー・趣味</button>
-      </div>
-    </div>
-
-    <div class="discover-filter-section">
-      <div class="discover-filter-label">エリア</div>
-      <input id="discoverArea" class="discover-filter-input" type="text" placeholder="例：新宿、渋谷、池袋">
-    </div>
-
-    <label class="discover-toggle-row">
-      <span>募集中のみ</span>
-      <input id="discoverOpenOnly" type="checkbox" checked>
-    </label>
-
-    <div class="discover-filter-actions">
-      <button id="discoverResetBtn" type="button" class="discover-reset-btn" onclick="resetDiscoverFilters()">リセット</button>
-      <button id="discoverApplyBtn" type="button" class="discover-apply-btn" onclick="applyDiscoverFilters()">この条件で探す</button>
-    </div>
-  </div>
-
-  <div id="discoverActiveFilters" class="discover-active-filters"></div>
-
-  <div class="discover-summary-row" id="discoverSummary">
+  <div class="discover-summary-row">
     <div id="discoverCount" class="discover-count">0件見つかりました</div>
-    <select id="discoverSort" class="discover-sort" onchange="renderDiscover()">
-      <option value="recommended">おすすめ順</option>
-      <option value="soon">日付が近い順</option>
-      <option value="new">新着順</option>
-      <option value="available">空きが多い順</option>
-    </select>
   </div>
 
   <div id="discoverResults" class="discover-results"></div>
 </section>
+
 
 
 
@@ -4243,25 +4271,12 @@ html,body{
 
 
 
-<div id="cardDetailModal" class="modal" onclick="backdropClose(event,'cardDetailModal')">
-  <div class="sheet v23-4-detail-sheet">
-    <div class="sheet-head v23-4-detail-head">
-      <div>
-        <div class="sheet-title">募集詳細</div>
-        <div class="sheet-sub">内容を確認する</div>
-      </div>
-      <button type="button" class="close-btn" onclick="closeModal('cardDetailModal')">×</button>
-    </div>
-    <div id="cardDetailContent"></div>
-  </div>
-</div>
-
 <div id="toast" class="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v23_4_card_detail_contact_fix";
+const KEY="tk_my_gathers_v23_5_sticky_simple_search";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
@@ -4908,71 +4923,6 @@ async function loadEventsFromSupabase(){
   }
 }
 
-function resolveEventByAnyId(id){
-  return state.events.find(e=>String(e.id)===String(id) || String(e.dbId||"")===String(id))||null;
-}
-function openCardDetail(id){
-  const e=resolveEventByAnyId(id);
-  if(!e){
-    toast("募集を読み込めませんでした");
-    return;
-  }
-
-  const u=person(e.owner);
-  const mine=e.owner===(currentAuthUser?.id||meId());
-  const arg=eventIdArg(e.id);
-
-  $("cardDetailContent").innerHTML=`
-    <article class="v23-4-detail-card">
-      <div class="v23-4-detail-image">
-        <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
-        <span>${esc(e.sub||e.category)}</span>
-      </div>
-
-      <div class="v23-4-detail-body">
-        <div class="v23-4-detail-owner-row">
-          <button class="v23-4-detail-owner" onclick="openOtherProfile('${escjs(e.owner)}')">
-            <span class="mini-avatar">${avatarHtml(u)}</span>
-            <span>
-              <b>${esc(u.name)}</b>
-              <small>主催</small>
-            </span>
-          </button>
-
-          ${mine ? "" : `<button class="v23-4-detail-contact" onclick="startChat('${escjs(e.owner)}')">主催者に連絡</button>`}
-        </div>
-
-        <h3>${esc(e.title)}</h3>
-
-        <div class="v23-4-detail-meta">
-          <div><strong>日時</strong><span>${dateLabel(e.date)} ${esc(e.time)}</span></div>
-          <div><strong>場所</strong><span>${esc(e.place)}</span></div>
-          <div><strong>人数</strong><span>${e.people}/${e.capacity}人</span></div>
-          <div><strong>予算</strong><span>${esc(e.budget)}</span></div>
-        </div>
-
-        <div class="v23-4-detail-visibility">
-          ${visibilityBadgeHtml(e.visibilityDb||e.visibility)}
-        </div>
-
-        <div class="v23-4-detail-note">${esc(e.note||"")}</div>
-
-        <div class="v23-4-detail-tags">
-          ${(e.tags||[]).map(t=>`<span>${esc(t)}</span>`).join("")}
-        </div>
-
-        <div class="v23-4-detail-actions">
-          <button class="${e.saved?"saved":""}" onclick="toggleSave(${arg});openCardDetail(${arg})">${e.saved?"保存済み":"保存"}</button>
-          ${mine
-            ? `<button class="danger" onclick="closeModal('cardDetailModal');removeEvent(${arg})">削除</button>`
-            : `<button class="primary ${e.joined?"joined":""}" onclick="toggleJoin(${arg});openCardDetail(${arg})">${e.joined?"参加中":"参加する"}</button>`}
-        </div>
-      </div>
-    </article>
-  `;
-
-  openModal("cardDetailModal");
-}
 
 function eventCard(e){
   const u=person(e.owner);
@@ -4986,7 +4936,7 @@ function eventCard(e){
       : "";
 
   return `<article class="card v22-event-card v22-2-card">
-    <div class="v22-event-cover" onclick="openCardDetail(${arg})">
+    <div class="v22-event-cover">
       <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
       <div class="v22-cover-top">
         <span class="v22-category">${esc(e.sub||e.category)}</span>
@@ -5009,7 +4959,7 @@ function eventCard(e){
         ${visibilityBadgeHtml(e.visibilityDb||e.visibility)}
       </div>
 
-      <button class="v22-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
+      <div class="v22-title v22-title-static">${esc(e.title)}</div>
 
       <div class="v22-primary-meta">
         <span>${dateLabel(e.date)} ${esc(e.time)}</span>
@@ -5022,13 +4972,9 @@ function eventCard(e){
         ${(e.tags||[]).slice(0,1).map(t=>`<span>${esc(t)}</span>`).join("")}
       </div>
 
-      <div class="v22-card-actions v23-4-actions">
+      <div class="v22-card-actions v23-5-actions">
         <button class="v22-action-button ${e.saved?"saved":""}" onclick="toggleSave(${arg})">
           ${e.saved?"保存済み":"保存"}
-        </button>
-
-        <button class="v22-action-button" onclick="openCardDetail(${arg})">
-          詳細
         </button>
 
         ${mine
@@ -5084,196 +5030,14 @@ function clearDiscoverFilters(){state.discoverCategory=null;state.discoverDateFi
 function isWeekendDate(d){const day=new Date(d+"T00:00:00").getDay();return day===0||day===6}
 
 
-function ensureDiscoverState(){
-  if(!state.discoverFilters){
-    state.discoverFilters={
-      date:"all",
-      category:"すべて",
-      area:"",
-      openOnly:true
-    };
-  }
-}
+
 function normalizeText(value){
   return String(value||"")
     .trim()
     .toLowerCase()
     .replace(/\s+/g," ");
 }
-function normalizeCategory(value){
-  const v=String(value||"").trim();
-  const aliases={
-    "飲み会":"食事・飲み",
-    "カフェ":"食事・飲み",
-    "BBQ":"おでかけ",
-    "麻雀":"ゲーム・遊び",
-    "散歩":"おでかけ"
-  };
-  return aliases[v]||v;
-}
-function syncDiscoverFilterInputs(){
-  ensureDiscoverState();
-  if($("discoverArea"))$("discoverArea").value=state.discoverFilters.area||"";
-  if($("discoverOpenOnly"))$("discoverOpenOnly").checked=state.discoverFilters.openOnly!==false;
-  updateDiscoverFilterButtons();
-}
-function toggleDiscoverFilters(){
-  const panel=$("discoverFilterPanel");
-  if(!panel)return;
-  const willOpen=panel.hidden;
-  panel.hidden=!willOpen;
-  if(willOpen){
-    syncDiscoverFilterInputs();
-    requestAnimationFrame(()=>{
-      panel.scrollIntoView({behavior:"smooth",block:"nearest"});
-    });
-  }
-}
-function closeDiscoverFilters(){
-  const panel=$("discoverFilterPanel");
-  if(panel)panel.hidden=true;
-}
-function openDiscoverFilters(){
-  const panel=$("discoverFilterPanel");
-  if(!panel)return;
-  panel.hidden=false;
-  syncDiscoverFilterInputs();
-}
-function setDiscoverDate(value){
-  ensureDiscoverState();
-  state.discoverFilters.date=value;
-  updateDiscoverFilterButtons();
-}
-function setDiscoverCategory(value){
-  ensureDiscoverState();
-  state.discoverFilters.category=value;
-  updateDiscoverFilterButtons();
-}
-function updateDiscoverFilterButtons(){
-  ensureDiscoverState();
 
-  document.querySelectorAll("#discoverFilterPanel [data-filter-date]").forEach(btn=>{
-    btn.classList.toggle(
-      "active",
-      btn.dataset.filterDate===state.discoverFilters.date
-    );
-  });
-
-  document.querySelectorAll("#discoverFilterPanel [data-filter-category]").forEach(btn=>{
-    btn.classList.toggle(
-      "active",
-      btn.dataset.filterCategory===state.discoverFilters.category
-    );
-  });
-}
-function resetDiscoverFilters(){
-  state.discoverFilters={
-    date:"all",
-    category:"すべて",
-    area:"",
-    openOnly:true
-  };
-
-  syncDiscoverFilterInputs();
-  save();
-  renderDiscover();
-  toast("絞り込みをリセットしました");
-}
-function applyDiscoverFilters(){
-  ensureDiscoverState();
-
-  state.discoverFilters.area=($("discoverArea")?.value||"").trim();
-  state.discoverFilters.openOnly=$("discoverOpenOnly") ? $("discoverOpenOnly").checked : true;
-
-  save();
-  renderDiscover();
-  closeDiscoverFilters();
-
-  requestAnimationFrame(()=>{
-    const target=$("discoverSummary")||$("discoverResults");
-    if(target){
-      target.scrollIntoView({
-        behavior:"smooth",
-        block:"start"
-      });
-    }
-  });
-
-  toast($("discoverCount")?.textContent||"検索結果を更新しました");
-}
-function toLocalDay(dateStr){
-  if(!dateStr)return null;
-  const parts=String(dateStr).split("-");
-  if(parts.length!==3)return null;
-
-  const y=Number(parts[0]);
-  const m=Number(parts[1]);
-  const d=Number(parts[2]);
-
-  if(!y||!m||!d)return null;
-
-  return new Date(y,m-1,d,12,0,0,0);
-}
-function dayDiffFromToday(dateStr){
-  const target=toLocalDay(dateStr);
-  if(!target)return null;
-
-  const now=new Date();
-  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate(),12,0,0,0);
-
-  return Math.round((target-today)/86400000);
-}
-function discoverDateMatches(e,mode){
-  if(mode==="all")return true;
-
-  const target=toLocalDay(e.date);
-  if(!target)return false;
-
-  const diff=dayDiffFromToday(e.date);
-  if(diff===null)return false;
-
-  if(mode==="today"){
-    return diff===0;
-  }
-
-  if(mode==="weekend"){
-    const weekday=target.getDay();
-    return diff>=0 && diff<=7 && (weekday===0 || weekday===6);
-  }
-
-  if(mode==="weeknight"){
-    const weekday=target.getDay();
-    const hour=Number(String(e.time||"0:00").split(":")[0]);
-    return diff>=0 && diff<=7 && weekday>=1 && weekday<=5 && hour>=17;
-  }
-
-  return true;
-}
-function discoverCategoryMatches(e,selected){
-  if(!selected || selected==="すべて")return true;
-
-  const selectedNorm=normalizeCategory(selected);
-  const eventCategory=normalizeCategory(e.category);
-  const eventSub=String(e.sub||e.activity||"").trim();
-
-  if(selectedNorm===eventCategory)return true;
-  if(selected===eventSub)return true;
-
-  return false;
-}
-function discoverAreaMatches(e,area){
-  const q=normalizeText(area);
-  if(!q)return true;
-
-  const hay=normalizeText([
-    e.place,
-    e.area,
-    e.title,
-    e.note
-  ].filter(Boolean).join(" "));
-
-  return hay.includes(q);
-}
 function discoverKeywordMatches(e,query){
   const q=normalizeText(query);
   if(!q)return true;
@@ -5291,23 +5055,17 @@ function discoverKeywordMatches(e,query){
 
   return hay.includes(q);
 }
-function discoverIsOpen(e){
-  const people=Number(e.people||0);
-  const capacity=Number(e.capacity||0);
 
-  if(!capacity)return true;
-  return people<capacity;
-}
 function discoverCard(e){
   const u=person(e.owner);
   const arg=eventIdArg(e.id);
   const mine=e.owner===(currentAuthUser?.id||meId());
 
   return `<article class="discover-card">
-    <button class="discover-card-image" onclick="openCardDetail(${arg})">
+    <div class="discover-card-image">
       <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
       <span class="discover-card-category">${esc(e.sub||e.category)}</span>
-    </button>
+    </div>
 
     <div class="discover-card-body">
       <div class="discover-card-top">
@@ -5321,7 +5079,7 @@ function discoverCard(e){
         ${visibilityBadgeHtml(e.visibilityDb||e.visibility)}
       </div>
 
-      <button class="discover-card-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
+      <div class="discover-card-title discover-card-title-static">${esc(e.title)}</div>
 
       <div class="discover-card-meta">
         <span>${dateLabel(e.date)} ${esc(e.time)}</span>
@@ -5334,9 +5092,8 @@ function discoverCard(e){
         ${(e.tags||[]).slice(0,1).map(t=>`<span>${esc(t)}</span>`).join("")}
       </div>
 
-      <div class="discover-card-actions">
+      <div class="discover-card-actions discover-card-actions-simple">
         <button class="${e.saved?"saved":""}" onclick="toggleSave(${arg})">${e.saved?"保存済み":"保存"}</button>
-        <button onclick="openCardDetail(${arg})">詳細</button>
         ${mine
           ? `<button class="discover-primary muted-primary" onclick="removeEvent(${arg})">削除</button>`
           : `<button class="discover-primary ${e.joined?"joined":""}" onclick="toggleJoin(${arg})">${e.joined?"参加中":"参加する"}</button>`}
@@ -5344,120 +5101,18 @@ function discoverCard(e){
     </div>
   </article>`;
 }
-function renderDiscoverActiveFilters(){
-  const row=$("discoverActiveFilters");
-  if(!row)return;
 
-  ensureDiscoverState();
-  const f=state.discoverFilters;
-  const chips=[];
-
-  if(f.date!=="all"){
-    const label={
-      today:"今日",
-      weekend:"今週末",
-      weeknight:"平日夜"
-    }[f.date]||f.date;
-
-    chips.push(
-      `<button onclick="state.discoverFilters.date='all';save();renderDiscover()">${esc(label)} ×</button>`
-    );
-  }
-
-  if(f.category!=="すべて"){
-    chips.push(
-      `<button onclick="state.discoverFilters.category='すべて';save();renderDiscover()">${esc(f.category)} ×</button>`
-    );
-  }
-
-  if(f.area){
-    chips.push(
-      `<button onclick="state.discoverFilters.area='';save();renderDiscover()">${esc(f.area)} ×</button>`
-    );
-  }
-
-  if(f.openOnly){
-    chips.push(
-      `<button onclick="state.discoverFilters.openOnly=false;save();renderDiscover()">募集中 ×</button>`
-    );
-  }
-
-  row.innerHTML=chips.join("");
-}
-function sortDiscoverRows(rows,sort){
-  const copy=[...rows];
-
-  if(sort==="soon"){
-    copy.sort((a,b)=>{
-      const aKey=`${a.date||""} ${a.time||""}`;
-      const bKey=`${b.date||""} ${b.time||""}`;
-      return aKey.localeCompare(bKey);
-    });
-    return copy;
-  }
-
-  if(sort==="new"){
-    copy.sort((a,b)=>{
-      const aTime=new Date(a.created_at||a.date||0).getTime()||0;
-      const bTime=new Date(b.created_at||b.date||0).getTime()||0;
-      return bTime-aTime;
-    });
-    return copy;
-  }
-
-  if(sort==="available"){
-    copy.sort((a,b)=>{
-      const aRemain=Math.max(0,Number(a.capacity||0)-Number(a.people||0));
-      const bRemain=Math.max(0,Number(b.capacity||0)-Number(b.people||0));
-      return bRemain-aRemain;
-    });
-    return copy;
-  }
-
-  copy.sort((a,b)=>{
-    const score=x=>{
-      let s=0;
-      if(x.saved)s+=2;
-      if(x.joined)s+=2;
-      if(x.owner===(currentAuthUser?.id||meId()))s+=1;
-
-      const diff=dayDiffFromToday(x.date);
-      if(diff!==null && diff>=0 && diff<=7)s+=1;
-
-      return s;
-    };
-
-    return score(b)-score(a);
-  });
-
-  return copy;
-}
 function renderDiscover(){
-  ensureDiscoverState();
-
   const query=($("discoverQuery")?.value||"").trim();
-  const sort=$("discoverSort")?.value||"recommended";
-  const f=state.discoverFilters;
 
-  let rows=(state.events||[]).filter(e=>{
+  const rows=(state.events||[]).filter(e=>{
     if(!e)return false;
-
-    if(f.openOnly && !discoverIsOpen(e))return false;
-    if(!discoverCategoryMatches(e,f.category))return false;
-    if(!discoverAreaMatches(e,f.area))return false;
-    if(!discoverDateMatches(e,f.date))return false;
-    if(!discoverKeywordMatches(e,query))return false;
-
-    return true;
+    return discoverKeywordMatches(e,query);
   });
-
-  rows=sortDiscoverRows(rows,sort);
 
   if($("discoverCount")){
     $("discoverCount").textContent=`${rows.length}件見つかりました`;
   }
-
-  renderDiscoverActiveFilters();
 
   const results=$("discoverResults");
   if(!results)return;
@@ -5465,8 +5120,8 @@ function renderDiscover(){
   results.innerHTML=rows.length
     ? rows.map(discoverCard).join("")
     : `<div class="discover-empty">
-        <strong>条件に合う募集がありません</strong>
-        <span>条件を少しゆるめて探してみてください。</span>
+        <strong>検索結果がありません</strong>
+        <span>別の言葉で検索してみてください。</span>
       </div>`;
 }
 
