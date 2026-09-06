@@ -3365,6 +3365,301 @@ html,body{
   opacity:0 !important;
 }
 
+
+/* =========================================================
+   V23.4 — CARD DETAIL / CONTACT / MOBILE SAVE FIX
+   ========================================================= */
+
+/* Home action row now 3 items */
+.home-v22 .v23-4-actions{
+  display:grid !important;
+  grid-template-columns:.92fr .92fr 1.28fr !important;
+  gap:6px !important;
+}
+
+.home-v22 .v23-4-actions .v22-action-button{
+  min-width:0 !important;
+  width:100% !important;
+  padding:0 6px !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+
+.home-v22 .v23-4-actions .v22-action-button.saved{
+  font-size:7.5px !important;
+  letter-spacing:-.02em !important;
+}
+
+/* Host contact is separate from action row */
+.v23-4-host-wrap,
+.v23-4-discover-owner-wrap{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+}
+
+.v23-4-contact{
+  min-height:26px;
+  padding:0 8px;
+  border:1px solid #C9D9F5;
+  border-radius:999px;
+  background:#F3F7FF;
+  color:#0F55BE;
+  font-size:7.5px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.v23-4-contact.compact{
+  min-height:23px;
+  padding:0 7px;
+  font-size:7px;
+}
+
+/* discover card save overflow */
+.discover-card-actions button{
+  min-width:0 !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+.discover-card-actions button.saved{
+  font-size:7px !important;
+}
+
+/* Detail modal */
+.v23-4-detail-sheet{
+  max-height:88vh;
+  overflow:auto;
+  padding-bottom:calc(18px + env(safe-area-inset-bottom));
+}
+
+.v23-4-detail-head{
+  position:sticky;
+  top:0;
+  z-index:5;
+  margin:-2px 0 10px;
+  padding:4px 0 8px;
+  background:#fff;
+}
+
+.v23-4-detail-card{
+  overflow:hidden;
+  border:1px solid #E1E7EF;
+  border-radius:18px;
+  background:#fff;
+}
+
+.v23-4-detail-image{
+  position:relative;
+  height:190px;
+  overflow:hidden;
+  background:#EEF2F7;
+}
+
+.v23-4-detail-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.v23-4-detail-image > span{
+  position:absolute;
+  left:12px;
+  top:12px;
+  padding:5px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.94);
+  color:#344054;
+  font-size:8px;
+  font-weight:800;
+}
+
+.v23-4-detail-body{
+  padding:15px;
+}
+
+.v23-4-detail-owner-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.v23-4-detail-owner{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+  border:0;
+  background:transparent;
+  padding:0;
+  text-align:left;
+}
+
+.v23-4-detail-owner > span:last-child{
+  display:grid;
+}
+
+.v23-4-detail-owner b{
+  font-size:9.5px;
+  color:#344054;
+}
+
+.v23-4-detail-owner small{
+  margin-top:2px;
+  font-size:7px;
+  color:#98A2B3;
+}
+
+.v23-4-detail-contact{
+  min-height:31px;
+  padding:0 10px;
+  border:1px solid #BED4FA;
+  border-radius:999px;
+  background:#EAF2FF;
+  color:#0F55BE;
+  font-size:8px;
+  font-weight:800;
+}
+
+.v23-4-detail-card h3{
+  margin:15px 0 12px;
+  color:#1B2430;
+  font-size:20px;
+  line-height:1.35;
+}
+
+.v23-4-detail-meta{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.v23-4-detail-meta > div{
+  padding:10px;
+  border-radius:11px;
+  background:#F5F8FC;
+}
+
+.v23-4-detail-meta strong,
+.v23-4-detail-meta span{
+  display:block;
+}
+
+.v23-4-detail-meta strong{
+  margin-bottom:3px;
+  color:#98A2B3;
+  font-size:7px;
+}
+
+.v23-4-detail-meta span{
+  color:#344054;
+  font-size:9px;
+  font-weight:750;
+}
+
+.v23-4-detail-visibility{
+  margin-top:10px;
+}
+
+.v23-4-detail-note{
+  margin-top:12px;
+  color:#475467;
+  font-size:9.5px;
+  line-height:1.75;
+  white-space:pre-wrap;
+}
+
+.v23-4-detail-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+}
+
+.v23-4-detail-tags span{
+  padding:5px 7px;
+  border-radius:999px;
+  background:#F0F4F9;
+  color:#667085;
+  font-size:7.5px;
+  font-weight:700;
+}
+
+.v23-4-detail-actions{
+  display:grid;
+  grid-template-columns:.9fr 1.4fr;
+  gap:8px;
+  margin-top:15px;
+  padding-top:13px;
+  border-top:1px solid #E8EDF3;
+}
+
+.v23-4-detail-actions button{
+  min-height:42px;
+  border:1px solid #D8E0EA;
+  border-radius:11px;
+  background:#fff;
+  color:#667085;
+  font-size:9px;
+  font-weight:800;
+}
+
+.v23-4-detail-actions button.saved{
+  background:#EAF2FF;
+  color:#0F55BE;
+  border-color:#BED4FA;
+}
+
+.v23-4-detail-actions button.primary{
+  background:#1769E0;
+  color:#fff;
+  border-color:#1769E0;
+}
+
+.v23-4-detail-actions button.primary.joined{
+  background:#EAF2FF;
+  color:#0F55BE;
+  border-color:#BED4FA;
+}
+
+.v23-4-detail-actions button.danger{
+  color:#B42318;
+}
+
+@media (max-width:360px){
+  .home-v22 .v23-4-actions{
+    gap:4px !important;
+    grid-template-columns:.9fr .84fr 1.26fr !important;
+  }
+
+  .home-v22 .v23-4-actions .v22-action-button{
+    padding:0 4px !important;
+    font-size:7.5px !important;
+  }
+
+  .home-v22 .v23-4-actions .v22-action-button.saved{
+    font-size:7px !important;
+  }
+
+  .v23-4-contact{
+    font-size:7px;
+    padding:0 7px;
+  }
+
+  .v23-4-detail-image{
+    height:168px;
+  }
+
+  .v23-4-detail-card h3{
+    font-size:18px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -3947,12 +4242,26 @@ html,body{
 </div>
 
 
+
+<div id="cardDetailModal" class="modal" onclick="backdropClose(event,'cardDetailModal')">
+  <div class="sheet v23-4-detail-sheet">
+    <div class="sheet-head v23-4-detail-head">
+      <div>
+        <div class="sheet-title">募集詳細</div>
+        <div class="sheet-sub">内容を確認する</div>
+      </div>
+      <button type="button" class="close-btn" onclick="closeModal('cardDetailModal')">×</button>
+    </div>
+    <div id="cardDetailContent"></div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v23_3_inline_filters_auth_fix";
+const KEY="tk_my_gathers_v23_4_card_detail_contact_fix";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
@@ -4598,6 +4907,73 @@ async function loadEventsFromSupabase(){
     setDbStatus("Supabaseの読み込みに失敗したため、デモ募集を表示しています");
   }
 }
+
+function resolveEventByAnyId(id){
+  return state.events.find(e=>String(e.id)===String(id) || String(e.dbId||"")===String(id))||null;
+}
+function openCardDetail(id){
+  const e=resolveEventByAnyId(id);
+  if(!e){
+    toast("募集を読み込めませんでした");
+    return;
+  }
+
+  const u=person(e.owner);
+  const mine=e.owner===(currentAuthUser?.id||meId());
+  const arg=eventIdArg(e.id);
+
+  $("cardDetailContent").innerHTML=`
+    <article class="v23-4-detail-card">
+      <div class="v23-4-detail-image">
+        <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
+        <span>${esc(e.sub||e.category)}</span>
+      </div>
+
+      <div class="v23-4-detail-body">
+        <div class="v23-4-detail-owner-row">
+          <button class="v23-4-detail-owner" onclick="openOtherProfile('${escjs(e.owner)}')">
+            <span class="mini-avatar">${avatarHtml(u)}</span>
+            <span>
+              <b>${esc(u.name)}</b>
+              <small>主催</small>
+            </span>
+          </button>
+
+          ${mine ? "" : `<button class="v23-4-detail-contact" onclick="startChat('${escjs(e.owner)}')">主催者に連絡</button>`}
+        </div>
+
+        <h3>${esc(e.title)}</h3>
+
+        <div class="v23-4-detail-meta">
+          <div><strong>日時</strong><span>${dateLabel(e.date)} ${esc(e.time)}</span></div>
+          <div><strong>場所</strong><span>${esc(e.place)}</span></div>
+          <div><strong>人数</strong><span>${e.people}/${e.capacity}人</span></div>
+          <div><strong>予算</strong><span>${esc(e.budget)}</span></div>
+        </div>
+
+        <div class="v23-4-detail-visibility">
+          ${visibilityBadgeHtml(e.visibilityDb||e.visibility)}
+        </div>
+
+        <div class="v23-4-detail-note">${esc(e.note||"")}</div>
+
+        <div class="v23-4-detail-tags">
+          ${(e.tags||[]).map(t=>`<span>${esc(t)}</span>`).join("")}
+        </div>
+
+        <div class="v23-4-detail-actions">
+          <button class="${e.saved?"saved":""}" onclick="toggleSave(${arg});openCardDetail(${arg})">${e.saved?"保存済み":"保存"}</button>
+          ${mine
+            ? `<button class="danger" onclick="closeModal('cardDetailModal');removeEvent(${arg})">削除</button>`
+            : `<button class="primary ${e.joined?"joined":""}" onclick="toggleJoin(${arg});openCardDetail(${arg})">${e.joined?"参加中":"参加する"}</button>`}
+        </div>
+      </div>
+    </article>
+  `;
+
+  openModal("cardDetailModal");
+}
+
 function eventCard(e){
   const u=person(e.owner);
   const mine=e.owner===(currentAuthUser?.id||meId());
@@ -4610,9 +4986,8 @@ function eventCard(e){
       : "";
 
   return `<article class="card v22-event-card v22-2-card">
-    <div class="v22-event-cover" onclick="openEvent(${arg})">
+    <div class="v22-event-cover" onclick="openCardDetail(${arg})">
       <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
-
       <div class="v22-cover-top">
         <span class="v22-category">${esc(e.sub||e.category)}</span>
         ${quickLabel}
@@ -4621,17 +4996,20 @@ function eventCard(e){
 
     <div class="v22-event-body">
       <div class="v22-host-row">
-        <div class="v22-host-static" onclick="openOtherProfile('${escjs(e.owner)}')" role="button" tabindex="0">
-          <span class="mini-avatar">${avatarHtml(u)}</span>
-          <span class="v22-host-text">
-            <b>${esc(u.name)}</b>
-            <small>主催</small>
-          </span>
+        <div class="v23-4-host-wrap">
+          <div class="v22-host-static" onclick="openOtherProfile('${escjs(e.owner)}')" role="button" tabindex="0">
+            <span class="mini-avatar">${avatarHtml(u)}</span>
+            <span class="v22-host-text">
+              <b>${esc(u.name)}</b>
+              <small>主催</small>
+            </span>
+          </div>
+          ${mine ? "" : `<button class="v23-4-contact" onclick="startChat('${escjs(e.owner)}')">主催者に連絡</button>`}
         </div>
         ${visibilityBadgeHtml(e.visibilityDb||e.visibility)}
       </div>
 
-      <button class="v22-title" onclick="openEvent(${arg})">${esc(e.title)}</button>
+      <button class="v22-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
 
       <div class="v22-primary-meta">
         <span>${dateLabel(e.date)} ${esc(e.time)}</span>
@@ -4644,17 +5022,13 @@ function eventCard(e){
         ${(e.tags||[]).slice(0,1).map(t=>`<span>${esc(t)}</span>`).join("")}
       </div>
 
-      <div class="v22-card-actions v22-3-actions">
+      <div class="v22-card-actions v23-4-actions">
         <button class="v22-action-button ${e.saved?"saved":""}" onclick="toggleSave(${arg})">
-          ${e.saved?"保存済":"保存"}
+          ${e.saved?"保存済み":"保存"}
         </button>
 
-        <button class="v22-action-button" onclick="openEvent(${arg})">
+        <button class="v22-action-button" onclick="openCardDetail(${arg})">
           詳細
-        </button>
-
-        <button class="v22-action-button" onclick="startChat('${escjs(e.owner)}')">
-          連絡
         </button>
 
         ${mine
@@ -4930,21 +5304,24 @@ function discoverCard(e){
   const mine=e.owner===(currentAuthUser?.id||meId());
 
   return `<article class="discover-card">
-    <button class="discover-card-image" onclick="openEvent(${arg})">
+    <button class="discover-card-image" onclick="openCardDetail(${arg})">
       <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
       <span class="discover-card-category">${esc(e.sub||e.category)}</span>
     </button>
 
     <div class="discover-card-body">
       <div class="discover-card-top">
-        <button class="discover-owner" onclick="openOtherProfile('${escjs(e.owner)}')">
-          <span class="mini-avatar">${avatarHtml(u)}</span>
-          <span>${esc(u.name)}</span>
-        </button>
+        <div class="v23-4-discover-owner-wrap">
+          <button class="discover-owner" onclick="openOtherProfile('${escjs(e.owner)}')">
+            <span class="mini-avatar">${avatarHtml(u)}</span>
+            <span>${esc(u.name)}</span>
+          </button>
+          ${mine ? "" : `<button class="v23-4-contact compact" onclick="startChat('${escjs(e.owner)}')">主催者に連絡</button>`}
+        </div>
         ${visibilityBadgeHtml(e.visibilityDb||e.visibility)}
       </div>
 
-      <button class="discover-card-title" onclick="openEvent(${arg})">${esc(e.title)}</button>
+      <button class="discover-card-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
 
       <div class="discover-card-meta">
         <span>${dateLabel(e.date)} ${esc(e.time)}</span>
@@ -4958,8 +5335,8 @@ function discoverCard(e){
       </div>
 
       <div class="discover-card-actions">
-        <button class="${e.saved?"saved":""}" onclick="toggleSave(${arg})">${e.saved?"保存済":"保存"}</button>
-        <button onclick="openEvent(${arg})">詳細</button>
+        <button class="${e.saved?"saved":""}" onclick="toggleSave(${arg})">${e.saved?"保存済み":"保存"}</button>
+        <button onclick="openCardDetail(${arg})">詳細</button>
         ${mine
           ? `<button class="discover-primary muted-primary" onclick="removeEvent(${arg})">削除</button>`
           : `<button class="discover-primary ${e.joined?"joined":""}" onclick="toggleJoin(${arg})">${e.joined?"参加中":"参加する"}</button>`}
