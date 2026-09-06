@@ -3284,91 +3284,85 @@ html,body{
 
 
 /* =========================================================
-   V23.1.2 — FILTER TAP FIX
+   V23.3 — INLINE DISCOVER FILTERS + AUTH UX FIX
    ========================================================= */
 
-#discoverFilterModal{
-  z-index:500 !important;
-  pointer-events:auto !important;
+.discover-inline-filter{
+  margin-top:10px;
+  padding:14px;
+  border:1px solid #DDE5EF;
+  border-radius:16px;
+  background:#FFFFFF;
+  box-shadow:0 8px 24px rgba(31,41,55,.05);
 }
 
-#discoverFilterModal .sheet{
-  position:relative;
-  z-index:501 !important;
-  pointer-events:auto !important;
-  touch-action:pan-y;
+.discover-inline-filter[hidden]{
+  display:none !important;
 }
 
-#discoverFilterModal button,
-#discoverFilterModal input,
-#discoverFilterModal label{
-  position:relative;
-  z-index:502 !important;
-  pointer-events:auto !important;
+.discover-inline-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
 }
 
-#discoverFilterModal button{
+.discover-inline-head strong{
+  display:block;
+  color:#1B2430;
+  font-size:13px;
+  font-weight:850;
+}
+
+.discover-inline-head span{
+  display:block;
+  margin-top:2px;
+  color:#98A2B3;
+  font-size:8px;
+}
+
+.discover-inline-close{
+  width:30px;
+  height:30px;
+  border:1px solid #DDE5EF;
+  border-radius:50%;
+  background:#fff;
+  color:#475467;
+  font-size:15px;
+  line-height:1;
+}
+
+.discover-inline-filter .discover-filter-options button{
   touch-action:manipulation;
-  -webkit-tap-highlight-color:rgba(23,105,224,.08);
-}
-
-#discoverFilterModal .discover-filter-options button{
-  user-select:none;
-  -webkit-user-select:none;
-}
-
-#discoverFilterModal .discover-filter-options button:active{
-  transform:scale(.97);
-}
-
-#discoverFilterModal .discover-filter-options button.active{
-  background:#1769E0 !important;
-  border-color:#1769E0 !important;
-  color:#fff !important;
-}
-
-
-/* =========================================================
-   V23.2 — DISCOVER INTERACTION POLISH
-   ========================================================= */
-
-#discoverFilterModal .discover-filter-options button{
+  cursor:pointer;
   transition:
-    background .14s ease,
-    color .14s ease,
-    border-color .14s ease,
+    background .12s ease,
+    color .12s ease,
+    border-color .12s ease,
     transform .08s ease;
 }
 
-#discoverFilterModal .discover-filter-options button.active{
+.discover-inline-filter .discover-filter-options button.active{
   background:#1769E0 !important;
   color:#fff !important;
   border-color:#1769E0 !important;
-  box-shadow:0 0 0 2px rgba(23,105,224,.08);
 }
 
-#discoverFilterModal .discover-filter-options button:active{
-  transform:scale(.96);
+.discover-inline-filter .discover-filter-options button:active{
+  transform:scale(.97);
 }
 
-#discoverApplyBtn{
-  position:relative;
-  z-index:510 !important;
-  pointer-events:auto !important;
+#discoverSummary{
+  scroll-margin-top:16px;
 }
 
-#discoverResetBtn{
-  position:relative;
-  z-index:510 !important;
-  pointer-events:auto !important;
-}
-
-#discoverCount{
-  scroll-margin-top:18px;
-}
-
-.discover-summary-row{
-  scroll-margin-top:18px;
+/* Auth gate must truly disappear after a successful login */
+#authGate.hidden{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  opacity:0 !important;
 }
 
 </style>
@@ -3486,6 +3480,7 @@ html,body{
 </section>
 
 
+
 <section id="discover" class="page discover-v23">
   <div class="discover-head-row">
     <div>
@@ -3499,12 +3494,59 @@ html,body{
       <span class="discover-search-icon">⌕</span>
       <input id="discoverQuery" type="search" placeholder="募集名・場所・カテゴリで検索">
     </div>
-    <button id="discoverFilterOpenBtn" type="button" class="discover-filter-btn">絞り込み</button>
+    <button id="discoverFilterOpenBtn" type="button" class="discover-filter-btn" onclick="toggleDiscoverFilters()">絞り込み</button>
+  </div>
+
+  <div id="discoverFilterPanel" class="discover-inline-filter" hidden>
+    <div class="discover-inline-head">
+      <div>
+        <strong>絞り込み</strong>
+        <span>条件を選んで探す</span>
+      </div>
+      <button type="button" class="discover-inline-close" onclick="closeDiscoverFilters()">×</button>
+    </div>
+
+    <div class="discover-filter-section">
+      <div class="discover-filter-label">日付</div>
+      <div class="discover-filter-options">
+        <button type="button" data-filter-date="all" onclick="setDiscoverDate('all')">指定なし</button>
+        <button type="button" data-filter-date="today" onclick="setDiscoverDate('today')">今日</button>
+        <button type="button" data-filter-date="weekend" onclick="setDiscoverDate('weekend')">今週末</button>
+        <button type="button" data-filter-date="weeknight" onclick="setDiscoverDate('weeknight')">平日夜</button>
+      </div>
+    </div>
+
+    <div class="discover-filter-section">
+      <div class="discover-filter-label">カテゴリ</div>
+      <div class="discover-filter-options">
+        <button type="button" data-filter-category="すべて" onclick="setDiscoverCategory('すべて')">すべて</button>
+        <button type="button" data-filter-category="食事・飲み" onclick="setDiscoverCategory('食事・飲み')">食事・飲み</button>
+        <button type="button" data-filter-category="スポーツ" onclick="setDiscoverCategory('スポーツ')">スポーツ</button>
+        <button type="button" data-filter-category="ゲーム・遊び" onclick="setDiscoverCategory('ゲーム・遊び')">ゲーム・遊び</button>
+        <button type="button" data-filter-category="おでかけ" onclick="setDiscoverCategory('おでかけ')">おでかけ</button>
+        <button type="button" data-filter-category="カルチャー・趣味" onclick="setDiscoverCategory('カルチャー・趣味')">カルチャー・趣味</button>
+      </div>
+    </div>
+
+    <div class="discover-filter-section">
+      <div class="discover-filter-label">エリア</div>
+      <input id="discoverArea" class="discover-filter-input" type="text" placeholder="例：新宿、渋谷、池袋">
+    </div>
+
+    <label class="discover-toggle-row">
+      <span>募集中のみ</span>
+      <input id="discoverOpenOnly" type="checkbox" checked>
+    </label>
+
+    <div class="discover-filter-actions">
+      <button id="discoverResetBtn" type="button" class="discover-reset-btn" onclick="resetDiscoverFilters()">リセット</button>
+      <button id="discoverApplyBtn" type="button" class="discover-apply-btn" onclick="applyDiscoverFilters()">この条件で探す</button>
+    </div>
   </div>
 
   <div id="discoverActiveFilters" class="discover-active-filters"></div>
 
-  <div class="discover-summary-row">
+  <div class="discover-summary-row" id="discoverSummary">
     <div id="discoverCount" class="discover-count">0件見つかりました</div>
     <select id="discoverSort" class="discover-sort" onchange="renderDiscover()">
       <option value="recommended">おすすめ順</option>
@@ -3516,6 +3558,7 @@ html,body{
 
   <div id="discoverResults" class="discover-results"></div>
 </section>
+
 
 
 <section id="messages" class="page">
@@ -3904,62 +3947,12 @@ html,body{
 </div>
 
 
-<div id="discoverFilterModal" class="modal" onclick="backdropClose(event,'discoverFilterModal')">
-  <div class="sheet">
-    <div class="handle"></div>
-    <div class="sheet-head">
-      <div>
-        <div class="sheet-title">絞り込み</div>
-        <div class="sheet-sub">条件を選んで探す</div>
-      </div>
-      <button class="close-btn" onclick="closeModal('discoverFilterModal')">×</button>
-    </div>
-
-    <div class="discover-filter-section">
-      <div class="discover-filter-label">日付</div>
-      <div class="discover-filter-options">
-        <button type="button" data-filter-date="all">指定なし</button>
-        <button type="button" data-filter-date="today">今日</button>
-        <button type="button" data-filter-date="weekend">今週末</button>
-        <button type="button" data-filter-date="weeknight">平日夜</button>
-      </div>
-    </div>
-
-    <div class="discover-filter-section">
-      <div class="discover-filter-label">カテゴリ</div>
-      <div class="discover-filter-options">
-        <button type="button" data-filter-category="すべて">すべて</button>
-        <button type="button" data-filter-category="食事・飲み">食事・飲み</button>
-        <button type="button" data-filter-category="スポーツ">スポーツ</button>
-        <button type="button" data-filter-category="ゲーム・遊び">ゲーム・遊び</button>
-        <button type="button" data-filter-category="おでかけ">おでかけ</button>
-        <button type="button" data-filter-category="カルチャー・趣味">カルチャー・趣味</button>
-      </div>
-    </div>
-
-    <div class="discover-filter-section">
-      <div class="discover-filter-label">エリア</div>
-      <input id="discoverArea" class="discover-filter-input" type="text" placeholder="例：新宿、渋谷、池袋">
-    </div>
-
-    <label class="discover-toggle-row">
-      <span>募集中のみ</span>
-      <input id="discoverOpenOnly" type="checkbox" checked>
-    </label>
-
-    <div class="discover-filter-actions">
-      <button id="discoverResetBtn" type="button" class="discover-reset-btn">リセット</button>
-      <button id="discoverApplyBtn" type="button" class="discover-apply-btn">この条件で探す</button>
-    </div>
-  </div>
-</div>
-
 <div id="toast" class="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v22.2_1_plus_quick_action";
+const KEY="tk_my_gathers_v23_3_inline_filters_auth_fix";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
@@ -4281,8 +4274,8 @@ function showPage(id){
   }
   window.scrollTo({top:0,behavior:"smooth"})
 }
-function openModal(id){$(id).classList.add("open")}
-function closeModal(id){$(id).classList.remove("open")}
+function openModal(id){const el=$(id);if(el)el.classList.add("open")}
+function closeModal(id){const el=$(id);if(el)el.classList.remove("open")}
 function backdropClose(e,id){if(e.target.id===id)closeModal(id)}
 function toast(t){const el=$("toast");el.textContent=t;el.classList.add("show");clearTimeout(window._tt);window._tt=setTimeout(()=>el.classList.remove("show"),1800)}
 function dateLabel(d){const x=new Date(d+"T00:00:00");return `${x.getMonth()+1}/${x.getDate()}`}
@@ -4657,7 +4650,7 @@ function eventCard(e){
         </button>
 
         <button class="v22-action-button" onclick="openEvent(${arg})">
-          コメント
+          詳細
         </button>
 
         <button class="v22-action-button" onclick="startChat('${escjs(e.owner)}')">
@@ -4744,14 +4737,33 @@ function normalizeCategory(value){
   };
   return aliases[v]||v;
 }
-function openDiscoverFilters(){
+function syncDiscoverFilterInputs(){
   ensureDiscoverState();
-
-  $("discoverArea").value=state.discoverFilters.area||"";
-  $("discoverOpenOnly").checked=state.discoverFilters.openOnly!==false;
-
+  if($("discoverArea"))$("discoverArea").value=state.discoverFilters.area||"";
+  if($("discoverOpenOnly"))$("discoverOpenOnly").checked=state.discoverFilters.openOnly!==false;
   updateDiscoverFilterButtons();
-  openModal("discoverFilterModal");
+}
+function toggleDiscoverFilters(){
+  const panel=$("discoverFilterPanel");
+  if(!panel)return;
+  const willOpen=panel.hidden;
+  panel.hidden=!willOpen;
+  if(willOpen){
+    syncDiscoverFilterInputs();
+    requestAnimationFrame(()=>{
+      panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+    });
+  }
+}
+function closeDiscoverFilters(){
+  const panel=$("discoverFilterPanel");
+  if(panel)panel.hidden=true;
+}
+function openDiscoverFilters(){
+  const panel=$("discoverFilterPanel");
+  if(!panel)return;
+  panel.hidden=false;
+  syncDiscoverFilterInputs();
 }
 function setDiscoverDate(value){
   ensureDiscoverState();
@@ -4766,14 +4778,14 @@ function setDiscoverCategory(value){
 function updateDiscoverFilterButtons(){
   ensureDiscoverState();
 
-  document.querySelectorAll("[data-filter-date]").forEach(btn=>{
+  document.querySelectorAll("#discoverFilterPanel [data-filter-date]").forEach(btn=>{
     btn.classList.toggle(
       "active",
       btn.dataset.filterDate===state.discoverFilters.date
     );
   });
 
-  document.querySelectorAll("[data-filter-category]").forEach(btn=>{
+  document.querySelectorAll("#discoverFilterPanel [data-filter-category]").forEach(btn=>{
     btn.classList.toggle(
       "active",
       btn.dataset.filterCategory===state.discoverFilters.category
@@ -4788,54 +4800,23 @@ function resetDiscoverFilters(){
     openOnly:true
   };
 
-  if($("discoverArea"))$("discoverArea").value="";
-  if($("discoverOpenOnly"))$("discoverOpenOnly").checked=true;
-
-  updateDiscoverFilterButtons();
+  syncDiscoverFilterInputs();
   save();
   renderDiscover();
-
   toast("絞り込みをリセットしました");
 }
 function applyDiscoverFilters(){
   ensureDiscoverState();
 
-  const activeDate=document.querySelector(
-    "#discoverFilterModal [data-filter-date].active"
-  );
-  const activeCategory=document.querySelector(
-    "#discoverFilterModal [data-filter-category].active"
-  );
-
-  state.discoverFilters.date=
-    activeDate?.dataset?.filterDate ||
-    state.discoverFilters.date ||
-    "all";
-
-  state.discoverFilters.category=
-    activeCategory?.dataset?.filterCategory ||
-    state.discoverFilters.category ||
-    "すべて";
-
-  state.discoverFilters.area=
-    ($("discoverArea")?.value||"").trim();
-
-  state.discoverFilters.openOnly=
-    $("discoverOpenOnly")
-      ? $("discoverOpenOnly").checked
-      : true;
+  state.discoverFilters.area=($("discoverArea")?.value||"").trim();
+  state.discoverFilters.openOnly=$("discoverOpenOnly") ? $("discoverOpenOnly").checked : true;
 
   save();
-
-  // 先に結果を更新
   renderDiscover();
+  closeDiscoverFilters();
 
-  // そのあと絞り込み画面を閉じる
-  closeModal("discoverFilterModal");
-
-  // 探すページを確実に表示したまま、結果へ移動
   requestAnimationFrame(()=>{
-    const target=$("discoverCount") || $("discoverResults");
+    const target=$("discoverSummary")||$("discoverResults");
     if(target){
       target.scrollIntoView({
         behavior:"smooth",
@@ -4844,7 +4825,7 @@ function applyDiscoverFilters(){
     }
   });
 
-  toast($("discoverCount")?.textContent || "検索結果を更新しました");
+  toast($("discoverCount")?.textContent||"検索結果を更新しました");
 }
 function toLocalDay(dateStr){
   if(!dateStr)return null;
@@ -5392,48 +5373,6 @@ function renderChat(){
 $("discoverQuery").addEventListener("input",()=>{
   renderDiscover();
 });
-
-
-$("discoverFilterOpenBtn").addEventListener("click",e=>{
-  e.preventDefault();
-  e.stopPropagation();
-  openDiscoverFilters();
-});
-
-$("discoverFilterModal").addEventListener("click",e=>{
-  const dateBtn=e.target.closest("[data-filter-date]");
-  if(dateBtn){
-    e.preventDefault();
-    e.stopPropagation();
-    setDiscoverDate(dateBtn.dataset.filterDate);
-    return;
-  }
-
-  const categoryBtn=e.target.closest("[data-filter-category]");
-  if(categoryBtn){
-    e.preventDefault();
-    e.stopPropagation();
-    setDiscoverCategory(categoryBtn.dataset.filterCategory);
-    return;
-  }
-
-  const applyBtn=e.target.closest("#discoverApplyBtn");
-  if(applyBtn){
-    e.preventDefault();
-    e.stopPropagation();
-    applyDiscoverFilters();
-    return;
-  }
-
-  const resetBtn=e.target.closest("#discoverResetBtn");
-  if(resetBtn){
-    e.preventDefault();
-    e.stopPropagation();
-    resetDiscoverFilters();
-    return;
-  }
-});
-
 
 
 $("dmUserSearch").addEventListener("input",e=>{
@@ -6595,6 +6534,14 @@ function hideAuthGate(){
   $("authGate").classList.add("hidden");
   document.body.style.overflow="";
 }
+
+function finishAuthSuccess(){
+  const gate=$("authGate");
+  if(gate)gate.classList.add("hidden");
+  document.body.style.overflow="";
+  setAuthMessage("");
+}
+
 function authFriendlyMessage(error){
   const msg=(error?.message||"").toLowerCase();
   if(msg.includes("invalid login credentials"))return "メールアドレスかパスワードが違います。";
@@ -6647,8 +6594,7 @@ async function activateSupabaseUser(user){
   upsertLocalAuthAccount(user,profile);
   renderAll();
   updateAccountUI();
-  hideAuthGate();
-  closeModal("authModal");
+  finishAuthSuccess();
   await loadEventsFromSupabase();
   await loadFollowState();
   await loadMessageThreads();
@@ -6683,6 +6629,7 @@ $("loginForm").addEventListener("submit",async e=>{
   const {data,error}=await sb.auth.signInWithPassword({email,password});
   button.disabled=false;
   if(error){setAuthMessage(authFriendlyMessage(error),"error");return}
+  finishAuthSuccess();
   await activateSupabaseUser(data.user);
   toast("ログインしました");
 });
@@ -6705,6 +6652,7 @@ $("signupForm").addEventListener("submit",async e=>{
   button.disabled=false;
   if(error){setAuthMessage(authFriendlyMessage(error),"error");return}
   if(data.session && data.user){
+    finishAuthSuccess();
     await activateSupabaseUser(data.user);
     toast("アカウントを作成しました");
   }else{
