@@ -4710,10 +4710,20 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v23_6_detail_board_comments";
+const KEY="tk_my_gathers_v23_6_1_auth_events_fix";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const sb=window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth:{
+      persistSession:true,
+      autoRefreshToken:true,
+      detectSessionInUrl:true
+    }
+  }
+);
 let currentAuthUser=null;
 const quickTagOptions=["新規歓迎","初参加歓迎","1人参加OK","初心者歓迎","途中参加OK","当日参加OK","友達連れOK","少人数","ゆるめ","相談しながら決めたい"];
 const categories={
@@ -5365,12 +5375,6 @@ function resolveEventByAnyId(id){
   )||null;
 }
 
-function resolveEventByAnyId(id){
-  return state.events.find(
-    e=>String(e.id)===String(id) || String(e.dbId||"")===String(id)
-  )||null;
-}
-
 
 async function cardDetailToggleSave(id){
   await toggleSave(id);
@@ -5700,13 +5704,6 @@ function renderHome(){
     : `<div class="tk-empty"><strong>まだこの条件の募集はありません</strong><span>自分で募集を作ってみる？</span><button onclick="openCreate()">募集を作成</button></div>`;
 }
 $("homeChips").addEventListener("click",e=>{const c=e.target.closest(".home-feed-tab");if(!c)return;state.tkSpecialFilter=null;clearTkMoodSelection();state.homeFilter=c.dataset.homefilter;document.querySelectorAll("#homeChips .home-feed-tab").forEach(x=>x.classList.toggle("active",x===c));renderHome()})
-function renderDiscoverGenres(){$("genreGrid").innerHTML=Object.keys(categories).slice(0,7).map((c,i)=>`<button class="genre"><div><div class="gicon">${String(i+1).padStart(2,"0")}</div><span>${esc(c)}</span></div></button>`).join("")}
-function setDiscoverCategory(c){state.discoverCategory=c;renderDiscover()}
-function clearDiscoverFilters(){state.discoverCategory=null;state.discoverDateFilter=null;document.querySelectorAll(".date-btn").forEach(b=>b.classList.remove("active"));$("dateInputWrap").classList.remove("show");renderDiscover()}
-function isWeekendDate(d){const day=new Date(d+"T00:00:00").getDay();return day===0||day===6}
-
-
-
 function normalizeText(value){
   return String(value||"")
     .trim()
@@ -6767,7 +6764,63 @@ $("createForm").addEventListener("submit",async e=>{
     resetCreateState(e.target);
     closeModal("createModal");
     showPage("home");
+
     await loadEventsFromSupabase();
+
+    // 万一一覧取得の直後に反映が遅れても、自分の新規募集を個別取得して補完
+    const existsNow=state.events.some(ev=>String(ev.dbId||ev.id)===String(created.id));
+
+    if(!existsNow){
+      const {data:freshRow,error:freshError}=await sb
+        .from("events")
+        .select(`
+          id,
+          owner_id,
+          title,
+          category,
+          activity,
+          event_date,
+          start_time,
+          end_time,
+          place,
+          capacity,
+          budget,
+          description,
+          image_url,
+          tags,
+          visibility,
+          status,
+          created_at
+        `)
+        .eq("id",created.id)
+        .maybeSingle();
+
+      if(!freshError && freshRow){
+        const profile=state.accounts[currentAuthUser.id]||null;
+        freshRow.profiles=profile ? {
+          id:currentAuthUser.id,
+          username:(profile.handle||"").replace(/^@/,""),
+          display_name:profile.name,
+          avatar_url:profile.avatar||null,
+          bio:profile.bio||"",
+          area:profile.area||"",
+          interests:profile.interests||[]
+        } : null;
+
+        const freshEvent=mapSupabaseEvent(freshRow);
+        freshEvent.mine=true;
+        freshEvent.joined=true;
+        freshEvent.saved=false;
+        freshEvent.people=Math.max(1,freshEvent.people||1);
+
+        state.events.unshift(freshEvent);
+        save();
+        renderHome();
+        renderDiscover();
+        renderMyGathers();
+      }
+    }
+
     toast("募集を公開しました");
 
   }catch(error){
@@ -7293,24 +7346,60 @@ function upsertLocalAuthAccount(user,profile){
   state.currentUserId=id;
   save();
 }
-async function activateSupabaseUser(user){
-  currentAuthUser=user;
-  let profile=await loadSupabaseProfile(user);
+let authActivationPromise=null;
 
-  // Trigger creation can take a moment immediately after signup.
-  if(!profile){
-    await new Promise(r=>setTimeout(r,450));
-    profile=await loadSupabaseProfile(user);
+async function activateSupabaseUser(user){
+  if(!user)return;
+
+  // SIGNED_IN と signInWithPassword の二重発火を直列化
+  if(authActivationPromise){
+    await authActivationPromise;
+    if(currentAuthUser?.id===user.id)return;
   }
 
-  upsertLocalAuthAccount(user,profile);
-  renderAll();
-  updateAccountUI();
-  finishAuthSuccess();
-  await loadEventsFromSupabase();
-  await loadFollowState();
-  await loadMessageThreads();
-  await loadNotifications();
+  authActivationPromise=(async()=>{
+    currentAuthUser=user;
+
+    let profile=await loadSupabaseProfile(user);
+
+    if(!profile){
+      await new Promise(r=>setTimeout(r,350));
+      profile=await loadSupabaseProfile(user);
+    }
+
+    upsertLocalAuthAccount(user,profile);
+
+    updateAccountUI();
+    finishAuthSuccess();
+
+    // 各画面は現在のログイン状態で描画
+    renderAll();
+
+    // Supabaseデータを順番に更新
+    await loadEventsFromSupabase();
+    await loadFollowState();
+    await loadMessageThreads();
+    await loadNotifications();
+
+    // 最後にもう一度UIを同期
+    updateAccountUI();
+    renderHome();
+    renderDiscover();
+    renderMyGathers();
+    renderProfile();
+  })();
+
+  try{
+    await authActivationPromise;
+  }catch(error){
+    console.error("activateSupabaseUser:",error);
+    // 認証セッション自体は維持し、UIをログアウト扱いにしない
+    currentAuthUser=user;
+    finishAuthSuccess();
+    updateAccountUI();
+  }finally{
+    authActivationPromise=null;
+  }
 }
 async function logoutSupabase(){
   closeModal("accountModal");
@@ -7341,9 +7430,10 @@ $("loginForm").addEventListener("submit",async e=>{
   const {data,error}=await sb.auth.signInWithPassword({email,password});
   button.disabled=false;
   if(error){setAuthMessage(authFriendlyMessage(error),"error");return}
-  finishAuthSuccess();
-  await activateSupabaseUser(data.user);
-  toast("ログインしました");
+  if(data?.user){
+    await activateSupabaseUser(data.user);
+    toast("ログインしました");
+  }
 });
 $("signupForm").addEventListener("submit",async e=>{
   e.preventDefault();
@@ -7390,18 +7480,43 @@ async function initSupabaseAuth(){
   }
 
   sb.auth.onAuthStateChange(async(event,session)=>{
-    if(event==="SIGNED_IN" && session?.user){
+    if(session?.user && (
+      event==="SIGNED_IN" ||
+      event==="TOKEN_REFRESHED" ||
+      event==="INITIAL_SESSION" ||
+      event==="USER_UPDATED"
+    )){
       await activateSupabaseUser(session.user);
+      return;
     }
+
     if(event==="SIGNED_OUT"){
       currentAuthUser=null;
+      state.currentUserId="shuzo";
+      updateAccountUI();
       hideAuthGate();
+      renderAll();
     }
   });
 }
 
-function renderAll(){renderHome();renderDiscoverGenres();renderDiscover();renderMessages();renderProfile();renderCategories();renderSubs();renderMemberPicker()}
-ensureAccountState();renderAll();renderQuickTags();renderHomeCategories();updateAccountUI();setDefaultDate();initSupabaseAuth();
+function renderAll(){
+  renderHome();
+  renderDiscover();
+  renderMessages();
+  renderProfile();
+  renderCategories();
+  renderSubs();
+  renderMemberPicker();
+  renderMyGathers();
+}
+ensureAccountState();
+renderAll();
+renderQuickTags();
+renderHomeCategories();
+updateAccountUI();
+setDefaultDate();
+initSupabaseAuth();
 </script>
 </body>
 </html>
