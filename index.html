@@ -2097,7 +2097,7 @@ body{align-items:flex-start!important}
 
 
 /* =========================================================
-   V23 — CHARCOAL × COBALT BLUE
+   V23.1 — CHARCOAL × COBALT BLUE
    UI COLOR REFRESH ONLY
    ========================================================= */
 
@@ -4627,6 +4627,7 @@ function setDiscoverCategory(c){state.discoverCategory=c;renderDiscover()}
 function clearDiscoverFilters(){state.discoverCategory=null;state.discoverDateFilter=null;document.querySelectorAll(".date-btn").forEach(b=>b.classList.remove("active"));$("dateInputWrap").classList.remove("show");renderDiscover()}
 function isWeekendDate(d){const day=new Date(d+"T00:00:00").getDay();return day===0||day===6}
 
+
 function ensureDiscoverState(){
   if(!state.discoverFilters){
     state.discoverFilters={
@@ -4637,11 +4638,29 @@ function ensureDiscoverState(){
     };
   }
 }
+function normalizeText(value){
+  return String(value||"")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g," ");
+}
+function normalizeCategory(value){
+  const v=String(value||"").trim();
+  const aliases={
+    "飲み会":"食事・飲み",
+    "カフェ":"食事・飲み",
+    "BBQ":"おでかけ",
+    "麻雀":"ゲーム・遊び",
+    "散歩":"おでかけ"
+  };
+  return aliases[v]||v;
+}
 function openDiscoverFilters(){
-  if(!requireAuth("絞り込みを使うにはログインしてください。"))return;
   ensureDiscoverState();
+
   $("discoverArea").value=state.discoverFilters.area||"";
   $("discoverOpenOnly").checked=state.discoverFilters.openOnly!==false;
+
   updateDiscoverFilterButtons();
   openModal("discoverFilterModal");
 }
@@ -4657,11 +4676,19 @@ function setDiscoverCategory(value){
 }
 function updateDiscoverFilterButtons(){
   ensureDiscoverState();
+
   document.querySelectorAll("[data-filter-date]").forEach(btn=>{
-    btn.classList.toggle("active",btn.dataset.filterDate===state.discoverFilters.date);
+    btn.classList.toggle(
+      "active",
+      btn.dataset.filterDate===state.discoverFilters.date
+    );
   });
+
   document.querySelectorAll("[data-filter-category]").forEach(btn=>{
-    btn.classList.toggle("active",btn.dataset.filterCategory===state.discoverFilters.category);
+    btn.classList.toggle(
+      "active",
+      btn.dataset.filterCategory===state.discoverFilters.category
+    );
   });
 }
 function resetDiscoverFilters(){
@@ -4671,40 +4698,120 @@ function resetDiscoverFilters(){
     area:"",
     openOnly:true
   };
-  $("discoverArea").value="";
-  $("discoverOpenOnly").checked=true;
+
+  if($("discoverArea"))$("discoverArea").value="";
+  if($("discoverOpenOnly"))$("discoverOpenOnly").checked=true;
+
   updateDiscoverFilterButtons();
+  save();
+  renderDiscover();
 }
 function applyDiscoverFilters(){
   ensureDiscoverState();
-  state.discoverFilters.area=$("discoverArea").value.trim();
-  state.discoverFilters.openOnly=$("discoverOpenOnly").checked;
+
+  state.discoverFilters.area=($("discoverArea")?.value||"").trim();
+  state.discoverFilters.openOnly=$("discoverOpenOnly")?.checked!==false;
+
   save();
   closeModal("discoverFilterModal");
   renderDiscover();
 }
+function toLocalDay(dateStr){
+  if(!dateStr)return null;
+  const parts=String(dateStr).split("-");
+  if(parts.length!==3)return null;
+
+  const y=Number(parts[0]);
+  const m=Number(parts[1]);
+  const d=Number(parts[2]);
+
+  if(!y||!m||!d)return null;
+
+  return new Date(y,m-1,d,12,0,0,0);
+}
+function dayDiffFromToday(dateStr){
+  const target=toLocalDay(dateStr);
+  if(!target)return null;
+
+  const now=new Date();
+  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate(),12,0,0,0);
+
+  return Math.round((target-today)/86400000);
+}
 function discoverDateMatches(e,mode){
   if(mode==="all")return true;
-  const d=new Date(`${e.date}T12:00:00`);
-  const now=new Date();
-  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const target=new Date(d.getFullYear(),d.getMonth(),d.getDate());
-  const diff=Math.round((target-today)/86400000);
 
-  if(mode==="today")return diff===0;
+  const target=toLocalDay(e.date);
+  if(!target)return false;
+
+  const diff=dayDiffFromToday(e.date);
+  if(diff===null)return false;
+
+  if(mode==="today"){
+    return diff===0;
+  }
 
   if(mode==="weekend"){
-    const day=target.getDay();
-    return diff>=0 && diff<=7 && (day===0||day===6);
+    const weekday=target.getDay();
+    return diff>=0 && diff<=7 && (weekday===0 || weekday===6);
   }
 
   if(mode==="weeknight"){
-    const day=target.getDay();
-    const hour=parseInt(String(e.time||"0").split(":")[0],10);
-    return diff>=0 && diff<=7 && day>=1 && day<=5 && hour>=17;
+    const weekday=target.getDay();
+    const hour=Number(String(e.time||"0:00").split(":")[0]);
+    return diff>=0 && diff<=7 && weekday>=1 && weekday<=5 && hour>=17;
   }
 
   return true;
+}
+function discoverCategoryMatches(e,selected){
+  if(!selected || selected==="すべて")return true;
+
+  const selectedNorm=normalizeCategory(selected);
+  const eventCategory=normalizeCategory(e.category);
+  const eventSub=String(e.sub||e.activity||"").trim();
+
+  if(selectedNorm===eventCategory)return true;
+  if(selected===eventSub)return true;
+
+  return false;
+}
+function discoverAreaMatches(e,area){
+  const q=normalizeText(area);
+  if(!q)return true;
+
+  const hay=normalizeText([
+    e.place,
+    e.area,
+    e.title,
+    e.note
+  ].filter(Boolean).join(" "));
+
+  return hay.includes(q);
+}
+function discoverKeywordMatches(e,query){
+  const q=normalizeText(query);
+  if(!q)return true;
+
+  const hay=normalizeText([
+    e.title,
+    e.sub,
+    e.activity,
+    e.category,
+    e.place,
+    e.area,
+    e.note,
+    ...(e.tags||[])
+  ].filter(Boolean).join(" "));
+
+  return hay.includes(q);
+}
+function discoverIsOpen(e){
+  const people=Number(e.people||0);
+  const capacity=Number(e.capacity||0);
+
+  if(!capacity)return true;
+  return people<capacity;
 }
 function discoverCard(e){
   const u=person(e.owner);
@@ -4752,68 +4859,122 @@ function discoverCard(e){
 function renderDiscoverActiveFilters(){
   const row=$("discoverActiveFilters");
   if(!row)return;
-  ensureDiscoverState();
 
-  const chips=[];
+  ensureDiscoverState();
   const f=state.discoverFilters;
+  const chips=[];
 
   if(f.date!=="all"){
-    const label={today:"今日",weekend:"今週末",weeknight:"平日夜"}[f.date]||f.date;
-    chips.push(`<button onclick="setDiscoverDate('all');renderDiscover()">${esc(label)} ×</button>`);
+    const label={
+      today:"今日",
+      weekend:"今週末",
+      weeknight:"平日夜"
+    }[f.date]||f.date;
+
+    chips.push(
+      `<button onclick="state.discoverFilters.date='all';save();renderDiscover()">${esc(label)} ×</button>`
+    );
   }
 
   if(f.category!=="すべて"){
-    chips.push(`<button onclick="setDiscoverCategory('すべて');renderDiscover()">${esc(f.category)} ×</button>`);
+    chips.push(
+      `<button onclick="state.discoverFilters.category='すべて';save();renderDiscover()">${esc(f.category)} ×</button>`
+    );
   }
 
   if(f.area){
-    chips.push(`<button onclick="state.discoverFilters.area='';save();renderDiscover()">${esc(f.area)} ×</button>`);
+    chips.push(
+      `<button onclick="state.discoverFilters.area='';save();renderDiscover()">${esc(f.area)} ×</button>`
+    );
   }
 
   if(f.openOnly){
-    chips.push(`<button onclick="state.discoverFilters.openOnly=false;save();renderDiscover()">募集中 ×</button>`);
+    chips.push(
+      `<button onclick="state.discoverFilters.openOnly=false;save();renderDiscover()">募集中 ×</button>`
+    );
   }
 
   row.innerHTML=chips.join("");
 }
+function sortDiscoverRows(rows,sort){
+  const copy=[...rows];
+
+  if(sort==="soon"){
+    copy.sort((a,b)=>{
+      const aKey=`${a.date||""} ${a.time||""}`;
+      const bKey=`${b.date||""} ${b.time||""}`;
+      return aKey.localeCompare(bKey);
+    });
+    return copy;
+  }
+
+  if(sort==="new"){
+    copy.sort((a,b)=>{
+      const aTime=new Date(a.created_at||a.date||0).getTime()||0;
+      const bTime=new Date(b.created_at||b.date||0).getTime()||0;
+      return bTime-aTime;
+    });
+    return copy;
+  }
+
+  if(sort==="available"){
+    copy.sort((a,b)=>{
+      const aRemain=Math.max(0,Number(a.capacity||0)-Number(a.people||0));
+      const bRemain=Math.max(0,Number(b.capacity||0)-Number(b.people||0));
+      return bRemain-aRemain;
+    });
+    return copy;
+  }
+
+  copy.sort((a,b)=>{
+    const score=x=>{
+      let s=0;
+      if(x.saved)s+=2;
+      if(x.joined)s+=2;
+      if(x.owner===(currentAuthUser?.id||meId()))s+=1;
+
+      const diff=dayDiffFromToday(x.date);
+      if(diff!==null && diff>=0 && diff<=7)s+=1;
+
+      return s;
+    };
+
+    return score(b)-score(a);
+  });
+
+  return copy;
+}
 function renderDiscover(){
   ensureDiscoverState();
 
-  const query=($("discoverQuery")?.value||"").trim().toLowerCase();
+  const query=($("discoverQuery")?.value||"").trim();
   const sort=$("discoverSort")?.value||"recommended";
   const f=state.discoverFilters;
 
-  let rows=state.events.filter(e=>{
-    if(f.openOnly && e.people>=e.capacity)return false;
-    if(f.category!=="すべて" && e.category!==f.category)return false;
-    if(f.area && !String(e.place||"").toLowerCase().includes(f.area.toLowerCase()))return false;
-    if(!discoverDateMatches(e,f.date))return false;
+  let rows=(state.events||[]).filter(e=>{
+    if(!e)return false;
 
-    if(query){
-      const hay=`${e.title} ${e.sub} ${e.category} ${e.place} ${(e.tags||[]).join(" ")}`.toLowerCase();
-      if(!hay.includes(query))return false;
-    }
+    if(f.openOnly && !discoverIsOpen(e))return false;
+    if(!discoverCategoryMatches(e,f.category))return false;
+    if(!discoverAreaMatches(e,f.area))return false;
+    if(!discoverDateMatches(e,f.date))return false;
+    if(!discoverKeywordMatches(e,query))return false;
+
     return true;
   });
 
-  if(sort==="soon"){
-    rows.sort((a,b)=>`${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
-  }else if(sort==="new"){
-    rows.sort((a,b)=>String(b.created_at||"").localeCompare(String(a.created_at||"")));
-  }else if(sort==="available"){
-    rows.sort((a,b)=>(b.capacity-b.people)-(a.capacity-a.people));
-  }else{
-    rows.sort((a,b)=>{
-      const aScore=(a.saved?2:0)+(a.joined?2:0)+(a.owner===meId()?1:0);
-      const bScore=(b.saved?2:0)+(b.joined?2:0)+(b.owner===meId()?1:0);
-      return bScore-aScore;
-    });
+  rows=sortDiscoverRows(rows,sort);
+
+  if($("discoverCount")){
+    $("discoverCount").textContent=`${rows.length}件見つかりました`;
   }
 
-  $("discoverCount").textContent=`${rows.length}件見つかりました`;
   renderDiscoverActiveFilters();
 
-  $("discoverResults").innerHTML=rows.length
+  const results=$("discoverResults");
+  if(!results)return;
+
+  results.innerHTML=rows.length
     ? rows.map(discoverCard).join("")
     : `<div class="discover-empty">
         <strong>条件に合う募集がありません</strong>
@@ -5097,7 +5258,10 @@ function renderChat(){
 }
 
 
-$("discoverQuery").addEventListener("input",renderDiscover);
+
+$("discoverQuery").addEventListener("input",()=>{
+  renderDiscover();
+});
 
 $("dmUserSearch").addEventListener("input",e=>{
   renderDmUserPicker(e.target.value);
