@@ -2097,7 +2097,7 @@ body{align-items:flex-start!important}
 
 
 /* =========================================================
-   V23.1.2 — CHARCOAL × COBALT BLUE
+   V23.2.1 — CHARCOAL × COBALT BLUE
    UI COLOR REFRESH ONLY
    ========================================================= */
 
@@ -3325,6 +3325,50 @@ html,body{
   background:#1769E0 !important;
   border-color:#1769E0 !important;
   color:#fff !important;
+}
+
+
+/* =========================================================
+   V23.2 — DISCOVER INTERACTION POLISH
+   ========================================================= */
+
+#discoverFilterModal .discover-filter-options button{
+  transition:
+    background .14s ease,
+    color .14s ease,
+    border-color .14s ease,
+    transform .08s ease;
+}
+
+#discoverFilterModal .discover-filter-options button.active{
+  background:#1769E0 !important;
+  color:#fff !important;
+  border-color:#1769E0 !important;
+  box-shadow:0 0 0 2px rgba(23,105,224,.08);
+}
+
+#discoverFilterModal .discover-filter-options button:active{
+  transform:scale(.96);
+}
+
+#discoverApplyBtn{
+  position:relative;
+  z-index:510 !important;
+  pointer-events:auto !important;
+}
+
+#discoverResetBtn{
+  position:relative;
+  z-index:510 !important;
+  pointer-events:auto !important;
+}
+
+#discoverCount{
+  scroll-margin-top:18px;
+}
+
+.discover-summary-row{
+  scroll-margin-top:18px;
 }
 
 </style>
@@ -4750,13 +4794,18 @@ function resetDiscoverFilters(){
   updateDiscoverFilterButtons();
   save();
   renderDiscover();
+
+  toast("絞り込みをリセットしました");
 }
 function applyDiscoverFilters(){
   ensureDiscoverState();
 
-  // 画面上で選択されている値を最終的な正として読み取る
-  const activeDate=document.querySelector("[data-filter-date].active");
-  const activeCategory=document.querySelector("[data-filter-category].active");
+  const activeDate=document.querySelector(
+    "#discoverFilterModal [data-filter-date].active"
+  );
+  const activeCategory=document.querySelector(
+    "#discoverFilterModal [data-filter-category].active"
+  );
 
   state.discoverFilters.date=
     activeDate?.dataset?.filterDate ||
@@ -4772,28 +4821,30 @@ function applyDiscoverFilters(){
     ($("discoverArea")?.value||"").trim();
 
   state.discoverFilters.openOnly=
-    $("discoverOpenOnly") ? $("discoverOpenOnly").checked : true;
+    $("discoverOpenOnly")
+      ? $("discoverOpenOnly").checked
+      : true;
 
   save();
 
-  // 先に再描画してからモーダルを閉じる
+  // 先に結果を更新
   renderDiscover();
+
+  // そのあと絞り込み画面を閉じる
   closeModal("discoverFilterModal");
 
-  const resultText=$("discoverCount")?.textContent||"検索結果を更新しました";
-  toast(resultText);
-
-  // 探す画面を確実に表示
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  $("discover")?.classList.add("active");
-
-  // 検索結果の上部へ戻す
+  // 探すページを確実に表示したまま、結果へ移動
   requestAnimationFrame(()=>{
-    $("discoverCount")?.scrollIntoView({
-      behavior:"smooth",
-      block:"start"
-    });
+    const target=$("discoverCount") || $("discoverResults");
+    if(target){
+      target.scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+      });
+    }
   });
+
+  toast($("discoverCount")?.textContent || "検索結果を更新しました");
 }
 function toLocalDay(dateStr){
   if(!dateStr)return null;
@@ -5366,14 +5417,16 @@ $("discoverFilterModal").addEventListener("click",e=>{
     return;
   }
 
-  if(e.target.closest("#discoverApplyBtn")){
+  const applyBtn=e.target.closest("#discoverApplyBtn");
+  if(applyBtn){
     e.preventDefault();
     e.stopPropagation();
     applyDiscoverFilters();
     return;
   }
 
-  if(e.target.closest("#discoverResetBtn")){
+  const resetBtn=e.target.closest("#discoverResetBtn");
+  if(resetBtn){
     e.preventDefault();
     e.stopPropagation();
     resetDiscoverFilters();
@@ -6595,6 +6648,7 @@ async function activateSupabaseUser(user){
   renderAll();
   updateAccountUI();
   hideAuthGate();
+  closeModal("authModal");
   await loadEventsFromSupabase();
   await loadFollowState();
   await loadMessageThreads();
