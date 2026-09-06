@@ -2097,7 +2097,7 @@ body{align-items:flex-start!important}
 
 
 /* =========================================================
-   V22.3 — CHARCOAL × COBALT BLUE
+   V22.3.1 — CHARCOAL × COBALT BLUE
    UI COLOR REFRESH ONLY
    ========================================================= */
 
@@ -2530,6 +2530,125 @@ html,body{
 /* selection states */
 .count-btn strong{
   color:var(--charcoal) !important;
+}
+
+
+/* =========================================================
+   V22.3.1 — COMPACT HOME CATEGORIES
+   ========================================================= */
+
+.home-v22 .home-section-row:has(+ .home-category-row){
+  margin-bottom:8px !important;
+}
+
+.home-v22 .home-category-row{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  padding:0 2px 8px !important;
+  margin:0 0 14px !important;
+  scroll-snap-type:x proximity;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+.home-v22 .home-category-row::-webkit-scrollbar{
+  display:none;
+}
+
+/* New compact chip style */
+.home-v22 .home-category-chip{
+  flex:0 0 auto;
+  min-width:auto !important;
+  height:34px !important;
+  padding:0 13px !important;
+  border:1px solid #D8E0EA !important;
+  border-radius:999px !important;
+  background:#fff !important;
+  color:#667085 !important;
+  font-size:9px !important;
+  font-weight:750 !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  box-shadow:none !important;
+  scroll-snap-align:start;
+}
+.home-v22 .home-category-chip.active{
+  background:#1769E0 !important;
+  border-color:#1769E0 !important;
+  color:#fff !important;
+}
+
+/* Existing legacy category buttons: force compact chip appearance too */
+.home-v22 .home-category-row button{
+  flex:0 0 auto !important;
+  min-width:auto !important;
+  width:auto !important;
+  height:34px !important;
+  padding:0 13px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:0 !important;
+  border:1px solid #D8E0EA !important;
+  border-radius:999px !important;
+  background:#fff !important;
+  color:#667085 !important;
+  font-size:9px !important;
+  font-weight:750 !important;
+  line-height:1 !important;
+  box-shadow:none !important;
+  white-space:nowrap !important;
+}
+
+/* Hide old round icons / kanji icon circles */
+.home-v22 .home-category-row button > span:first-child,
+.home-v22 .home-category-row .home-cat-icon{
+  display:none !important;
+}
+
+/* Keep only the actual label */
+.home-v22 .home-category-row button > span:last-child{
+  display:inline !important;
+  margin:0 !important;
+  font-size:9px !important;
+  color:inherit !important;
+  line-height:1 !important;
+}
+
+/* Selected state */
+.home-v22 .home-category-row button.active{
+  background:#1769E0 !important;
+  border-color:#1769E0 !important;
+  color:#fff !important;
+}
+.home-v22 .home-category-row button.active > span:last-child{
+  color:#fff !important;
+}
+
+/* Reduce the space around section title */
+.home-v22 .home-section-row{
+  min-height:auto !important;
+}
+
+/* Bring recommendations closer */
+.home-v22 .home-category-row + .home-section-row,
+.home-v22 .home-category-row + .db-status{
+  margin-top:2px !important;
+}
+
+/* On narrow phones, keep swipe feel */
+@media (max-width:360px){
+  .home-v22 .home-category-row{
+    gap:6px !important;
+  }
+  .home-v22 .home-category-row button,
+  .home-v22 .home-category-chip{
+    height:32px !important;
+    padding:0 11px !important;
+    font-size:8.5px !important;
+  }
 }
 
 </style>
@@ -5169,22 +5288,25 @@ function updateAccountUI(){
 
 
 function renderHomeCategories(){
+  const row=$("homeCategoryRow");
+  if(!row)return;
+
   const items=[
-    ["すべて","人",null],
-    ["飲み会","杯","食事・飲み"],
-    ["BBQ","火","おでかけ"],
-    ["麻雀","麻","ゲーム・遊び"],
-    ["スポーツ","球","スポーツ"],
-    ["カフェ","珈","食事・飲み"],
-    ["散歩","歩","おでかけ"],
-    ["趣味","趣","カルチャー・趣味"]
+    ["すべて","すべて"],
+    ["飲み会","飲み会"],
+    ["BBQ","BBQ"],
+    ["麻雀","麻雀"],
+    ["スポーツ","スポーツ"],
+    ["カフェ","カフェ"],
+    ["散歩","散歩"]
   ];
-  const box=$("homeCategoryRow");
-  if(!box)return;
-  box.innerHTML=items.map(([label,icon,cat],i)=>`<div class="home-cat ${i===0?"active":""}">
-    <button onclick="homeCategorySelect(${cat?`'${escjs(cat)}'`:"null"},this)">${icon}</button>
-    <span>${label}</span>
-  </div>`).join("");
+
+  row.innerHTML=items.map(([label,value])=>`
+    <button
+      class="home-category-chip ${state.homeCategory===value?"active":""}"
+      onclick="setHomeCategory('${escjs(value)}')"
+    >${esc(label)}</button>
+  `).join("");
 }
 function homeCategorySelect(cat,btn){
   document.querySelectorAll(".home-cat").forEach(x=>x.classList.remove("active"));
