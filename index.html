@@ -4162,6 +4162,74 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.0.5 — COMMENTS: VIEWER ACCESS + MULTILINE
+   ========================================================= */
+
+.v23-6-board-form{
+  align-items:end;
+}
+
+.v23-6-board-form textarea{
+  width:100%;
+  min-width:0;
+  min-height:74px;
+  max-height:180px;
+  resize:vertical;
+  padding:10px 11px;
+  border:1px solid #D8E0EA;
+  border-radius:11px;
+  outline:none;
+  background:#fff;
+  color:#1B2430;
+  font:inherit;
+  font-size:9px;
+  line-height:1.55;
+}
+
+.v23-6-board-form textarea:focus{
+  border-color:#9ABCF4;
+  box-shadow:0 0 0 3px rgba(23,105,224,.08);
+}
+
+.v23-6-board-form textarea:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.comment-compose-row{
+  align-items:end !important;
+}
+
+.comment-compose-row textarea{
+  flex:1;
+  min-width:0;
+  min-height:74px;
+  max-height:180px;
+  resize:vertical;
+  padding:10px 11px;
+  border:1px solid #D8E0EA;
+  border-radius:11px;
+  background:#fff;
+  color:#1B2430;
+  font:inherit;
+  line-height:1.55;
+}
+
+.comment-text,
+.v23-6-board-comment-text{
+  white-space:pre-wrap !important;
+  overflow-wrap:anywhere;
+}
+
+@media (max-width:360px){
+  .v23-6-board-form textarea,
+  .comment-compose-row textarea{
+    min-height:68px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4471,7 +4539,7 @@ html,body{
 <div class="detail-tabs"><button class="detail-tab active" data-detailtab="comments" onclick="switchDetailTab('comments')">コメント</button><button class="detail-tab" data-detailtab="participants" onclick="switchDetailTab('participants')">参加者</button></div>
 <div id="comments" class="detail-panel active">
   <div id="commentList" class="comment-list"></div>
-  <form id="commentForm" class="input-row" style="margin-top:10px"><input id="commentInput" placeholder="コメントを入力"><button class="send-btn">送信</button></form>
+  <form id="commentForm" class="input-row comment-compose-row" style="margin-top:10px"><textarea id="commentInput" rows="3" maxlength="1000" placeholder="コメントを入力"></textarea><button class="send-btn" type="submit">送信</button></form>
 </div>
 <div id="participants" class="detail-panel"><div id="participantList" class="list"></div></div>
 </div>
@@ -4710,7 +4778,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_0_4_real_user_fix";
+const KEY="tk_my_gathers_v24_0_5_comments_access_multiline";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -5468,7 +5536,7 @@ async function cardDetailToggleJoin(id){
 
 function cardDetailCommentPlaceholder(e){
   if(!currentAuthUser)return "コメントするにはログインしてください";
-  if(!canCurrentUserComment(e))return "保存または参加するとコメントできます";
+  if(!canCurrentUserComment(e))return "この募集にはコメントできません";
   return "コメントを書く";
 }
 
@@ -5524,11 +5592,11 @@ async function submitCardDetailComment(event,id){
 
   if(!requireAuth("コメントするにはログインしてください。"))return;
 
-  const e=resolveEventByAnyId(id);
+  const e=resolveEventRecord(id);
   if(!e)return;
 
   if(!canCurrentUserComment(e)){
-    toast("保存または参加するとコメントできます");
+    toast("この募集にはコメントできません");
     return;
   }
 
@@ -5541,11 +5609,12 @@ async function submitCardDetailComment(event,id){
   if(submit)submit.disabled=true;
 
   try{
-    if(e.source==="supabase" && e.dbId){
+    if(isRealSupabaseEvent(e)){
+      const eventId=getSupabaseEventId(e);
       const {error}=await sb
         .from("comments")
         .insert({
-          event_id:e.dbId,
+          event_id:eventId,
           user_id:currentAuthUser.id,
           body:text
         });
@@ -5654,18 +5723,18 @@ function openCardDetail(id){
           </div>
 
           <form class="v23-6-board-form" onsubmit="submitCardDetailComment(event,${arg})">
-            <input
+            <textarea
               id="cardDetailCommentInput"
-              type="text"
-              maxlength="500"
+              rows="3"
+              maxlength="1000"
               placeholder="${esc(cardDetailCommentPlaceholder(e))}"
-            >
+            ></textarea>
             <button id="cardDetailCommentSubmit" type="submit">投稿</button>
           </form>
 
           ${
-            currentAuthUser && !canCurrentUserComment(e)
-              ? `<div class="v23-6-board-help">保存または参加すると、この掲示板にコメントできます。</div>`
+            !currentAuthUser
+              ? `<div class="v23-6-board-help">ログインするとコメントできます。</div>`
               : ""
           }
         </section>
@@ -7274,7 +7343,11 @@ async function removeEvent(id){
 
 function canCurrentUserComment(ev){
   if(!currentAuthUser||!ev)return false;
-  return ev.owner===meId() || ev.joined || ev.saved;
+
+  // v24.0.5:
+  // state.events には公開範囲チェックを通過した募集だけが入る。
+  // そのため、ログイン中でこの募集を表示できているならコメント可能。
+  return state.events.some(e=>String(e.id)===String(ev.id));
 }
 function commentTimeLabel(value){
   if(!value)return "";
@@ -7354,7 +7427,7 @@ function updateCommentComposer(ev){
   if(!currentAuthUser){
     input.placeholder="コメントするにはログインしてください";
   }else if(!allowed){
-    input.placeholder="保存または参加するとコメントできます";
+    input.placeholder="この募集にはコメントできません";
   }else{
     input.placeholder="コメントを入力";
   }
@@ -7405,7 +7478,7 @@ $("commentForm").addEventListener("submit",async e=>{
   if(!ev)return;
 
   if(!canCurrentUserComment(ev)){
-    toast("保存または参加するとコメントできます");
+    toast("この募集にはコメントできません");
     return;
   }
 
@@ -7413,11 +7486,12 @@ $("commentForm").addEventListener("submit",async e=>{
   if(button)button.disabled=true;
 
   try{
-    if(ev.source==="supabase"&&ev.dbId){
+    if(isRealSupabaseEvent(ev)){
+      const eventId=getSupabaseEventId(ev);
       const {error}=await sb
         .from("comments")
         .insert({
-          event_id:ev.dbId,
+          event_id:eventId,
           user_id:currentAuthUser.id,
           body:text
         });
