@@ -4230,6 +4230,27 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.1.1 — PROFILE AVATAR SYNC
+   ========================================================= */
+
+#accountAvatarBtn{
+  overflow:hidden;
+}
+
+#accountAvatarBtn img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  border-radius:inherit;
+}
+
+#profileImagePreview{
+  object-fit:cover;
+}
+
 </style>
 </head>
 <body>
@@ -4778,7 +4799,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_0_5_comments_access_multiline";
+const KEY="tk_my_gathers_v24_1_1_profile_avatar_sync";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -6625,38 +6646,240 @@ async function showFollowList(type){
 function renderProfile(){const m=me();$("profileName").textContent=m.name;$("profileHandle").textContent=m.handle;$("profileBio").textContent=m.bio;$("profileArea").textContent=m.area;$("followersCount").textContent=m.followers;$("followingCount").textContent=m.following;$("mutualCount").textContent=mutuals().length;$("myFunTotal").textContent=m.fun;$("profileAvatar").innerHTML=m.avatar?`<img src="${m.avatar}" alt="">`:esc(m.name.slice(0,2));$("interestGrid").innerHTML=m.interests.map(x=>`<button class="interest-chip light" onclick="prefill('${escjs(x)}')">${esc(x)}</button>`).join("");$("upcoming").innerHTML=profileList(state.events.filter(e=>e.joined&&e.status==="upcoming"),"まだ参加予定はありません",false);$("created").innerHTML=profileList(state.events.filter(e=>e.owner===(currentAuthUser?.id||meId())),"まだ自分の募集はありません",false);$("history").innerHTML=profileList(state.events.filter(e=>e.status==="history"&&e.participants.includes(meId())),"まだ履歴はありません",true)}
 function profileList(list,empty,historyMode){if(!list.length)return `<div class="panel" style="padding:18px;text-align:center;color:var(--muted)">${empty}</div>`;return `<div class="list">${list.map(e=>{const arg=eventIdArg(e.id);return `<div class="friend"><div class="friend-left" onclick="openEvent(${arg})" style="cursor:pointer"><div class="mini-avatar">${esc(e.sub.slice(0,2))}</div><div><div class="friend-name">${esc(e.title)}</div><div class="muted">${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</div></div></div>${historyMode?`<button class="fun-btn" onclick="openFun(${arg})">楽しかった！</button>`:`<div class="muted">${e.people}/${e.capacity}人</div>`}</div>`}).join("")}</div>`}
 function switchProfileTab(id){document.querySelectorAll(".profile-tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("active",p.id===id))}
-function openProfileEdit(){if(!requireAuth("プロフィール編集にはログインが必要です。"))return;const m=me();$("editName").value=m.name;$("editHandle").value=m.handle;$("editBio").value=m.bio;$("editArea").value=m.area;$("profileImagePreview").style.display=m.avatar?"block":"none";if(m.avatar)$("profileImagePreview").src=m.avatar;openModal("profileEditModal")}
+
+let selectedProfileImageFile=null;
+let selectedProfileImagePreviewUrl=null;
+let profileImageRemoveRequested=false;
+
+function profileImageExtension(file){
+  const byMime={
+    "image/jpeg":"jpg",
+    "image/png":"png",
+    "image/webp":"webp"
+  };
+  return byMime[file?.type]||"jpg";
+}
+
+function validateProfileImageFile(file){
+  if(!file)return false;
+
+  const allowed=["image/jpeg","image/png","image/webp"];
+  if(!allowed.includes(file.type)){
+    toast("JPEG・PNG・WebPの画像を選んでください");
+    return false;
+  }
+
+  if(file.size>5*1024*1024){
+    toast("プロフィール画像は5MB以下にしてください");
+    return false;
+  }
+
+  return true;
+}
+
+async function uploadProfileAvatar(file){
+  if(!file)return null;
+  if(!currentAuthUser)throw new Error("ログインが必要です");
+
+  const ext=profileImageExtension(file);
+  const path=`${currentAuthUser.id}/avatar-${Date.now()}.${ext}`;
+
+  const {error:uploadError}=await sb.storage
+    .from("profile-media")
+    .upload(path,file,{
+      cacheControl:"3600",
+      upsert:false,
+      contentType:file.type
+    });
+
+  if(uploadError)throw uploadError;
+
+  const {data}=sb.storage
+    .from("profile-media")
+    .getPublicUrl(path);
+
+  if(!data?.publicUrl)throw new Error("プロフィール画像URLを取得できませんでした");
+
+  return {
+    publicUrl:data.publicUrl,
+    path
+  };
+}
+
+function resetProfileImageSelection(){
+  selectedProfileImageFile=null;
+  profileImageRemoveRequested=false;
+
+  if(selectedProfileImagePreviewUrl){
+    URL.revokeObjectURL(selectedProfileImagePreviewUrl);
+    selectedProfileImagePreviewUrl=null;
+  }
+
+  const input=$("profileImageInput");
+  if(input)input.value="";
+}
+
+function openProfileEdit(){
+  if(!requireAuth("プロフィール編集にはログインが必要です。"))return;
+
+  resetProfileImageSelection();
+
+  const m=me();
+  $("editName").value=m.name;
+  $("editHandle").value=m.handle;
+  $("editBio").value=m.bio;
+  $("editArea").value=m.area;
+
+  const preview=$("profileImagePreview");
+  if(m.avatar){
+    preview.src=m.avatar;
+    preview.style.display="block";
+  }else{
+    preview.removeAttribute("src");
+    preview.style.display="none";
+  }
+
+  openModal("profileEditModal");
+}
 $("profileEditForm").addEventListener("submit",async e=>{
   e.preventDefault();
+
+  if(!requireAuth("プロフィール編集にはログインが必要です。"))return;
+
   const m=me();
   const newName=$("editName").value.trim();
   const rawHandle=$("editHandle").value.trim().replace(/^@/,"").replace(/\s+/g,"_");
   const newBio=$("editBio").value.trim();
   const newArea=$("editArea").value.trim();
+  const button=e.submitter||e.currentTarget.querySelector(".submit");
 
-  if(currentAuthUser){
-    const {error}=await sb.from("profiles").update({
-      display_name:newName,
-      username:rawHandle,
-      bio:newBio,
-      area:newArea,
-      interests:m.interests||[]
-    }).eq("id",currentAuthUser.id);
-    if(error){toast("プロフィール更新に失敗しました");console.error(error);return}
+  if(!newName || !rawHandle){
+    toast("名前とユーザー名を入力してください");
+    return;
   }
 
-  m.name=newName;
-  m.handle="@"+rawHandle;
-  m.bio=newBio;
-  m.area=newArea;
-  save();
-  renderProfile();
-  updateAccountUI();
-  closeModal("profileEditModal");
-  toast("プロフィールを更新しました");
+  let uploadedAvatar=null;
+  let nextAvatar=m.avatar||null;
+
+  if(button){
+    button.disabled=true;
+    button.textContent="保存しています…";
+  }
+
+  try{
+    if(selectedProfileImageFile){
+      if(button)button.textContent="画像をアップロード中…";
+      uploadedAvatar=await uploadProfileAvatar(selectedProfileImageFile);
+      nextAvatar=uploadedAvatar.publicUrl;
+    }else if(profileImageRemoveRequested){
+      nextAvatar=null;
+    }
+
+    const {data:updated,error}=await sb
+      .from("profiles")
+      .update({
+        display_name:newName,
+        username:rawHandle,
+        bio:newBio,
+        area:newArea,
+        avatar_url:nextAvatar,
+        interests:m.interests||[]
+      })
+      .eq("id",currentAuthUser.id)
+      .select("id,username,display_name,avatar_url,bio,area,interests")
+      .single();
+
+    if(error)throw error;
+
+    // Supabaseから返った最新プロフィールを唯一の正として同期
+    const p=remoteProfileToPerson(updated);
+
+    state.accounts[currentAuthUser.id]={
+      ...(state.accounts[currentAuthUser.id]||{}),
+      id:currentAuthUser.id,
+      name:p.name,
+      handle:p.handle,
+      bio:p.bio||"",
+      area:p.area||"",
+      avatar:p.avatar||null,
+      interests:p.interests||[],
+      followers:state.accounts[currentAuthUser.id]?.followers||0,
+      following:state.accounts[currentAuthUser.id]?.following||0,
+      fun:state.accounts[currentAuthUser.id]?.fun||0
+    };
+
+    state.currentUserId=currentAuthUser.id;
+
+    save();
+    renderProfile();
+    updateAccountUI();
+    renderHome();
+    renderDiscover();
+    renderMyGathers();
+    renderMessages();
+
+    closeModal("profileEditModal");
+    resetProfileImageSelection();
+    toast("プロフィールを更新しました");
+
+  }catch(error){
+    console.error("profile update:",error);
+
+    if(uploadedAvatar?.path){
+      try{
+        await sb.storage.from("profile-media").remove([uploadedAvatar.path]);
+      }catch(cleanupError){
+        console.warn("profile image cleanup:",cleanupError);
+      }
+    }
+
+    toast("プロフィール更新に失敗しました");
+
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent="保存する";
+    }
+  }
 })
-$("profileImageInput").addEventListener("change",e=>readFile(e.target.files[0],data=>{me().avatar=data;$("profileImagePreview").src=data;$("profileImagePreview").style.display="block"}))
-function clearProfileImage(){me().avatar=null;$("profileImagePreview").style.display="none"}
+$("profileImageInput").addEventListener("change",e=>{
+  const file=e.target.files?.[0];
+  if(!file)return;
+
+  if(!validateProfileImageFile(file)){
+    e.target.value="";
+    return;
+  }
+
+  if(selectedProfileImagePreviewUrl){
+    URL.revokeObjectURL(selectedProfileImagePreviewUrl);
+  }
+
+  selectedProfileImageFile=file;
+  profileImageRemoveRequested=false;
+  selectedProfileImagePreviewUrl=URL.createObjectURL(file);
+
+  const preview=$("profileImagePreview");
+  preview.src=selectedProfileImagePreviewUrl;
+  preview.style.display="block";
+});
+
+function clearProfileImage(){
+  selectedProfileImageFile=null;
+  profileImageRemoveRequested=true;
+
+  if(selectedProfileImagePreviewUrl){
+    URL.revokeObjectURL(selectedProfileImagePreviewUrl);
+    selectedProfileImagePreviewUrl=null;
+  }
+
+  const input=$("profileImageInput");
+  if(input)input.value="";
+
+  const preview=$("profileImagePreview");
+  preview.removeAttribute("src");
+  preview.style.display="none";
+}
 function openWant(){openModal("wantModal")}
 $("wantForm").addEventListener("submit",async e=>{
   e.preventDefault();
@@ -7550,7 +7773,13 @@ function renderAccountSwitcher(){
 function updateAccountUI(){
   const a=me();
   const btn=$("accountAvatarBtn");
-  if(btn)btn.textContent=(a?.name||"U").slice(0,1);
+  if(!btn)return;
+
+  if(a?.avatar){
+    btn.innerHTML=`<img src="${esc(a.avatar)}" alt="${esc(a.name||"プロフィール")}">`;
+  }else{
+    btn.textContent=(a?.name||"U").slice(0,1);
+  }
 }
 
 
@@ -7676,7 +7905,14 @@ function upsertLocalAuthAccount(user,profile){
     state.people.unshift({id,name:displayName,handle:"@"+username,fun:0,mutual:false});
   }else{
     const p=state.people.find(p=>p.id===id);
-    p.name=displayName;p.handle="@"+username;
+    p.name=displayName;
+    p.handle="@"+username;
+    p.avatar=profile?.avatar_url||existing.avatar||null;
+    p.bio=profile?.bio||existing.bio||"";
+    p.area=profile?.area||existing.area||"";
+    p.interests=Array.isArray(profile?.interests)?profile.interests:(existing.interests||[]);
+    p.realUser=true;
+    p.demoUser=false;
   }
   state.currentUserId=id;
   save();
