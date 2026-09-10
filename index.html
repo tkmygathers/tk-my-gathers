@@ -4318,19 +4318,66 @@ html,body{
   .profile-banner-edit,.other-profile-banner{height:108px;}
 }
 
+
+/* =========================================================
+   V24.1.3 — LOGO HOME + LARGER NAV SYMBOLS
+   ========================================================= */
+
+.brand-home-btn{
+  appearance:none;
+  -webkit-appearance:none;
+  border:0;
+  padding:0;
+  margin:0;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+
+.nav-btn{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:2px !important;
+  line-height:1 !important;
+}
+
+.nav-btn .nav-symbol{
+  display:block;
+  font-size:20px !important;
+  line-height:22px !important;
+  font-weight:700;
+}
+
+.nav-btn .nav-label{
+  display:block;
+  font-size:9px !important;
+  line-height:11px !important;
+  font-weight:700;
+}
+
+/* 中央＋も外枠サイズは変えず、記号だけ大きく */
+.fab{
+  font-size:31px !important;
+  line-height:1 !important;
+}
+
 </style>
 </head>
 <body>
 <main class="shell">
 <header class="topbar">
   <div class="toprow">
-    <div class="brand" onclick="showPage('home')" style="cursor:pointer">
+    <button type="button" class="brand brand-home-btn" onclick="goHomeFromLogo()" aria-label="ホームに戻る">
       <div class="tk-mark"><span class="t">T</span><span class="k">K</span><span class="slash"></span></div>
       <div class="brand-copy">
         <div class="brand-title">TK <em>MY</em> GATHERS</div>
         <div class="brand-sub">やりたいことから、集まる</div>
       </div>
-    </div>
+    </button>
     <div class="top-actions">
       <button class="icon-btn" onclick="showPage('messages')" aria-label="メッセージ">✉</button>
       <div class="header-actions">
@@ -4533,11 +4580,23 @@ html,body{
 
 <button class="fab" onclick="openQuickAction()">＋</button>
 <nav class="nav nav-five">
-  <button class="nav-btn active" data-page="home" onclick="showPage('home')">⌂<br>ホーム</button>
-  <button class="nav-btn" data-page="discover" onclick="showPage('discover')">⌕<br>探す</button>
+  <button class="nav-btn active" data-page="home" onclick="showPage('home')">
+    <span class="nav-symbol" aria-hidden="true">⌂</span>
+    <span class="nav-label">ホーム</span>
+  </button>
+  <button class="nav-btn" data-page="discover" onclick="showPage('discover')">
+    <span class="nav-symbol" aria-hidden="true">⌕</span>
+    <span class="nav-label">探す</span>
+  </button>
   <div class="nav-spacer"></div>
-  <button class="nav-btn" data-page="messages" onclick="showPage('messages')">✉<br>メッセージ</button>
-  <button class="nav-btn" data-page="mygathers" onclick="showPage('mygathers')">▣<br>マイ募集</button>
+  <button class="nav-btn" data-page="messages" onclick="showPage('messages')">
+    <span class="nav-symbol" aria-hidden="true">✉</span>
+    <span class="nav-label">メッセージ</span>
+  </button>
+  <button class="nav-btn" data-page="mygathers" onclick="showPage('mygathers')">
+    <span class="nav-symbol" aria-hidden="true">▣</span>
+    <span class="nav-label">マイ募集</span>
+  </button>
 </nav>
 </main>
 
@@ -4879,7 +4938,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_1_2_profile_banner";
+const KEY="tk_my_gathers_v24_1_3_logo_home_nav_icons";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -5219,6 +5278,27 @@ async function openNotification(id){
     openChat(n.actor_id);
     return;
   }
+}
+
+
+function goHomeFromLogo(){
+  // TKロゴは常に「ホームの先頭」へ戻す
+  state.tkSpecialFilter=null;
+  state.homeFilter="all";
+  state.homeCategory="すべて";
+
+  document.querySelectorAll(".modal.open").forEach(el=>el.classList.remove("open"));
+  document.body.style.overflow="";
+
+  showPage("home");
+  renderHome();
+  renderHomeCategories();
+
+  window.scrollTo({
+    top:0,
+    left:0,
+    behavior:"smooth"
+  });
 }
 
 function showPage(id){
