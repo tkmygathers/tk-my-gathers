@@ -4550,6 +4550,140 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.2.3 — ONE MORE FOCUS
+   ========================================================= */
+
+.one-more-focus{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:10px;
+  padding:10px 11px;
+  border:1px solid #E6D7A8;
+  border-radius:12px;
+  background:#FFFBEF;
+}
+
+.one-more-focus-main{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+}
+
+.one-more-focus-main strong{
+  color:#6D5720;
+  font-size:10px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.one-more-focus-sub{
+  color:#8A7844;
+  font-size:7.5px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.one-more-dot{
+  width:7px;
+  height:7px;
+  flex:0 0 auto;
+  border-radius:50%;
+  background:#C89B2C;
+  box-shadow:0 0 0 3px rgba(200,155,44,.12);
+}
+
+.one-more-people{
+  color:#8A6511 !important;
+  font-weight:900 !important;
+}
+
+.one-more-join{
+  background:#1769E0 !important;
+  border-color:#1769E0 !important;
+  color:#fff !important;
+  box-shadow:0 5px 14px rgba(23,105,224,.18) !important;
+}
+
+.discover-one-more{
+  border-color:#E9DFC2 !important;
+}
+
+.discover-one-more-row{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-top:7px;
+  padding:7px 8px;
+  border-radius:10px;
+  background:#FFFBEF;
+  color:#6D5720;
+}
+
+.discover-one-more-row strong{
+  font-size:8.5px;
+  font-weight:900;
+}
+
+.detail-one-more-focus{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:10px 0 12px;
+  padding:11px 12px;
+  border:1px solid #E6D7A8;
+  border-radius:12px;
+  background:#FFFBEF;
+}
+
+.detail-one-more-focus > div{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.detail-one-more-focus strong{
+  color:#6D5720;
+  font-size:10px;
+  font-weight:900;
+}
+
+.detail-one-more-focus > span{
+  color:#8A7844;
+  font-size:7.5px;
+  font-weight:700;
+}
+
+.v22-urgency{
+  background:#FFF7DB !important;
+  border:1px solid #E6CF86 !important;
+  color:#7A5B0A !important;
+  font-weight:900 !important;
+}
+
+@media(max-width:360px){
+  .one-more-focus{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:4px;
+  }
+
+  .one-more-focus-sub{
+    padding-left:14px;
+  }
+
+  .detail-one-more-focus{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:4px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -5142,7 +5276,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_2_2_visibility_ui";
+const KEY="tk_my_gathers_v24_2_3_one_more_focus";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -6139,6 +6273,16 @@ function openCardDetail(id){
 
         <h3>${esc(e.title)}</h3>
 
+        ${Math.max(0,e.capacity-e.people)===1 && !e.joined ? `
+          <div class="detail-one-more-focus">
+            <div>
+              <span class="one-more-dot"></span>
+              <strong>あと1人で開催</strong>
+            </div>
+            <span>参加できる人を募集中</span>
+          </div>
+        ` : ""}
+
         <div class="v23-5-1-detail-meta">
           <div><strong>日時</strong><span>${dateLabel(e.date)} ${esc(e.time)}</span></div>
           <div><strong>場所</strong><span>${esc(e.place)}</span></div>
@@ -6209,6 +6353,7 @@ function eventCard(e){
   const mine=e.owner===(currentAuthUser?.id||meId());
   const arg=eventIdArg(e.id);
   const remaining=Math.max(0,e.capacity-e.people);
+  const oneMore=remaining===1 && !e.joined;
   const quickLabel=remaining===1
     ? `<span class="v22-urgency">あと1人</span>`
     : e.joined
@@ -6241,13 +6386,23 @@ function eventCard(e){
 
       <button class="v22-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
 
+      ${oneMore?`
+        <div class="one-more-focus">
+          <div class="one-more-focus-main">
+            <span class="one-more-dot"></span>
+            <strong>あと1人で開催</strong>
+          </div>
+          <span class="one-more-focus-sub">参加できる人を募集中</span>
+        </div>
+      `:""}
+
       <div class="v22-primary-meta">
         <span>${dateLabel(e.date)} ${esc(e.time)}</span>
         <span>${esc(e.place)}</span>
       </div>
 
       <div class="v22-info-row">
-        <span>${e.people}/${e.capacity}人</span>
+        <span class="${oneMore?"one-more-people":""}">${oneMore?`あと1人 · ${e.people}/${e.capacity}人`:`${e.people}/${e.capacity}人`}</span>
         <span>${esc(e.budget)}</span>
         ${(e.tags||[]).slice(0,1).map(t=>`<span>${esc(t)}</span>`).join("")}
       </div>
@@ -6263,7 +6418,7 @@ function eventCard(e){
 
         ${mine
           ? `<button class="v22-action-button danger" onclick="removeEvent(${arg})">削除</button>`
-          : `<button class="v22-action-button primary ${e.joined?"joined":""}" onclick="toggleJoin(${arg})">${e.joined?"参加中":"参加する"}</button>`}
+          : `<button class="v22-action-button primary ${e.joined?"joined":""} ${oneMore?"one-more-join":""}" onclick="toggleJoin(${arg})">${e.joined?"参加中":oneMore?"参加して埋める":"参加する"}</button>`}
       </div>
     </div>
   </article>`
@@ -6341,8 +6496,10 @@ function discoverCard(e){
   const u=person(e.owner);
   const arg=eventIdArg(e.id);
   const mine=e.owner===(currentAuthUser?.id||meId());
+  const remaining=Math.max(0,e.capacity-e.people);
+  const oneMore=remaining===1 && !e.joined;
 
-  return `<article class="discover-card">
+  return `<article class="discover-card ${oneMore?"discover-one-more":""}">
     <button class="discover-card-image" onclick="openCardDetail(${arg})">
       <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
       <span class="discover-card-category">${esc(e.sub||e.category)}</span>
@@ -6362,13 +6519,20 @@ function discoverCard(e){
 
       <button class="discover-card-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
 
+      ${oneMore?`
+        <div class="discover-one-more-row">
+          <span class="one-more-dot"></span>
+          <strong>あと1人で開催</strong>
+        </div>
+      `:""}
+
       <div class="discover-card-meta">
         <span>${dateLabel(e.date)} ${esc(e.time)}</span>
         <span>${esc(e.place)}</span>
       </div>
 
       <div class="discover-card-info">
-        <span>${e.people}/${e.capacity}人</span>
+        <span class="${oneMore?"one-more-people":""}">${oneMore?`あと1人 · ${e.people}/${e.capacity}人`:`${e.people}/${e.capacity}人`}</span>
         <span>${esc(e.budget)}</span>
         ${(e.tags||[]).slice(0,1).map(t=>`<span>${esc(t)}</span>`).join("")}
       </div>
@@ -6378,7 +6542,7 @@ function discoverCard(e){
         <button onclick="openCardDetail(${arg})">詳細</button>
         ${mine
           ? `<button class="discover-primary muted-primary" onclick="removeEvent(${arg})">削除</button>`
-          : `<button class="discover-primary ${e.joined?"joined":""}" onclick="toggleJoin(${arg})">${e.joined?"参加中":"参加する"}</button>`}
+          : `<button class="discover-primary ${e.joined?"joined":""} ${oneMore?"one-more-join":""}" onclick="toggleJoin(${arg})">${e.joined?"参加中":oneMore?"参加して埋める":"参加する"}</button>`}
       </div>
     </div>
   </article>`;
