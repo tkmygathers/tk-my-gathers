@@ -5065,6 +5065,290 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.3 — MY GATHERS CALENDAR
+   ========================================================= */
+
+.mygathers-tabs-three{
+  grid-template-columns:repeat(3,1fr)!important;
+}
+
+.calendar-shell{
+  margin:10px 12px 22px;
+  padding:14px;
+  border:1px solid var(--tk-line,#E4E8EE);
+  border-radius:18px;
+  background:#fff;
+}
+
+.calendar-head{
+  display:grid;
+  grid-template-columns:38px 1fr 38px;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.calendar-head > div{
+  text-align:center;
+}
+
+.calendar-eyebrow{
+  color:#98A2B3;
+  font-size:7px;
+  font-weight:800;
+  letter-spacing:.12em;
+}
+
+.calendar-month-label{
+  margin-top:2px;
+  color:#16181D;
+  font-size:16px;
+  font-weight:900;
+  letter-spacing:-.02em;
+}
+
+.calendar-nav-btn{
+  width:36px;
+  height:36px;
+  border:1px solid #E4E8EE;
+  border-radius:50%;
+  background:#fff;
+  color:#16181D;
+  font-size:22px;
+  line-height:1;
+}
+
+.calendar-legend{
+  display:flex;
+  justify-content:center;
+  gap:16px;
+  margin-bottom:12px;
+  color:#667085;
+  font-size:8px;
+  font-weight:700;
+}
+
+.calendar-legend span{
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+.calendar-weekdays,
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+}
+
+.calendar-weekdays{
+  margin-bottom:4px;
+}
+
+.calendar-weekdays span{
+  padding:4px 0;
+  text-align:center;
+  color:#98A2B3;
+  font-size:7px;
+  font-weight:800;
+}
+
+.calendar-weekdays span:first-child{
+  color:#B77979;
+}
+
+.calendar-weekdays span:last-child{
+  color:#6F86B5;
+}
+
+.calendar-cell{
+  position:relative;
+  min-width:0;
+  height:44px;
+  padding:5px 2px 3px;
+  border:0;
+  border-radius:10px;
+  background:transparent;
+  color:#344054;
+  font:inherit;
+}
+
+.calendar-cell.outside{
+  pointer-events:none;
+}
+
+.calendar-cell:not(.outside):hover{
+  background:#F8FAFC;
+}
+
+.calendar-cell.today .calendar-day-number{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:23px;
+  height:23px;
+  border-radius:50%;
+  background:#EEF4FF;
+  color:#2563EB;
+  font-weight:900;
+}
+
+.calendar-cell.selected{
+  background:#17191E!important;
+  color:#fff!important;
+}
+
+.calendar-cell.selected .calendar-day-number{
+  background:transparent;
+  color:#fff;
+}
+
+.calendar-day-number{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:23px;
+  height:23px;
+  font-size:9px;
+  font-weight:750;
+}
+
+.calendar-event-dots{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  height:7px;
+}
+
+.calendar-dot{
+  display:inline-block;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+}
+
+.calendar-dot.own{
+  background:#2563EB;
+}
+
+.calendar-dot.joined{
+  background:#B48A2C;
+}
+
+.calendar-cell.selected .calendar-dot{
+  box-shadow:0 0 0 1px rgba(255,255,255,.45);
+}
+
+.calendar-day-section{
+  margin-top:14px;
+  padding-top:13px;
+  border-top:1px solid #EAECEF;
+}
+
+.calendar-selected-label{
+  margin-bottom:8px;
+  color:#16181D;
+  font-size:10px;
+  font-weight:900;
+}
+
+.calendar-day-events{
+  display:grid;
+  gap:7px;
+}
+
+.calendar-event-card{
+  width:100%;
+  display:grid;
+  grid-template-columns:48px 1fr auto;
+  align-items:center;
+  gap:9px;
+  padding:10px;
+  border:1px solid #E4E8EE;
+  border-radius:12px;
+  background:#fff;
+  text-align:left;
+}
+
+.calendar-event-card.own{
+  border-left:3px solid #2563EB;
+}
+
+.calendar-event-card.joined{
+  border-left:3px solid #B48A2C;
+}
+
+.calendar-event-time{
+  color:#344054;
+  font-size:9px;
+  font-weight:900;
+}
+
+.calendar-event-copy{
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+
+.calendar-event-copy strong{
+  overflow:hidden;
+  color:#16181D;
+  font-size:9px;
+  font-weight:850;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.calendar-event-copy small{
+  overflow:hidden;
+  color:#8B95A5;
+  font-size:7px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.calendar-event-type{
+  padding:4px 6px;
+  border-radius:999px;
+  background:#F5F7FA;
+  color:#667085;
+  font-size:6.5px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.calendar-empty-day{
+  padding:18px 8px;
+  border-radius:12px;
+  background:#F8FAFC;
+  color:#98A2B3;
+  font-size:8px;
+  text-align:center;
+}
+
+@media(max-width:360px){
+  .calendar-shell{
+    margin-left:8px;
+    margin-right:8px;
+    padding:10px;
+  }
+
+  .calendar-cell{
+    height:40px;
+  }
+
+  .calendar-event-card{
+    grid-template-columns:42px 1fr;
+  }
+
+  .calendar-event-type{
+    grid-column:2;
+    justify-self:start;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -5236,13 +5520,42 @@ html,body{
     </div>
   </div>
 
-  <div class="mygathers-tabs">
+  <div class="mygathers-tabs mygathers-tabs-three">
     <button id="mySavedTab" class="mygathers-tab active" onclick="switchMyGathersTab('saved')">保存した募集</button>
     <button id="myCreatedTab" class="mygathers-tab" onclick="switchMyGathersTab('created')">自分の募集</button>
+    <button id="myCalendarTab" class="mygathers-tab" onclick="switchMyGathersTab('calendar')">カレンダー</button>
   </div>
 
   <div id="mySavedPanel" class="mygathers-panel"></div>
   <div id="myCreatedPanel" class="mygathers-panel" hidden></div>
+  <div id="myCalendarPanel" class="mygathers-panel" hidden>
+    <div class="calendar-shell">
+      <div class="calendar-head">
+        <button type="button" class="calendar-nav-btn" onclick="changeCalendarMonth(-1)" aria-label="前の月">‹</button>
+        <div>
+          <div class="calendar-eyebrow">SCHEDULE</div>
+          <div id="calendarMonthLabel" class="calendar-month-label"></div>
+        </div>
+        <button type="button" class="calendar-nav-btn" onclick="changeCalendarMonth(1)" aria-label="次の月">›</button>
+      </div>
+
+      <div class="calendar-legend">
+        <span><i class="calendar-dot own"></i>自分の募集</span>
+        <span><i class="calendar-dot joined"></i>参加予定</span>
+      </div>
+
+      <div class="calendar-weekdays">
+        <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+      </div>
+
+      <div id="calendarGrid" class="calendar-grid"></div>
+
+      <div class="calendar-day-section">
+        <div id="calendarSelectedLabel" class="calendar-selected-label"></div>
+        <div id="calendarDayEvents" class="calendar-day-events"></div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="profile" class="page">
@@ -5657,7 +5970,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_2_4_palette_refresh";
+const KEY="tk_my_gathers_v24_3_calendar";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -7298,13 +7611,187 @@ $("chatForm").addEventListener("submit",async e=>{
   }
 })
 
+let calendarViewDate=new Date();
+let calendarSelectedDate=null;
+
 function switchMyGathersTab(tab){
   const saved=tab==="saved";
+  const created=tab==="created";
+  const calendar=tab==="calendar";
+
   $("mySavedTab").classList.toggle("active",saved);
-  $("myCreatedTab").classList.toggle("active",!saved);
+  $("myCreatedTab").classList.toggle("active",created);
+  $("myCalendarTab").classList.toggle("active",calendar);
+
   $("mySavedPanel").hidden=!saved;
-  $("myCreatedPanel").hidden=saved;
+  $("myCreatedPanel").hidden=!created;
+  $("myCalendarPanel").hidden=!calendar;
+
+  if(calendar)renderMyCalendar();
 }
+
+function pad2(n){
+  return String(n).padStart(2,"0");
+}
+
+function calendarDateKey(date){
+  return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}`;
+}
+
+function calendarEvents(){
+  if(!currentAuthUser)return [];
+
+  const uid=currentAuthUser.id;
+
+  return state.events.filter(e=>{
+    if(!e.date || e.status!=="upcoming")return false;
+
+    const own=e.owner===uid;
+    const joined=Boolean(e.joined) || (Array.isArray(e.participants) && e.participants.includes(uid));
+
+    return own || joined;
+  });
+}
+
+function calendarEventKind(e){
+  if(currentAuthUser && e.owner===currentAuthUser.id)return "own";
+  return "joined";
+}
+
+function changeCalendarMonth(delta){
+  calendarViewDate=new Date(
+    calendarViewDate.getFullYear(),
+    calendarViewDate.getMonth()+delta,
+    1
+  );
+  calendarSelectedDate=null;
+  renderMyCalendar();
+}
+
+function selectCalendarDate(dateKey){
+  calendarSelectedDate=dateKey;
+  renderMyCalendar();
+}
+
+function renderMyCalendar(){
+  const grid=$("calendarGrid");
+  const monthLabel=$("calendarMonthLabel");
+  const selectedLabel=$("calendarSelectedLabel");
+  const dayEvents=$("calendarDayEvents");
+  if(!grid||!monthLabel||!selectedLabel||!dayEvents)return;
+
+  if(!currentAuthUser){
+    grid.innerHTML="";
+    monthLabel.textContent="";
+    selectedLabel.textContent="";
+    dayEvents.innerHTML=`<div class="my-event-empty">ログインすると予定をカレンダーで確認できます。</div>`;
+    return;
+  }
+
+  const year=calendarViewDate.getFullYear();
+  const month=calendarViewDate.getMonth();
+  const first=new Date(year,month,1);
+  const lastDate=new Date(year,month+1,0).getDate();
+  const startDay=first.getDay();
+  const events=calendarEvents();
+
+  monthLabel.textContent=`${year}年 ${month+1}月`;
+
+  const eventMap=new Map();
+  events.forEach(e=>{
+    if(!eventMap.has(e.date))eventMap.set(e.date,[]);
+    eventMap.get(e.date).push(e);
+  });
+
+  const todayKey=calendarDateKey(new Date());
+
+  let cells="";
+
+  for(let i=0;i<startDay;i++){
+    cells+=`<div class="calendar-cell outside" aria-hidden="true"></div>`;
+  }
+
+  for(let day=1;day<=lastDate;day++){
+    const date=new Date(year,month,day);
+    const key=calendarDateKey(date);
+    const dayList=eventMap.get(key)||[];
+    const hasOwn=dayList.some(e=>calendarEventKind(e)==="own");
+    const hasJoined=dayList.some(e=>calendarEventKind(e)==="joined");
+    const selected=calendarSelectedDate===key;
+    const today=key===todayKey;
+
+    cells+=`
+      <button
+        type="button"
+        class="calendar-cell ${selected?"selected":""} ${today?"today":""} ${dayList.length?"has-event":""}"
+        onclick="selectCalendarDate('${key}')"
+      >
+        <span class="calendar-day-number">${day}</span>
+        <span class="calendar-event-dots">
+          ${hasOwn?`<i class="calendar-dot own"></i>`:""}
+          ${hasJoined?`<i class="calendar-dot joined"></i>`:""}
+        </span>
+      </button>
+    `;
+  }
+
+  const totalCells=startDay+lastDate;
+  const tail=(7-(totalCells%7))%7;
+  for(let i=0;i<tail;i++){
+    cells+=`<div class="calendar-cell outside" aria-hidden="true"></div>`;
+  }
+
+  grid.innerHTML=cells;
+
+  let selectedKey=calendarSelectedDate;
+
+  if(!selectedKey){
+    const currentMonthToday=todayKey.startsWith(`${year}-${pad2(month+1)}-`);
+    const monthEventDates=[...eventMap.keys()].filter(k=>k.startsWith(`${year}-${pad2(month+1)}-`)).sort();
+
+    if(currentMonthToday){
+      selectedKey=todayKey;
+    }else if(monthEventDates.length){
+      selectedKey=monthEventDates[0];
+    }else{
+      selectedKey=`${year}-${pad2(month+1)}-01`;
+    }
+  }
+
+  calendarSelectedDate=selectedKey;
+
+  const selectedDateObj=new Date(`${selectedKey}T00:00:00`);
+  selectedLabel.textContent=`${selectedDateObj.getMonth()+1}月${selectedDateObj.getDate()}日の予定`;
+
+  const selectedEvents=(eventMap.get(selectedKey)||[])
+    .sort((a,b)=>String(a.time||"").localeCompare(String(b.time||"")));
+
+  dayEvents.innerHTML=selectedEvents.length
+    ? selectedEvents.map(e=>calendarEventCard(e)).join("")
+    : `<div class="calendar-empty-day">この日の予定はありません。</div>`;
+
+  grid.querySelectorAll(".calendar-cell").forEach(btn=>{
+    const onclick=btn.getAttribute("onclick")||"";
+    if(onclick.includes(`'${selectedKey}'`))btn.classList.add("selected");
+  });
+}
+
+function calendarEventCard(e){
+  const kind=calendarEventKind(e);
+  const arg=eventIdArg(e.id);
+
+  return `
+    <button type="button" class="calendar-event-card ${kind}" onclick="openEvent(${arg})">
+      <span class="calendar-event-time">${esc(e.time||"時間未定")}</span>
+      <span class="calendar-event-copy">
+        <strong>${esc(e.title)}</strong>
+        <small>${esc(e.place||"場所未定")}</small>
+      </span>
+      <span class="calendar-event-type">${kind==="own"?"自分の募集":"参加予定"}</span>
+    </button>
+  `;
+}
+
 function myEventCard(e,mode){
   const arg=eventIdArg(e.id);
   return `<div class="my-event-card">
@@ -7330,6 +7817,7 @@ function renderMyGathers(){
   if(!currentAuthUser){
     savedPanel.innerHTML=`<div class="my-event-empty">ログインすると保存した募集を確認できます。</div>`;
     createdPanel.innerHTML=`<div class="my-event-empty">ログインすると自分の募集を確認できます。</div>`;
+    renderMyCalendar();
     return;
   }
 
@@ -7344,6 +7832,8 @@ function renderMyGathers(){
   createdPanel.innerHTML=created.length
     ? created.map(e=>myEventCard(e,"created")).join("")
     : `<div class="my-event-empty">自分で作った募集はまだありません。</div>`;
+
+  renderMyCalendar();
 }
 
 
