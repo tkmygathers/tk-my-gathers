@@ -4251,6 +4251,73 @@ html,body{
   object-fit:cover;
 }
 
+
+/* =========================================================
+   V24.1.2 — PROFILE BANNER
+   ========================================================= */
+.profile-cover.profile-banner{
+  height:132px !important;
+  overflow:hidden;
+  background:#E9EEF5;
+}
+.profile-cover.profile-banner img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+.profile-banner-empty{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#A3ACB9;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.18em;
+}
+.profile-banner-edit{
+  width:100%;
+  height:120px;
+  overflow:hidden;
+  border:1px solid #D8E0EA;
+  border-radius:14px;
+  background:#F5F8FC;
+}
+.profile-banner-preview{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+.profile-banner-placeholder{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#98A2B3;
+  font-size:9px;
+}
+.other-profile-banner{
+  height:120px;
+  margin:-2px -2px 14px;
+  overflow:hidden;
+  border-radius:14px;
+  background:#EEF2F7;
+}
+.other-profile-banner img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+@media (max-width:360px){
+  .profile-cover.profile-banner{height:116px !important;}
+  .profile-banner-edit,.other-profile-banner{height:108px;}
+}
+
 </style>
 </head>
 <body>
@@ -4427,7 +4494,7 @@ html,body{
 </section>
 
 <section id="profile" class="page">
-  <div class="profile-cover"></div>
+  <div id="profileBanner" class="profile-cover profile-banner"><div class="profile-banner-empty">BANNER</div></div>
   <div class="profile-wrap">
     <div class="profile-head">
       <div class="profile-avatar"><div class="profile-avatar-inner" id="profileAvatar">TK</div></div>
@@ -4575,6 +4642,19 @@ html,body{
 <div class="step"><div class="field"><label class="label">名前</label><input id="editName" class="input" required></div><div class="field" style="margin-top:8px"><label class="label">@ユーザー名</label><input id="editHandle" class="input" required></div></div>
 <div class="step"><div class="field"><label class="label">自己紹介</label><textarea id="editBio" class="textarea"></textarea></div><div class="field" style="margin-top:8px"><label class="label">活動エリア</label><input id="editArea" class="input"></div></div>
 <div class="step"><div class="step-label">プロフィール画像</div><div class="upload-row"><img id="profileImagePreview" class="preview-img" style="display:none"><button type="button" class="upload-btn" onclick="$('profileImageInput').click()">写真を選ぶ</button><button type="button" class="upload-btn" onclick="clearProfileImage()">画像を外す</button></div><input id="profileImageInput" type="file" accept="image/*" hidden></div>
+<div class="step">
+  <div class="step-label">プロフィールバナー</div>
+  <div class="profile-banner-edit">
+    <img id="profileBannerPreview" class="profile-banner-preview" style="display:none" alt="プロフィールバナー">
+    <div id="profileBannerPlaceholder" class="profile-banner-placeholder">横長の画像を設定できます</div>
+  </div>
+  <div class="upload-row" style="margin-top:8px">
+    <button type="button" class="upload-btn" onclick="$('profileBannerInput').click()">バナーを選ぶ</button>
+    <button type="button" class="upload-btn" onclick="clearProfileBanner()">画像を外す</button>
+  </div>
+  <input id="profileBannerInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+  <div class="muted" style="margin-top:6px">JPEG・PNG・WebP / 5MBまで</div>
+</div>
 <button class="submit">保存する</button>
 </form>
 </div>
@@ -4799,7 +4879,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_1_1_profile_avatar_sync";
+const KEY="tk_my_gathers_v24_1_2_profile_banner";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -5003,7 +5083,7 @@ async function loadNotifications(){
     if(actorIds.length){
       const {data:profiles,error:profileError}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,bio,area,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
         .in("id",actorIds);
 
       if(profileError)throw profileError;
@@ -5195,6 +5275,7 @@ function remoteProfileToPerson(p){
     name:p.display_name||p.username||"ユーザー",
     handle:"@"+(p.username||"user"),
     avatar:p.avatar_url||null,
+    banner:p.banner_url||null,
     bio:p.bio||"",
     area:p.area||"",
     interests:Array.isArray(p.interests)?p.interests:[],
@@ -5211,7 +5292,8 @@ function remoteProfileToPerson(p){
     Object.assign(state.accounts[item.id],{
       name:item.name,
       handle:item.handle,
-      avatar:item.avatar
+      avatar:item.avatar,
+      banner:item.banner
     });
   }
   return item;
@@ -5434,7 +5516,7 @@ async function loadEventsFromSupabase(){
     if(ownerIds.length){
       const {data:profilesData,error:profilesError}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,bio,area,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
         .in("id",ownerIds);
 
       if(profilesError)throw profilesError;
@@ -5985,7 +6067,7 @@ async function ensurePeopleFromProfiles(ids){
   if(!unique.length)return;
   const {data,error}=await sb
     .from("profiles")
-    .select("id,username,display_name,avatar_url,bio,area,interests")
+    .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
     .in("id",unique);
   if(error){console.error("load dm profiles:",error);return}
   (data||[]).forEach(remoteProfileToPerson);
@@ -6138,7 +6220,7 @@ async function openNewMessage(){
   try{
     const {data,error}=await sb
       .from("profiles")
-      .select("id,username,display_name,avatar_url,bio,area,interests")
+      .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
       .neq("id",currentAuthUser.id)
       .order("display_name",{ascending:true});
 
@@ -6436,7 +6518,7 @@ async function loadFollowState(){
     if(allIds.length){
       const {data:profiles,error}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,bio,area,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
         .in("id",allIds);
 
       if(error)throw error;
@@ -6531,7 +6613,7 @@ async function renderOtherProfile(id){
     if(isRealUserId(id)){
       const {data,error}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,bio,area,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
         .eq("id",id)
         .maybeSingle();
 
@@ -6546,6 +6628,7 @@ async function renderOtherProfile(id){
     const mutual=isMutualFollow(id);
 
     box.innerHTML=`
+      ${p.banner?`<div class="other-profile-banner"><img src="${esc(p.banner)}" alt=""></div>`:""}
       <div class="other-profile-top">
         <div class="other-profile-avatar">${avatarHtml(p)}</div>
         <div>
@@ -6618,7 +6701,7 @@ async function showFollowList(type){
   try{
     const {data,error}=await sb
       .from("profiles")
-      .select("id,username,display_name,avatar_url,bio,area,interests")
+      .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
       .in("id",ids);
 
     if(error)throw error;
@@ -6643,9 +6726,20 @@ async function showFollowList(type){
   }
 }
 
-function renderProfile(){const m=me();$("profileName").textContent=m.name;$("profileHandle").textContent=m.handle;$("profileBio").textContent=m.bio;$("profileArea").textContent=m.area;$("followersCount").textContent=m.followers;$("followingCount").textContent=m.following;$("mutualCount").textContent=mutuals().length;$("myFunTotal").textContent=m.fun;$("profileAvatar").innerHTML=m.avatar?`<img src="${m.avatar}" alt="">`:esc(m.name.slice(0,2));$("interestGrid").innerHTML=m.interests.map(x=>`<button class="interest-chip light" onclick="prefill('${escjs(x)}')">${esc(x)}</button>`).join("");$("upcoming").innerHTML=profileList(state.events.filter(e=>e.joined&&e.status==="upcoming"),"まだ参加予定はありません",false);$("created").innerHTML=profileList(state.events.filter(e=>e.owner===(currentAuthUser?.id||meId())),"まだ自分の募集はありません",false);$("history").innerHTML=profileList(state.events.filter(e=>e.status==="history"&&e.participants.includes(meId())),"まだ履歴はありません",true)}
+function renderProfile(){const m=me();
+const banner=$("profileBanner");
+if(banner){
+  banner.innerHTML=m.banner
+    ? `<img src="${esc(m.banner)}" alt="プロフィールバナー">`
+    : `<div class="profile-banner-empty">BANNER</div>`;
+}
+$("profileName").textContent=m.name;$("profileHandle").textContent=m.handle;$("profileBio").textContent=m.bio;$("profileArea").textContent=m.area;$("followersCount").textContent=m.followers;$("followingCount").textContent=m.following;$("mutualCount").textContent=mutuals().length;$("myFunTotal").textContent=m.fun;$("profileAvatar").innerHTML=m.avatar?`<img src="${m.avatar}" alt="">`:esc(m.name.slice(0,2));$("interestGrid").innerHTML=m.interests.map(x=>`<button class="interest-chip light" onclick="prefill('${escjs(x)}')">${esc(x)}</button>`).join("");$("upcoming").innerHTML=profileList(state.events.filter(e=>e.joined&&e.status==="upcoming"),"まだ参加予定はありません",false);$("created").innerHTML=profileList(state.events.filter(e=>e.owner===(currentAuthUser?.id||meId())),"まだ自分の募集はありません",false);$("history").innerHTML=profileList(state.events.filter(e=>e.status==="history"&&e.participants.includes(meId())),"まだ履歴はありません",true)}
 function profileList(list,empty,historyMode){if(!list.length)return `<div class="panel" style="padding:18px;text-align:center;color:var(--muted)">${empty}</div>`;return `<div class="list">${list.map(e=>{const arg=eventIdArg(e.id);return `<div class="friend"><div class="friend-left" onclick="openEvent(${arg})" style="cursor:pointer"><div class="mini-avatar">${esc(e.sub.slice(0,2))}</div><div><div class="friend-name">${esc(e.title)}</div><div class="muted">${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</div></div></div>${historyMode?`<button class="fun-btn" onclick="openFun(${arg})">楽しかった！</button>`:`<div class="muted">${e.people}/${e.capacity}人</div>`}</div>`}).join("")}</div>`}
 function switchProfileTab(id){document.querySelectorAll(".profile-tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("active",p.id===id))}
+
+let selectedProfileBannerFile=null;
+let selectedProfileBannerPreviewUrl=null;
+let profileBannerRemoveRequested=false;
 
 let selectedProfileImageFile=null;
 let selectedProfileImagePreviewUrl=null;
@@ -6675,6 +6769,33 @@ function validateProfileImageFile(file){
   }
 
   return true;
+}
+
+
+async function uploadProfileBanner(file){
+  if(!file)return null;
+  if(!currentAuthUser)throw new Error("ログインが必要です");
+
+  const ext=profileImageExtension(file);
+  const path=`${currentAuthUser.id}/banner-${Date.now()}.${ext}`;
+
+  const {error:uploadError}=await sb.storage
+    .from("profile-media")
+    .upload(path,file,{
+      cacheControl:"3600",
+      upsert:false,
+      contentType:file.type
+    });
+
+  if(uploadError)throw uploadError;
+
+  const {data}=sb.storage
+    .from("profile-media")
+    .getPublicUrl(path);
+
+  if(!data?.publicUrl)throw new Error("バナー画像URLを取得できませんでした");
+
+  return {publicUrl:data.publicUrl,path};
 }
 
 async function uploadProfileAvatar(file){
@@ -6717,6 +6838,17 @@ function resetProfileImageSelection(){
 
   const input=$("profileImageInput");
   if(input)input.value="";
+
+  selectedProfileBannerFile=null;
+  profileBannerRemoveRequested=false;
+
+  if(selectedProfileBannerPreviewUrl){
+    URL.revokeObjectURL(selectedProfileBannerPreviewUrl);
+    selectedProfileBannerPreviewUrl=null;
+  }
+
+  const bannerInput=$("profileBannerInput");
+  if(bannerInput)bannerInput.value="";
 }
 
 function openProfileEdit(){
@@ -6739,6 +6871,18 @@ function openProfileEdit(){
     preview.style.display="none";
   }
 
+  const bannerPreview=$("profileBannerPreview");
+  const bannerPlaceholder=$("profileBannerPlaceholder");
+  if(m.banner){
+    bannerPreview.src=m.banner;
+    bannerPreview.style.display="block";
+    bannerPlaceholder.style.display="none";
+  }else{
+    bannerPreview.removeAttribute("src");
+    bannerPreview.style.display="none";
+    bannerPlaceholder.style.display="flex";
+  }
+
   openModal("profileEditModal");
 }
 $("profileEditForm").addEventListener("submit",async e=>{
@@ -6759,7 +6903,9 @@ $("profileEditForm").addEventListener("submit",async e=>{
   }
 
   let uploadedAvatar=null;
+  let uploadedBanner=null;
   let nextAvatar=m.avatar||null;
+  let nextBanner=m.banner||null;
 
   if(button){
     button.disabled=true;
@@ -6775,6 +6921,14 @@ $("profileEditForm").addEventListener("submit",async e=>{
       nextAvatar=null;
     }
 
+    if(selectedProfileBannerFile){
+      if(button)button.textContent="バナーをアップロード中…";
+      uploadedBanner=await uploadProfileBanner(selectedProfileBannerFile);
+      nextBanner=uploadedBanner.publicUrl;
+    }else if(profileBannerRemoveRequested){
+      nextBanner=null;
+    }
+
     const {data:updated,error}=await sb
       .from("profiles")
       .update({
@@ -6783,10 +6937,11 @@ $("profileEditForm").addEventListener("submit",async e=>{
         bio:newBio,
         area:newArea,
         avatar_url:nextAvatar,
+        banner_url:nextBanner,
         interests:m.interests||[]
       })
       .eq("id",currentAuthUser.id)
-      .select("id,username,display_name,avatar_url,bio,area,interests")
+      .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
       .single();
 
     if(error)throw error;
@@ -6802,6 +6957,7 @@ $("profileEditForm").addEventListener("submit",async e=>{
       bio:p.bio||"",
       area:p.area||"",
       avatar:p.avatar||null,
+      banner:p.banner||null,
       interests:p.interests||[],
       followers:state.accounts[currentAuthUser.id]?.followers||0,
       following:state.accounts[currentAuthUser.id]?.following||0,
@@ -6830,6 +6986,14 @@ $("profileEditForm").addEventListener("submit",async e=>{
         await sb.storage.from("profile-media").remove([uploadedAvatar.path]);
       }catch(cleanupError){
         console.warn("profile image cleanup:",cleanupError);
+      }
+    }
+
+    if(uploadedBanner?.path){
+      try{
+        await sb.storage.from("profile-media").remove([uploadedBanner.path]);
+      }catch(cleanupError){
+        console.warn("profile banner cleanup:",cleanupError);
       }
     }
 
@@ -6880,6 +7044,50 @@ function clearProfileImage(){
   preview.removeAttribute("src");
   preview.style.display="none";
 }
+
+$("profileBannerInput").addEventListener("change",e=>{
+  const file=e.target.files?.[0];
+  if(!file)return;
+
+  if(!validateProfileImageFile(file)){
+    e.target.value="";
+    return;
+  }
+
+  if(selectedProfileBannerPreviewUrl){
+    URL.revokeObjectURL(selectedProfileBannerPreviewUrl);
+  }
+
+  selectedProfileBannerFile=file;
+  profileBannerRemoveRequested=false;
+  selectedProfileBannerPreviewUrl=URL.createObjectURL(file);
+
+  const preview=$("profileBannerPreview");
+  const placeholder=$("profileBannerPlaceholder");
+  preview.src=selectedProfileBannerPreviewUrl;
+  preview.style.display="block";
+  placeholder.style.display="none";
+});
+
+function clearProfileBanner(){
+  selectedProfileBannerFile=null;
+  profileBannerRemoveRequested=true;
+
+  if(selectedProfileBannerPreviewUrl){
+    URL.revokeObjectURL(selectedProfileBannerPreviewUrl);
+    selectedProfileBannerPreviewUrl=null;
+  }
+
+  const input=$("profileBannerInput");
+  if(input)input.value="";
+
+  const preview=$("profileBannerPreview");
+  const placeholder=$("profileBannerPlaceholder");
+  preview.removeAttribute("src");
+  preview.style.display="none";
+  placeholder.style.display="flex";
+}
+
 function openWant(){openModal("wantModal")}
 $("wantForm").addEventListener("submit",async e=>{
   e.preventDefault();
@@ -7610,7 +7818,7 @@ async function loadEventComments(ev){
     if(userIds.length){
       const {data:profiles,error:profileError}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,bio,area,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
         .in("id",userIds);
 
       if(profileError)throw profileError;
@@ -7896,6 +8104,7 @@ function upsertLocalAuthAccount(user,profile){
     bio:profile?.bio||existing.bio||"",
     area:profile?.area||existing.area||"東京",
     avatar:profile?.avatar_url||existing.avatar||null,
+    banner:profile?.banner_url||existing.banner||null,
     followers:existing.followers||0,
     following:existing.following||0,
     fun:existing.fun||0,
@@ -7908,6 +8117,7 @@ function upsertLocalAuthAccount(user,profile){
     p.name=displayName;
     p.handle="@"+username;
     p.avatar=profile?.avatar_url||existing.avatar||null;
+    p.banner=profile?.banner_url||existing.banner||null;
     p.bio=profile?.bio||existing.bio||"";
     p.area=profile?.area||existing.area||"";
     p.interests=Array.isArray(profile?.interests)?profile.interests:(existing.interests||[]);
