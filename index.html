@@ -4710,7 +4710,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_0_3C_save_join_front_fix";
+const KEY="tk_my_gathers_v24_0_4_real_user_fix";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -4784,8 +4784,30 @@ function save(){
 function meId(){return state.currentUserId||"shuzo"}
 function me(){return state.accounts[meId()]}
 function person(id){
-  if(state.accounts && state.accounts[id]) return state.accounts[id];
-  return state.people.find(p=>p.id===id)||{id,name:"User",handle:"@user",fun:0,mutual:false}
+  if(state.accounts && state.accounts[id])return state.accounts[id];
+
+  const found=state.people.find(p=>p.id===id);
+  if(found)return found;
+
+  if(isRealUserId(id)){
+    return {
+      id,
+      name:"ユーザー",
+      handle:"@user",
+      fun:0,
+      mutual:false,
+      realUser:true
+    };
+  }
+
+  return {
+    id,
+    name:"デモユーザー",
+    handle:"@demo",
+    fun:0,
+    mutual:false,
+    demoUser:true
+  };
 }
 function mutuals(){
   if(currentAuthUser && Array.isArray(state.followMutualIds)){
@@ -5088,7 +5110,9 @@ function remoteProfileToPerson(p){
     area:p.area||"",
     interests:Array.isArray(p.interests)?p.interests:[],
     fun:0,
-    mutual:false
+    mutual:false,
+    realUser:true,
+    demoUser:false
   };
   const old=state.people.find(x=>x.id===item.id);
   if(old)Object.assign(old,item);
@@ -5242,7 +5266,8 @@ function mapSupabaseEvent(row){
     funSent:[],
     tags:Array.isArray(row.tags)?row.tags:[],
     members:[],
-    source:"supabase"
+    source:"supabase",
+    ownerType:"real"
   };
 }
 function setDbStatus(text){
@@ -5384,13 +5409,10 @@ async function loadEventsFromSupabase(){
         return ev;
       });
 
-      const localOnly=state.events
-        .filter(e=>e.source!=="supabase")
-        .filter(clientCanViewLocalEvent);
-
-      // Supabase募集はRLSの返却結果をそのまま採用。
-      // 古いデモ募集だけフロント側で公開範囲を補正する。
-      state.events=[...remote,...localOnly];
+      // v24.0.4:
+      // 本番利用ではSupabaseの実募集だけを一覧に載せる。
+      // 旧デモ投稿（owner: "kento" 等）を実アカウントと混在させない。
+      state.events=[...remote];
 
       localStorage.setItem(KEY,JSON.stringify(state));
 
@@ -5405,12 +5427,11 @@ async function loadEventsFromSupabase(){
       );
 
     }else{
-      state.events=state.events
-        .filter(e=>e.source!=="supabase")
-        .filter(clientCanViewLocalEvent);
+      // Supabaseに表示可能な募集がなければ、旧デモ募集へフォールバックしない。
+      state.events=[];
       setDbStatus(currentAuthUser
-        ?"現在あなたが閲覧できるSupabase募集はありません"
-        :"公開中のSupabase募集はまだありません");
+        ?"現在あなたが閲覧できる募集はありません"
+        :"公開中の募集はまだありません");
     }
 
     renderHome();
@@ -6102,14 +6123,35 @@ function renderMessages(){
 }
 function startChat(id){
   if(!requireAuth("メッセージを送るにはログインしてください。"))return;
-  if(id===meId()){toast("自分自身にはメッセージできません");return}
+
+  if(id===currentAuthUser?.id){
+    toast("自分自身にはメッセージできません");
+    return;
+  }
+
+  if(!isRealUserId(id)){
+    toast("このユーザーは旧デモデータのためメッセージできません");
+    return;
+  }
+
   closeModal("eventModal");
+  closeModal("cardDetailModal");
   showPage("messages");
   openChat(id);
 }
 function openChat(id){
   if(!requireAuth("メッセージを使うにはログインしてください。"))return;
-  if(id===meId()){toast("自分自身にはメッセージできません");return}
+
+  if(id===currentAuthUser?.id){
+    toast("自分自身にはメッセージできません");
+    return;
+  }
+
+  if(!isRealUserId(id)){
+    toast("このユーザーは旧デモデータです");
+    return;
+  }
+
   state.currentChatUserId=id;
   $("messageListView").style.display="none";
   $("chatView").classList.add("active");
@@ -6236,6 +6278,30 @@ function renderMyGathers(){
 function isUuid(value){
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||""));
 }
+
+const LEGACY_DEMO_USER_IDS=new Set([
+  "shuzo",
+  "kento",
+  "misaki",
+  "yuta",
+  "sho",
+  "ryo"
+]);
+
+function isRealUserId(id){
+  return isUuid(id);
+}
+
+function isLegacyDemoUserId(id){
+  return LEGACY_DEMO_USER_IDS.has(String(id||""));
+}
+
+function userKind(id){
+  if(isRealUserId(id))return "real";
+  if(isLegacyDemoUserId(id))return "demo";
+  return "unknown";
+}
+
 function isFollowing(id){
   return Array.isArray(state.followingIds) && state.followingIds.includes(id);
 }
@@ -6288,7 +6354,7 @@ async function loadFollowState(){
     }
 
     state.people.forEach(p=>{
-      if(isUuid(p.id))p.mutual=mutualIds.includes(p.id);
+      if(isRealUserId(p.id))p.mutual=mutualIds.includes(p.id);
     });
 
     const account=me();
@@ -6309,8 +6375,8 @@ async function toggleFollow(id){
     toast("自分自身はフォローできません");
     return;
   }
-  if(!isUuid(id)){
-    toast("デモユーザーはフォロー対象外です");
+  if(!isRealUserId(id)){
+    toast("この旧デモユーザーには操作できません");
     return;
   }
 
@@ -6372,7 +6438,7 @@ async function renderOtherProfile(id){
   try{
     let p=person(id);
 
-    if(isUuid(id)){
+    if(isRealUserId(id)){
       const {data,error}=await sb
         .from("profiles")
         .select("id,username,display_name,avatar_url,bio,area,interests")
@@ -6384,7 +6450,7 @@ async function renderOtherProfile(id){
     }
 
     let counts={followers:0,following:0};
-    if(isUuid(id))counts=await fetchProfileCounts(id);
+    if(isRealUserId(id))counts=await fetchProfileCounts(id);
 
     const following=isFollowing(id);
     const mutual=isMutualFollow(id);
@@ -6417,10 +6483,10 @@ async function renderOtherProfile(id){
         <button
           class="follow-primary ${following?"following":""}"
           onclick="toggleFollow('${escjs(id)}')"
-          ${!isUuid(id)?"disabled":""}
-        >${!isUuid(id)?"デモユーザー":following?"フォロー中":"フォローする"}</button>
+          ${!isRealUserId(id)?"disabled":""}
+        >${!isRealUserId(id)?"旧デモデータ":following?"フォロー中":"フォローする"}</button>
 
-        <button class="follow-secondary" onclick="closeModal('otherProfileModal');startChat('${escjs(id)}')" ${!isUuid(id)?"disabled":""}>
+        <button class="follow-secondary" onclick="closeModal('otherProfileModal');startChat('${escjs(id)}')" ${!isRealUserId(id)?"disabled":""}>
           メッセージ
         </button>
       </div>
