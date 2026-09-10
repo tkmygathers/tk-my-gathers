@@ -4365,6 +4365,86 @@ html,body{
   line-height:1 !important;
 }
 
+
+/* =========================================================
+   V24.2.1 — CUSTOM EVENT TAGS
+   ========================================================= */
+
+.custom-tag-maker{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:7px;
+  margin-top:10px;
+}
+
+.custom-tag-maker .input{
+  min-width:0;
+}
+
+.custom-tag-add{
+  min-width:64px;
+  min-height:42px;
+  padding:0 12px;
+  border:1px solid #1769E0;
+  border-radius:10px;
+  background:#1769E0;
+  color:#fff;
+  font-size:10px;
+  font-weight:800;
+}
+
+.selected-tag-preview{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+}
+
+.selected-tag-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  min-height:30px;
+  padding:0 9px;
+  border:1px solid #C9D9F5;
+  border-radius:999px;
+  background:#EEF4FF;
+  color:#2457A6;
+  font-size:9px;
+  font-weight:750;
+}
+
+.selected-tag-chip b{
+  font-size:12px;
+  line-height:1;
+  font-weight:500;
+  opacity:.72;
+}
+
+.selected-tag-empty{
+  color:#98A2B3;
+  font-size:8px;
+  line-height:1.5;
+}
+
+.custom-tag-note{
+  margin-top:7px;
+  color:#98A2B3;
+  font-size:7.5px;
+}
+
+@media (max-width:360px){
+  .custom-tag-maker{
+    grid-template-columns:1fr 58px;
+    gap:5px;
+  }
+
+  .custom-tag-add{
+    min-width:58px;
+    padding:0 8px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4651,8 +4731,22 @@ html,body{
   <div id="picker" class="picker"><div id="memberList"></div><div id="selectedCount" class="muted" style="margin-top:7px"></div></div>
 </div>
 <div class="step">
-  <div class="step-label">7. よく使うタグ</div>
+  <div class="step-label">7. タグ</div>
   <div id="quickTags" class="quick-tags"></div>
+
+  <div class="custom-tag-maker">
+    <input
+      id="customTagInput"
+      class="input"
+      type="text"
+      maxlength="24"
+      placeholder="新しいタグを追加"
+    >
+    <button type="button" class="custom-tag-add" onclick="addCustomTag()">追加</button>
+  </div>
+
+  <div id="selectedTagPreview" class="selected-tag-preview"></div>
+  <div class="custom-tag-note">最大8個 / 1タグ24文字まで</div>
 </div>
 <div class="step"><div class="step-label">8. ひとこと</div><textarea id="eventNote" class="textarea" placeholder="例：集合場所は参加後にコメントで共有します"></textarea></div>
 <button class="submit" type="submit">プランを作成する</button>
@@ -4938,7 +5032,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_1_3_logo_home_nav_icons";
+const KEY="tk_my_gathers_v24_2_1_custom_tags";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -7252,20 +7346,107 @@ function renderSubs(){const list=categories[state.cat]||[];$("subs").innerHTML=(
 function selectSub(x){state.sub=x;$("customBox").classList.remove("show");renderSubs()}
 function useCustom(){state.sub="";$("customBox").classList.add("show")}
 
+function normalizeEventTag(value){
+  return String(value||"")
+    .trim()
+    .replace(/^#+/,"")
+    .replace(/\s+/g," ")
+    .slice(0,24);
+}
+
+function renderSelectedTagPreview(){
+  const el=$("selectedTagPreview");
+  if(!el)return;
+
+  const tags=state.selectedTags||[];
+
+  el.innerHTML=tags.length
+    ? tags.map(t=>`
+        <button type="button" class="selected-tag-chip" onclick="removeEventTag('${escjs(t)}')" aria-label="${esc(t)}を削除">
+          <span># ${esc(t)}</span>
+          <b>×</b>
+        </button>
+      `).join("")
+    : `<div class="selected-tag-empty">選んだタグがここに表示されます</div>`;
+}
+
 function renderQuickTags(){
   const el=$("quickTags");
   if(!el)return;
-  el.innerHTML=quickTagOptions.map(t=>`<button type="button" class="quick-tag ${state.selectedTags.includes(t)?"active":""}" onclick="toggleQuickTag('${escjs(t)}')">${esc(t)}</button>`).join("");
+
+  const selected=state.selectedTags||[];
+
+  el.innerHTML=quickTagOptions.map(t=>`
+    <button
+      type="button"
+      class="quick-tag ${selected.includes(t)?"active":""}"
+      onclick="toggleQuickTag('${escjs(t)}')"
+    >${esc(t)}</button>
+  `).join("");
+
+  renderSelectedTagPreview();
 }
+
 function toggleQuickTag(t){
-  state.selectedTags=state.selectedTags.includes(t)
-    ? state.selectedTags.filter(x=>x!==t)
-    : [...state.selectedTags,t];
+  state.selectedTags=state.selectedTags||[];
+
+  if(state.selectedTags.includes(t)){
+    state.selectedTags=state.selectedTags.filter(x=>x!==t);
+  }else{
+    if(state.selectedTags.length>=8){
+      toast("タグは最大8個までです");
+      return;
+    }
+    state.selectedTags=[...state.selectedTags,t];
+  }
+
   renderQuickTags();
 }
 
+function addCustomTag(){
+  const input=$("customTagInput");
+  if(!input)return;
+
+  const tag=normalizeEventTag(input.value);
+
+  if(!tag){
+    toast("タグ名を入力してください");
+    return;
+  }
+
+  state.selectedTags=state.selectedTags||[];
+
+  if(state.selectedTags.includes(tag)){
+    toast("同じタグがすでにあります");
+    input.value="";
+    return;
+  }
+
+  if(state.selectedTags.length>=8){
+    toast("タグは最大8個までです");
+    return;
+  }
+
+  state.selectedTags.push(tag);
+  input.value="";
+  renderQuickTags();
+}
+
+function removeEventTag(tag){
+  state.selectedTags=(state.selectedTags||[]).filter(x=>x!==tag);
+  renderQuickTags();
+}
+
+
 function renderMemberPicker(){$("memberList").innerHTML=mutuals().map(m=>`<label class="member"><div class="member-left"><div class="mini-avatar">${avatarHtml(m)}</div><div><div class="friend-name">${esc(m.name)}</div><div class="muted">${esc(m.handle)}</div></div></div><input type="checkbox" ${state.selectedMembers.includes(m.id)?"checked":""} onchange="toggleMember('${m.id}',this.checked)"></label>`).join("");$("selectedCount").textContent=`${state.selectedMembers.length}人選択中`}
 function toggleMember(id,on){if(on&&!state.selectedMembers.includes(id))state.selectedMembers.push(id);if(!on)state.selectedMembers=state.selectedMembers.filter(x=>x!==id);renderMemberPicker()}
+
+$("customTagInput")?.addEventListener("keydown",e=>{
+  if(e.key!=="Enter")return;
+  e.preventDefault();
+  addCustomTag();
+});
+
 document.querySelectorAll('input[name="vis"]').forEach(r=>r.addEventListener("change",updateVisibilityCreateHint))
 let selectedEventImageFile=null;
 let selectedEventImagePreviewUrl=null;
@@ -7371,6 +7552,8 @@ function resetCreateState(form){
   state.eventImage=null;
   state.selectedMembers=[];
   state.selectedTags=[];
+  const customTagInput=$("customTagInput");
+  if(customTagInput)customTagInput.value="";
   state.cat="ゲーム・遊び";
   state.sub="麻雀";
   form.reset();
@@ -7430,7 +7613,7 @@ $("createForm").addEventListener("submit",async e=>{
       budget:$("budget").value.trim()||"未設定",
       description:$("eventNote").value.trim()||"気軽に参加できる募集です。",
       image_url:uploadedImage?.publicUrl||null,
-      tags:[...state.selectedTags],
+      tags:[...(state.selectedTags||[])].map(normalizeEventTag).filter(Boolean).slice(0,8),
       visibility:visDb,
       status:"upcoming"
     };
