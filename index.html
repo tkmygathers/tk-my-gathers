@@ -4445,6 +4445,111 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.2.2 — VISIBILITY UI
+   ========================================================= */
+
+.home-visibility-wrap{
+  margin:8px 14px 12px;
+}
+
+.home-visibility-label{
+  margin-bottom:6px;
+  color:#98A2B3;
+  font-size:7.5px;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+
+.home-visibility-filters{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding-bottom:2px;
+  scrollbar-width:none;
+}
+
+.home-visibility-filters::-webkit-scrollbar{
+  display:none;
+}
+
+.home-visibility-chip{
+  flex:0 0 auto;
+  min-height:30px;
+  padding:0 11px;
+  border:1px solid #DDE4ED;
+  border-radius:999px;
+  background:#fff;
+  color:#667085;
+  font-size:8px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.home-visibility-chip.active{
+  border-color:#1769E0;
+  background:#1769E0;
+  color:#fff;
+}
+
+.visibility-badge{
+  display:inline-flex !important;
+  align-items:center;
+  gap:4px;
+  min-height:23px;
+  padding:0 7px !important;
+  border:1px solid #DDE4ED !important;
+  border-radius:999px !important;
+  background:#F8FAFC !important;
+  color:#475467 !important;
+  font-size:7px !important;
+  font-weight:800 !important;
+  white-space:nowrap;
+}
+
+.visibility-badge-icon{
+  font-size:7px;
+  line-height:1;
+}
+
+.visibility-public{
+  background:#F6F8FB !important;
+  color:#667085 !important;
+}
+
+.visibility-following,
+.visibility-friends_of_friends{
+  background:#EEF4FF !important;
+  border-color:#D3E1FA !important;
+  color:#2457A6 !important;
+}
+
+.visibility-mutual{
+  background:#F2F4F7 !important;
+  border-color:#D9DEE7 !important;
+  color:#344054 !important;
+}
+
+.visibility-selected{
+  background:#F7F3FA !important;
+  border-color:#E4D9EC !important;
+  color:#694A7C !important;
+}
+
+@media(max-width:360px){
+  .home-visibility-wrap{
+    margin-left:12px;
+    margin-right:12px;
+  }
+
+  .home-visibility-chip{
+    min-height:29px;
+    padding:0 9px;
+    font-size:7.5px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4541,6 +4646,11 @@ html,body{
     <div class="home-section-row home-recruit-head">
       <div><span class="home-mini-label">FOR YOU</span><div class="home-section-title">おすすめの募集</div></div>
       <button onclick="showPage('discover')">すべて見る ›</button>
+    </div>
+
+    <div class="home-visibility-wrap">
+      <div class="home-visibility-label">公開範囲</div>
+      <div id="homeVisibilityFilters" class="home-visibility-filters"></div>
     </div>
 
     <div id="dbStatus" class="db-status"></div>
@@ -5032,7 +5142,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_2_1_custom_tags";
+const KEY="tk_my_gathers_v24_2_2_visibility_ui";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -5380,6 +5490,7 @@ function goHomeFromLogo(){
   state.tkSpecialFilter=null;
   state.homeFilter="all";
   state.homeCategory="すべて";
+  state.homeVisibilityFilter="all";
 
   document.querySelectorAll(".modal.open").forEach(el=>el.classList.remove("open"));
   document.body.style.overflow="";
@@ -5492,9 +5603,75 @@ function visibilityDescription(value){
   if(v==="selected")return "募集主が選んだ人だけが見られます";
   return "";
 }
+
+function visibilityShortLabel(value){
+  const v=visibilityDbValue(value);
+  return ({
+    public:"公開",
+    following:"フォロー",
+    friends_of_friends:"フォローのフォロー",
+    mutual:"相互",
+    selected:"限定"
+  })[v]||"公開";
+}
+
+function visibilityIcon(value){
+  const v=visibilityDbValue(value);
+  return ({
+    public:"●",
+    following:"◐",
+    friends_of_friends:"◎",
+    mutual:"↔",
+    selected:"◆"
+  })[v]||"●";
+}
+
+function visibilityFilterGroup(value){
+  const v=visibilityDbValue(value);
+  if(v==="public")return "public";
+  if(v==="following" || v==="friends_of_friends")return "follow";
+  if(v==="mutual")return "mutual";
+  if(v==="selected")return "selected";
+  return "public";
+}
+
+function renderHomeVisibilityFilters(){
+  const el=$("homeVisibilityFilters");
+  if(!el)return;
+
+  if(!state.homeVisibilityFilter)state.homeVisibilityFilter="all";
+
+  const items=[
+    ["all","すべて"],
+    ["public","公開"],
+    ["follow","フォロー"],
+    ["mutual","相互"],
+    ["selected","限定"]
+  ];
+
+  el.innerHTML=items.map(([value,label])=>`
+    <button
+      type="button"
+      class="home-visibility-chip ${state.homeVisibilityFilter===value?"active":""}"
+      onclick="setHomeVisibilityFilter('${value}')"
+    >${label}</button>
+  `).join("");
+}
+
+function setHomeVisibilityFilter(value){
+  state.homeVisibilityFilter=value||"all";
+  renderHomeVisibilityFilters();
+  renderHome();
+}
+
 function visibilityBadgeHtml(value){
   const v=visibilityDbValue(value);
-  return `<span class="visibility-badge ${v==="public"?"":"private"}">${esc(visibilityLabel(v))}</span>`;
+  return `
+    <span class="visibility-badge visibility-${v}">
+      <span class="visibility-badge-icon">${visibilityIcon(v)}</span>
+      <span>${esc(visibilityShortLabel(v))}</span>
+    </span>
+  `;
 }
 function updateVisibilityCreateHint(){
   const checked=document.querySelector('input[name="vis"]:checked');
@@ -6093,6 +6270,10 @@ function eventCard(e){
 }
 function renderHome(){
   let list=state.events.filter(e=>e.status==="upcoming");
+
+  if(state.homeVisibilityFilter && state.homeVisibilityFilter!=="all"){
+    list=list.filter(e=>visibilityFilterGroup(e.visibilityDb||e.visibility)===state.homeVisibilityFilter);
+  }
 
   if(state.tkSpecialFilter==="oneMore"){
     list=list.filter(e=>(e.capacity-e.people)===1);
@@ -8545,6 +8726,7 @@ async function initSupabaseAuth(){
 }
 
 function renderAll(){
+  renderHomeVisibilityFilters();
   renderHome();
   renderDiscover();
   renderMessages();
