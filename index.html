@@ -4710,7 +4710,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v23_6_1_auth_events_fix";
+const KEY="tk_my_gathers_v24_0_2_visibility_double_check";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -5136,27 +5136,82 @@ function updateVisibilityCreateHint(){
   $("picker").classList.toggle("show",db==="selected");
 }
 function clientCanViewLocalEvent(e){
-  // Supabase由来はRLSが最終判断する。
-  if(e?.source==="supabase")return true;
-
   const v=visibilityDbValue(e?.visibility);
   const uid=currentAuthUser?.id||null;
 
   if(v==="public")return true;
   if(!uid)return false;
-  if(e.owner===uid || e.owner===meId())return true;
+
+  // ログイン中のUUIDと完全一致する自分の募集だけ本人扱い
+  if(e.owner===uid)return true;
+
+  // デモ募集は、実アカウントの権限判定に混ぜない
+  if(e?.source!=="supabase" && !isUuid(e.owner)){
+    return false;
+  }
+
   if(v==="following")return isFollowing(e.owner);
   if(v==="mutual")return isMutualFollow(e.owner);
 
   if(v==="selected"){
     const selected=e.selectedUsers||e.selectedMembers||[];
-    return selected.includes(uid)||selected.includes(meId());
+    return selected.includes(uid);
   }
 
-  // 古いデモ募集では2段階フォローを正確に判定できないので推測しない。
+  // ローカルデモでは2段階フォローを安全に確定できないため非表示
   if(v==="friends_of_friends")return false;
 
   return false;
+}
+
+
+async function serverCanViewSupabaseEvent(row){
+  if(!row)return false;
+
+  const visibility=visibilityDbValue(row.visibility);
+  const status=row.status||"upcoming";
+  const uid=currentAuthUser?.id||null;
+
+  // 自分の募集は常に表示
+  if(uid && row.owner_id===uid)return true;
+
+  // 他人の終了済み募集は一覧に出さない
+  if(status!=="upcoming")return false;
+
+  // 未ログインでは公開募集だけ
+  if(!uid)return visibility==="public";
+
+  try{
+    const {data,error}=await sb.rpc("can_view_event",{
+      p_event_id:row.id,
+      p_owner_id:row.owner_id,
+      p_visibility:visibility,
+      p_status:status
+    });
+
+    if(error){
+      console.error("visibility double check:",error);
+      return false;
+    }
+
+    return data===true;
+  }catch(error){
+    console.error("visibility double check:",error);
+    return false;
+  }
+}
+
+async function filterSupabaseRowsByVisibility(rows){
+  const checks=await Promise.all(
+    (rows||[]).map(async row=>({
+      row,
+      allowed:await serverCanViewSupabaseEvent(row)
+    }))
+  );
+
+  return checks
+    .filter(x=>x.allowed)
+    .map(x=>x.row);
 }
 
 function mapSupabaseEvent(row){
@@ -5248,9 +5303,14 @@ async function loadEventsFromSupabase(){
     }
 
     // idで重複除去して作成日時順
-    const rows=[...new Map(
+    let rows=[...new Map(
       mergedRows.map(row=>[row.id,row])
     ).values()].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+
+    // v24.0.2:
+    // RLSで返ってきた募集も、画面へ載せる直前に can_view_event で再確認。
+    // 見えてはいけない募集はここで必ず除外する。
+    rows=await filterSupabaseRowsByVisibility(rows);
 
     const eventIds=rows.map(r=>r.id);
     const ownerIds=[...new Set(rows.map(r=>r.owner_id).filter(Boolean))];
@@ -5340,8 +5400,8 @@ async function loadEventsFromSupabase(){
 
       setDbStatus(
         currentAuthUser
-          ? `${remote.length}件の募集を表示中・自分の募集 ${ownCount}件`
-          : `${remote.length}件の募集をSupabaseから表示中`
+          ? `${remote.length}件の閲覧可能な募集を表示中・自分の募集 ${ownCount}件`
+          : `${remote.length}件の公開募集を表示中`
       );
 
     }else{
