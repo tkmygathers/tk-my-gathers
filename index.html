@@ -7221,6 +7221,142 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.4.17 — BALANCED CARD INFORMATION
+   Left 36% / Right 64% with short description.
+   ========================================================= */
+
+.v24-4-17-card{
+  grid-template-columns:36% 64% !important;
+}
+
+.v24-4-17-card .fixed-layout-photo{
+  height:266px !important;
+}
+
+.v24-4-17-card .fixed-layout-info{
+  padding:13px 14px 11px !important;
+}
+
+.v24-4-17-top{
+  justify-content:space-between !important;
+}
+
+.v24-4-17-top-actions{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:5px !important;
+  min-width:0 !important;
+}
+
+.v24-4-17-contact{
+  flex:0 0 auto !important;
+  min-height:27px !important;
+  padding:0 8px !important;
+  border:1px solid #D8E4FA !important;
+  border-radius:999px !important;
+  background:#F7FAFF !important;
+  color:#2563EB !important;
+  font-size:6.8px !important;
+  font-weight:850 !important;
+  white-space:nowrap !important;
+}
+
+.v24-4-17-title{
+  margin-top:11px !important;
+  font-size:16px !important;
+  line-height:1.32 !important;
+
+  display:-webkit-box !important;
+  -webkit-line-clamp:2 !important;
+  -webkit-box-orient:vertical !important;
+  overflow:hidden !important;
+}
+
+.v24-4-17-one-more{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:7px !important;
+  width:max-content !important;
+  max-width:100% !important;
+  margin-top:10px !important;
+  padding:7px 9px !important;
+  border:1px solid #E6D7A8 !important;
+  border-radius:999px !important;
+  background:#FFF9E8 !important;
+}
+
+.v24-4-17-one-more strong{
+  color:#6A531B !important;
+  font-size:8px !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
+}
+
+.v24-4-17-meta{
+  gap:5px !important;
+  margin-top:10px !important;
+  font-size:7.8px !important;
+}
+
+.v24-4-17-summary{
+  margin:10px 0 0 !important;
+  color:#667085 !important;
+  font-size:8px !important;
+  line-height:1.5 !important;
+  font-weight:650 !important;
+
+  display:-webkit-box !important;
+  -webkit-line-clamp:2 !important;
+  -webkit-box-orient:vertical !important;
+  overflow:hidden !important;
+}
+
+.v24-4-17-card .fixed-layout-left-meta{
+  background:#FAFBFC !important;
+}
+
+.v24-4-17-card .fixed-left-meta-row{
+  min-height:36px !important;
+}
+
+.v24-4-17-card .fixed-left-tags{
+  background:#fff !important;
+}
+
+.v24-4-17-actions{
+  padding-top:10px !important;
+}
+
+@media(max-width:360px){
+  .v24-4-17-card{
+    grid-template-columns:35% 65% !important;
+  }
+
+  .v24-4-17-card .fixed-layout-photo{
+    height:246px !important;
+  }
+
+  .v24-4-17-card .fixed-layout-info{
+    padding:10px 10px 9px !important;
+  }
+
+  .v24-4-17-title{
+    font-size:14px !important;
+  }
+
+  .v24-4-17-summary{
+    font-size:7.3px !important;
+  }
+
+  .v24-4-17-contact{
+    padding:0 6px !important;
+    font-size:6.3px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -7891,7 +8027,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_16_fixed_card_layout";
+const KEY="tk_my_gathers_v24_4_17_balanced_card_info";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -9005,8 +9141,9 @@ function eventCard(e){
   const arg=eventIdArg(e.id);
   const remaining=Math.max(0,e.capacity-e.people);
   const oneMore=remaining===1 && !e.joined;
+  const summary=(e.note||e.description||"").trim();
 
-  return `<article class="card fixed-layout-card">
+  return `<article class="card fixed-layout-card v24-4-17-card">
     <div class="fixed-layout-left">
       <button class="fixed-layout-photo" onclick="openCardDetail(${arg})">
         <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
@@ -9019,10 +9156,12 @@ function eventCard(e){
           <span>人数</span>
           <strong>${e.people}/${e.capacity}人</strong>
         </div>
+
         <div class="fixed-left-meta-row">
           <span>予算</span>
           <strong>${esc(e.budget||"未定")}</strong>
         </div>
+
         ${(e.tags||[]).length?`
           <div class="fixed-left-tags">
             ${(e.tags||[]).slice(0,2).map(t=>`<span>${esc(t)}</span>`).join("")}
@@ -9033,7 +9172,7 @@ function eventCard(e){
 
     <div class="fixed-layout-right">
       <div class="fixed-layout-info">
-        <div class="fixed-card-top">
+        <div class="fixed-card-top v24-4-17-top">
           <button class="fixed-card-owner" onclick="openOtherProfile('${escjs(e.owner)}')">
             <span class="mini-avatar">${avatarHtml(u)}</span>
             <span class="fixed-owner-copy">
@@ -9042,29 +9181,32 @@ function eventCard(e){
             </span>
           </button>
 
-          ${mine ? "" : `<button class="v23-4-contact compact" onclick="startChat('${escjs(e.owner)}')">主催者に連絡</button>`}
-          ${visibilityBadgeHtml(e.visibilityDb||e.visibility)}
+          <div class="v24-4-17-top-actions">
+            ${mine ? "" : `<button class="v24-4-17-contact" onclick="startChat('${escjs(e.owner)}')">連絡</button>`}
+            ${visibilityBadgeHtml(e.visibilityDb||e.visibility)}
+          </div>
         </div>
 
-        <button class="fixed-card-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
+        <button class="fixed-card-title v24-4-17-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
 
         ${oneMore?`
-          <div class="fixed-card-one-more">
-            <div>
-              <span class="one-more-dot"></span>
-              <strong>あと1人で開催</strong>
-            </div>
-            <small>参加できる人を募集中</small>
+          <div class="v24-4-17-one-more">
+            <span class="one-more-dot"></span>
+            <strong>あと1人で開催</strong>
           </div>
         `:""}
 
-        <div class="fixed-card-meta">
+        <div class="fixed-card-meta v24-4-17-meta">
           <span>${dateLabel(e.date)} ${esc(e.time)}</span>
           <span>${esc(e.place)}</span>
         </div>
+
+        ${summary?`
+          <p class="v24-4-17-summary">${esc(summary)}</p>
+        `:""}
       </div>
 
-      <div class="fixed-layout-actions">
+      <div class="fixed-layout-actions v24-4-17-actions">
         <button class="v22-action-button ${e.saved?"saved":""}" onclick="toggleSave(${arg})">
           ${e.saved?"保存済み":"保存"}
         </button>
