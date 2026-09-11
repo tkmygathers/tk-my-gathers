@@ -7620,6 +7620,95 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.4.21 — DISCOVER CATEGORY DRILLDOWN + HOME CARD PARITY
+   ========================================================= */
+
+.v24-4-21-subcategory-area{
+  margin-top:11px;
+  padding-top:11px;
+  border-top:1px solid #EEF1F4;
+}
+
+.v24-4-21-subcategory-area[hidden]{
+  display:none !important;
+}
+
+.v24-4-21-subcategory-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:8px;
+}
+
+.v24-4-21-subcategory-title{
+  color:#475467;
+  font-size:8.5px;
+  font-weight:850;
+}
+
+.v24-4-21-subcategory-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+.v24-4-21-sub-chip{
+  min-height:31px;
+  padding:0 10px;
+  border:1px solid #E3E8EF;
+  border-radius:999px;
+  background:#fff;
+  color:#5B6472;
+  font-size:7.6px;
+  font-weight:800;
+}
+
+.v24-4-21-sub-chip.active{
+  border-color:#AFC7F5;
+  background:#EEF4FF;
+  color:#2563EB;
+}
+
+.v24-4-21-sub-chip.original{
+  width:auto;
+  min-height:34px;
+}
+
+.v24-4-21-original-note{
+  width:100%;
+  padding:9px 10px;
+  border-radius:11px;
+  background:#F8FAFC;
+  color:#667085;
+  font-size:7.4px;
+  line-height:1.55;
+  font-weight:650;
+}
+
+/* Discover cards intentionally use the exact same eventCard() as Home. */
+.v24-4-21-home-card-results{
+  display:grid !important;
+  gap:10px !important;
+}
+
+.v24-4-21-home-card-results .fixed-layout-card{
+  width:auto !important;
+}
+
+@media(max-width:360px){
+  .v24-4-21-sub-chip{
+    min-height:30px;
+    padding:0 8px;
+    font-size:7.2px;
+  }
+
+  .v24-4-21-original-note{
+    font-size:7px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -7758,13 +7847,20 @@ html,body{
       <button id="discoverCategoryClear" type="button" onclick="setDiscoverCategory('all')">すべて</button>
     </div>
     <div id="discoverCategoryRow" class="v24-4-20-category-row"></div>
+
+    <div id="discoverSubcategoryArea" class="v24-4-21-subcategory-area" hidden>
+      <div class="v24-4-21-subcategory-head">
+        <div id="discoverSubcategoryTitle" class="v24-4-21-subcategory-title"></div>
+      </div>
+      <div id="discoverSubcategoryRow" class="v24-4-21-subcategory-row"></div>
+    </div>
   </div>
 
   <div class="discover-summary-row">
     <div id="discoverCount" class="discover-count">0件見つかりました</div>
   </div>
 
-  <div id="discoverResults" class="discover-results"></div>
+  <div id="discoverResults" class="discover-results v24-4-21-home-card-results"></div>
 </section>
 
 
@@ -8261,8 +8357,8 @@ html,body{
 
       <button onclick="startQuickCreate('その他・オリジナル','')">
         <span class="quick-action-icon">TK</span>
-        <b>誰かと何か</b>
-        <small>まだ決まってなくてもOK</small>
+        <b>オリジナル</b>
+        <small>自由な募集をつくる</small>
       </button>
     </div>
 
@@ -8293,7 +8389,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_20_discover_categories";
+const KEY="tk_my_gathers_v24_4_21_discover_category_drilldown";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -8310,13 +8406,13 @@ const sb=window.supabase.createClient(
 let currentAuthUser=null;
 const quickTagOptions=["新規歓迎","初参加歓迎","1人参加OK","初心者歓迎","途中参加OK","当日参加OK","友達連れOK","少人数","ゆるめ","相談しながら決めたい"];
 const categories={
-"食事・飲み":["飲み会","ランチ","夜ごはん","カフェ","ラーメン","焼肉","食べ歩き","スイーツ巡り","せんべろ","はしご酒"],
-"スポーツ":["キャッチボール","フットサル","バスケ","バドミントン","テニス","卓球","ランニング","ボルダリング"],
-"ゲーム・遊び":["麻雀","ボードゲーム","ダーツ","ビリヤード","カラオケ","謎解き","人狼"],
-"おでかけ":["BBQ","ピクニック","街歩き","夜散歩","夜景","水族館","動物園","日帰り旅行"],
-"カルチャー・趣味":["映画","美術館","写真散歩","古着巡り","本屋巡り","ライブ","お笑い"],
+"食事・飲み":["飲み会","ランチ","夜ごはん","カフェ","ラーメン","焼肉","食べ歩き","スイーツ巡り","せんべろ","はしご酒","新しい店に行く"],
+"スポーツ":["キャッチボール","フットサル","バスケ","バドミントン","テニス","卓球","ボウリング","ランニング","サイクリング","ボルダリング","ゴルフ練習","筋トレ"],
+"ゲーム・遊び":["麻雀","ボードゲーム","ダーツ","ビリヤード","カラオケ","謎解き","脱出ゲーム","ゲームセンター","カードゲーム","人狼","eスポーツ"],
+"おでかけ":["BBQ","ピクニック","街歩き","夜散歩","夜景","水族館","動物園","プラネタリウム","神社・寺巡り","商店街巡り","日帰り旅行"],
+"カルチャー・趣味":["映画","美術館","展覧会","写真散歩","カメラ","古着巡り","本屋巡り","レコード屋巡り","ライブ","お笑い","音楽セッション","絵を描く"],
 "リラックス":["サウナ","銭湯","岩盤浴","公園でのんびり","カフェでゆっくり"],
-"学ぶ・作る":["勉強会","読書会","英会話","作業会","プログラミング","陶芸","ハンドメイド"],
+"学ぶ・作る":["勉強会","読書会","英会話","作業会","プログラミング","資格勉強","アイデア出し","料理教室","陶芸","ハンドメイド"],
 "その他・オリジナル":[]
 };
 const svgFallback={
@@ -8358,6 +8454,7 @@ yuta:[{from:"yuta",text:"BBQの食材、何か食べたいものある？",time:
 const clone=x=>JSON.parse(JSON.stringify(x));
 let state=(()=>{try{return JSON.parse(localStorage.getItem(KEY))||clone(defaults)}catch(e){return clone(defaults)}})();
 if(!state.discoverCategory)state.discoverCategory="all";
+if(!state.discoverSub)state.discoverSub="all";
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 const escjs=s=>String(s??"").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
 function save(){
@@ -9537,14 +9634,21 @@ const DISCOVER_CATEGORY_GROUPS=[
   {label:"カルチャー・趣味",value:"カルチャー・趣味"},
   {label:"リラックス",value:"リラックス"},
   {label:"学ぶ・作る",value:"学ぶ・作る"},
-  {label:"その他",value:"その他・オリジナル"}
+  {label:"オリジナル",value:"その他・オリジナル"}
 ];
+
+function discoverCategoryDisplayName(value){
+  return value==="その他・オリジナル" ? "オリジナル" : value;
+}
 
 function renderDiscoverCategories(){
   const row=$("discoverCategoryRow");
+  const subArea=$("discoverSubcategoryArea");
+  const subRow=$("discoverSubcategoryRow");
   if(!row)return;
 
   const active=state.discoverCategory||"all";
+  const activeSub=state.discoverSub||"all";
 
   row.innerHTML=DISCOVER_CATEGORY_GROUPS.map(item=>`
     <button
@@ -9559,23 +9663,83 @@ function renderDiscoverCategories(){
     clear.textContent=active==="all"?"すべて":"解除";
     clear.classList.toggle("active",active==="all");
   }
+
+  if(!subArea || !subRow)return;
+
+  if(active==="all"){
+    subArea.hidden=true;
+    subRow.innerHTML="";
+    return;
+  }
+
+  subArea.hidden=false;
+
+  const label=$("discoverSubcategoryTitle");
+  if(label){
+    label.textContent=active==="その他・オリジナル"
+      ? "自由な募集"
+      : `${discoverCategoryDisplayName(active)}から選ぶ`;
+  }
+
+  if(active==="その他・オリジナル"){
+    subRow.innerHTML=`
+      <button
+        type="button"
+        class="v24-4-21-sub-chip active original"
+        onclick="setDiscoverSub('all')"
+      >オリジナル募集をすべて見る</button>
+      <div class="v24-4-21-original-note">
+        例：山手線一周散歩、始発から終電まで遊ぶ、都内の変な自販機を探す など
+      </div>
+    `;
+    return;
+  }
+
+  const items=categories[active]||[];
+  subRow.innerHTML=[
+    `<button type="button" class="v24-4-21-sub-chip ${activeSub==="all"?"active":""}" onclick="setDiscoverSub('all')">すべて</button>`,
+    ...items.map(item=>`
+      <button
+        type="button"
+        class="v24-4-21-sub-chip ${activeSub===item?"active":""}"
+        onclick="setDiscoverSub('${escjs(item)}')"
+      >${esc(item)}</button>
+    `)
+  ].join("");
 }
 
 function setDiscoverCategory(category){
   state.discoverCategory=category||"all";
+  state.discoverSub="all";
+  renderDiscoverCategories();
+  renderDiscover();
+}
+
+function setDiscoverSub(sub){
+  state.discoverSub=sub||"all";
   renderDiscoverCategories();
   renderDiscover();
 }
 
 function discoverCategoryMatches(e){
   const selected=state.discoverCategory||"all";
-  if(selected==="all")return true;
+  const selectedSub=state.discoverSub||"all";
 
-  if(selected==="その他・オリジナル"){
-    return e.category==="その他・オリジナル" || e.category==="その他";
+  if(selected!=="all"){
+    const categoryMatch=selected==="その他・オリジナル"
+      ? (e.category==="その他・オリジナル" || e.category==="その他")
+      : e.category===selected;
+
+    if(!categoryMatch)return false;
   }
 
-  return e.category===selected;
+  if(selectedSub!=="all"){
+    return e.sub===selectedSub
+      || e.activity===selectedSub
+      || e.title===selectedSub;
+  }
+
+  return true;
 }
 
 function normalizeText(value){
@@ -9675,7 +9839,7 @@ function renderDiscover(){
   if(!results)return;
 
   results.innerHTML=rows.length
-    ? rows.map(discoverCard).join("")
+    ? rows.map(eventCard).join("")
     : `<div class="discover-empty">
         <strong>検索結果がありません</strong>
         <span>別の言葉で検索してみてください。</span>
@@ -11384,9 +11548,9 @@ function openFullCreateFromQuick(){
 
 function openCreate(){if(!requireAuth("募集を作成するにはログインしてください。"))return;setDefaultDate();renderCategories();renderSubs();renderMemberPicker();renderQuickTags();updateVisibilityCreateHint();$("eventImagePreview").style.display=selectedEventImageFile?"block":"none";openModal("createModal")}
 function setDefaultDate(){if(!$("eventDate").value){const d=new Date();d.setDate(d.getDate()+1);$("eventDate").value=d.toISOString().slice(0,10)}if(!$("eventTime").value)$("eventTime").value="19:00"}
-function renderCategories(){$("categoryGrid").innerHTML=Object.keys(categories).map(c=>`<button type="button" class="category-btn ${state.cat===c?"active":""}" onclick="selectCat('${escjs(c)}')">${esc(c)}</button>`).join("")}
+function renderCategories(){$("categoryGrid").innerHTML=Object.keys(categories).map(c=>`<button type="button" class="category-btn ${state.cat===c?"active":""}" onclick="selectCat('${escjs(c)}')">${esc(c==="その他・オリジナル"?"オリジナル":c)}</button>`).join("")}
 function selectCat(c){state.cat=c;state.sub="";renderCategories();renderSubs()}
-function renderSubs(){const list=categories[state.cat]||[];$("subs").innerHTML=(state.cat==="その他・オリジナル"?`<button type="button" class="sub-btn active">自由入力</button>`:list.map(x=>`<button type="button" class="sub-btn ${state.sub===x?"active":""}" onclick="selectSub('${escjs(x)}')">${esc(x)}</button>`).join("")+`<button type="button" class="sub-btn" onclick="useCustom()">＋ オリジナル</button>`);$("customBox").classList.toggle("show",state.cat==="その他・オリジナル")}
+function renderSubs(){const list=categories[state.cat]||[];$("subs").innerHTML=(state.cat==="その他・オリジナル"?`<button type="button" class="sub-btn active">オリジナルを入力</button>`:list.map(x=>`<button type="button" class="sub-btn ${state.sub===x?"active":""}" onclick="selectSub('${escjs(x)}')">${esc(x)}</button>`).join("")+`<button type="button" class="sub-btn" onclick="useCustom()">＋ オリジナル</button>`);$("customBox").classList.toggle("show",state.cat==="その他・オリジナル")}
 function selectSub(x){state.sub=x;$("customBox").classList.remove("show");renderSubs()}
 function useCustom(){state.sub="";$("customBox").classList.add("show")}
 
