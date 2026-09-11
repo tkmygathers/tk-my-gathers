@@ -6335,6 +6335,99 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.4.11 — HOME ACTION BUTTON TEXT FIX
+   ========================================================= */
+
+/* ホームカードのアクション行を崩れにくくする */
+.v22-actions,
+.actions{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:7px !important;
+  align-items:stretch !important;
+}
+
+/* ボタン内の文字を必ず収める */
+.v22-action-button,
+.action{
+  min-width:0 !important;
+  width:100% !important;
+  min-height:40px !important;
+  height:auto !important;
+  padding:8px 6px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
+  word-break:keep-all !important;
+  line-height:1.15 !important;
+  font-size:8.5px !important;
+  font-weight:800 !important;
+  box-sizing:border-box !important;
+}
+
+/* 長めのCTAだけ少し小さく */
+.v22-action-button.one-more-join,
+.action.one-more-join{
+  font-size:8px !important;
+}
+
+/* 保存済みや参加中でも幅を圧迫しない */
+.v22-action-button.saved,
+.v22-action-button.joined,
+.action.saved,
+.action.joined{
+  padding-left:5px !important;
+  padding-right:5px !important;
+}
+
+/* 探す画面側のボタンも同じ思想に */
+.discover-card-actions{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:7px !important;
+}
+
+.discover-primary,
+.discover-secondary{
+  min-width:0 !important;
+  width:100% !important;
+  min-height:40px !important;
+  padding:8px 6px !important;
+  white-space:normal !important;
+  line-height:1.15 !important;
+  text-align:center !important;
+  font-size:8.5px !important;
+  box-sizing:border-box !important;
+}
+
+/* 小さいスマホではさらに余白を詰める */
+@media(max-width:360px){
+  .v22-actions,
+  .actions{
+    gap:5px !important;
+  }
+
+  .v22-action-button,
+  .action,
+  .discover-primary,
+  .discover-secondary{
+    min-height:38px !important;
+    padding:7px 4px !important;
+    font-size:7.8px !important;
+  }
+
+  .v22-action-button.one-more-join,
+  .action.one-more-join{
+    font-size:7.4px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -7005,7 +7098,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_10_visibility_wording";
+const KEY="tk_my_gathers_v24_4_11_home_action_button_fix";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
