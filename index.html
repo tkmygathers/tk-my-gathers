@@ -5984,6 +5984,112 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.4.7 — FULL IMAGE + MOVABLE CROP FRAME
+   ========================================================= */
+
+/* アイコンと名前の重なりを完全に解消 */
+.profile-wrap-connected{
+  padding-top:82px !important;
+}
+
+.profile-wrap-connected .profile-info{
+  clear:both !important;
+  position:relative !important;
+  z-index:1 !important;
+}
+
+.profile-wrap-connected .profile-name{
+  margin-top:8px !important;
+}
+
+/* 写真全体を表示 */
+.crop-viewport{
+  position:relative;
+  overflow:hidden;
+  background:#111827;
+  touch-action:none;
+}
+
+.crop-viewport.crop-avatar,
+.crop-viewport.crop-banner{
+  width:100%;
+  height:min(62vh,420px);
+  aspect-ratio:auto !important;
+  border-radius:16px !important;
+}
+
+.crop-viewport img{
+  position:absolute;
+  object-fit:contain !important;
+  max-width:none !important;
+  max-height:none !important;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+/* 切り抜き範囲 */
+.crop-selection-frame{
+  position:absolute;
+  z-index:5;
+  box-sizing:border-box;
+  border:3px solid #fff;
+  box-shadow:
+    0 0 0 9999px rgba(0,0,0,.42),
+    0 4px 18px rgba(0,0,0,.22);
+  cursor:grab;
+  touch-action:none;
+}
+
+.crop-selection-frame:active{
+  cursor:grabbing;
+}
+
+.crop-selection-avatar{
+  border-radius:50%;
+}
+
+.crop-selection-banner{
+  border-radius:12px;
+}
+
+.crop-selection-frame::before{
+  content:"";
+  position:absolute;
+  inset:6px;
+  border:1px solid rgba(255,255,255,.46);
+  pointer-events:none;
+}
+
+.crop-selection-avatar::before{
+  border-radius:50%;
+}
+
+.crop-selection-banner::before{
+  border-radius:8px;
+}
+
+.crop-editor-stage-wrap{
+  padding:10px 0 4px;
+}
+
+.crop-help{
+  margin-top:10px;
+}
+
+@media(max-width:360px){
+  .profile-wrap-connected{
+    padding-top:72px !important;
+  }
+
+  .crop-viewport.crop-avatar,
+  .crop-viewport.crop-banner{
+    height:min(58vh,380px);
+  }
+}
+
 </style>
 </head>
 <body>
@@ -6417,15 +6523,16 @@ html,body{
     <div class="crop-editor-stage-wrap">
       <div id="cropViewport" class="crop-viewport crop-avatar">
         <img id="cropEditorImage" alt="切り抜きプレビュー">
+        <div id="cropSelectionFrame" class="crop-selection-frame crop-selection-avatar"></div>
       </div>
     </div>
 
     <div class="crop-gesture-tip">
-      <span>ドラッグで位置調整</span>
-      <span>2本指で拡大・縮小</span>
+      <span>枠をドラッグして位置調整</span>
+      <span>2本指で枠を拡大・縮小</span>
     </div>
 
-    <div class="crop-help"><strong>枠の中が、そのままプロフィールに表示されます。</strong><br>画像を直接動かして位置を決めてください。</div>
+    <div class="crop-help"><strong>写真全体を見ながら、使いたい部分に枠を合わせます。</strong><br>丸・長方形の枠の中が実際に保存されます。</div>
 
     <div class="crop-actions">
       <button type="button" class="upload-btn" onclick="cancelProfileCrop()">選び直す</button>
@@ -6653,7 +6760,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_6_touch_crop_profile_layout";
+const KEY="tk_my_gathers_v24_4_7_full_image_crop_frame";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -8897,10 +9004,20 @@ async function uploadProfileAvatar(file){
 
 
 
-let cropScale=1;
-let cropMinScale=1;
-let cropOffsetX=0;
-let cropOffsetY=0;
+
+let cropImageFitScale=1;
+let cropImageDrawWidth=0;
+let cropImageDrawHeight=0;
+let cropImageLeft=0;
+let cropImageTop=0;
+
+let cropFrameX=0;
+let cropFrameY=0;
+let cropFrameWidth=0;
+let cropFrameHeight=0;
+let cropFrameMinWidth=0;
+let cropFrameMaxWidth=0;
+
 let cropPointers=new Map();
 let cropDragStart=null;
 let cropPinchStart=null;
@@ -8925,42 +9042,71 @@ function cropViewportSize(){
   return {width:rect.width||1,height:rect.height||1};
 }
 
-function calculateCropMinScale(){
+function setupFullImageCrop(){
   const {width,height}=cropViewportSize();
   const nw=profileCropNaturalWidth||1;
   const nh=profileCropNaturalHeight||1;
-  return Math.max(width/nw,height/nh);
+
+  // 画像全体が必ず見える contain 表示
+  cropImageFitScale=Math.min(width/nw,height/nh);
+  cropImageDrawWidth=nw*cropImageFitScale;
+  cropImageDrawHeight=nh*cropImageFitScale;
+  cropImageLeft=(width-cropImageDrawWidth)/2;
+  cropImageTop=(height-cropImageDrawHeight)/2;
+
+  if(profileCropMode==="avatar"){
+    const maxSize=Math.min(cropImageDrawWidth,cropImageDrawHeight);
+    cropFrameMaxWidth=maxSize;
+    cropFrameMinWidth=Math.max(64,maxSize*0.28);
+    cropFrameWidth=Math.min(maxSize,maxSize*0.62);
+    cropFrameHeight=cropFrameWidth;
+  }else{
+    // 8:3 の横長比率
+    const ratio=8/3;
+    let maxWidth=cropImageDrawWidth;
+    let maxHeight=maxWidth/ratio;
+
+    if(maxHeight>cropImageDrawHeight){
+      maxHeight=cropImageDrawHeight;
+      maxWidth=maxHeight*ratio;
+    }
+
+    cropFrameMaxWidth=maxWidth;
+    cropFrameMinWidth=Math.max(120,maxWidth*0.30);
+    cropFrameWidth=Math.min(maxWidth,maxWidth*0.72);
+    cropFrameHeight=cropFrameWidth/ratio;
+  }
+
+  cropFrameX=cropImageLeft+(cropImageDrawWidth-cropFrameWidth)/2;
+  cropFrameY=cropImageTop+(cropImageDrawHeight-cropFrameHeight)/2;
+
+  renderFullImageCrop();
 }
 
-function clampCropOffsets(){
-  const {width,height}=cropViewportSize();
-  const displayWidth=(profileCropNaturalWidth||1)*cropScale;
-  const displayHeight=(profileCropNaturalHeight||1)*cropScale;
-  const minX=Math.min(0,width-displayWidth);
-  const minY=Math.min(0,height-displayHeight);
+function clampCropFrame(){
+  const imageRight=cropImageLeft+cropImageDrawWidth;
+  const imageBottom=cropImageTop+cropImageDrawHeight;
 
-  cropOffsetX=Math.min(0,Math.max(minX,cropOffsetX));
-  cropOffsetY=Math.min(0,Math.max(minY,cropOffsetY));
+  cropFrameX=Math.max(cropImageLeft,Math.min(imageRight-cropFrameWidth,cropFrameX));
+  cropFrameY=Math.max(cropImageTop,Math.min(imageBottom-cropFrameHeight,cropFrameY));
 }
 
-function centerCropImage(){
-  const {width,height}=cropViewportSize();
-  const displayWidth=(profileCropNaturalWidth||1)*cropScale;
-  const displayHeight=(profileCropNaturalHeight||1)*cropScale;
-  cropOffsetX=(width-displayWidth)/2;
-  cropOffsetY=(height-displayHeight)/2;
-  clampCropOffsets();
-}
-
-function renderTouchCrop(){
+function renderFullImageCrop(){
   const img=$("cropEditorImage");
-  if(!img||!profileCropNaturalWidth||!profileCropNaturalHeight)return;
+  const frame=$("cropSelectionFrame");
+  if(!img||!frame)return;
 
-  clampCropOffsets();
-  img.style.width=`${profileCropNaturalWidth*cropScale}px`;
-  img.style.height=`${profileCropNaturalHeight*cropScale}px`;
-  img.style.left=`${cropOffsetX}px`;
-  img.style.top=`${cropOffsetY}px`;
+  img.style.width=`${cropImageDrawWidth}px`;
+  img.style.height=`${cropImageDrawHeight}px`;
+  img.style.left=`${cropImageLeft}px`;
+  img.style.top=`${cropImageTop}px`;
+
+  clampCropFrame();
+
+  frame.style.left=`${cropFrameX}px`;
+  frame.style.top=`${cropFrameY}px`;
+  frame.style.width=`${cropFrameWidth}px`;
+  frame.style.height=`${cropFrameHeight}px`;
 }
 
 function openProfileCropEditor(file,mode){
@@ -8972,10 +9118,15 @@ function openProfileCropEditor(file,mode){
   profileCropSourceUrl=URL.createObjectURL(file);
 
   const viewport=$("cropViewport");
+  const frame=$("cropSelectionFrame");
   const img=$("cropEditorImage");
 
   viewport.classList.toggle("crop-avatar",mode==="avatar");
   viewport.classList.toggle("crop-banner",mode==="banner");
+
+  frame.classList.toggle("crop-selection-avatar",mode==="avatar");
+  frame.classList.toggle("crop-selection-banner",mode==="banner");
+
   $("cropEditorTitle").textContent=mode==="avatar"
     ? "プロフィール画像を切り抜く"
     : "バナー画像を切り抜く";
@@ -8983,13 +9134,7 @@ function openProfileCropEditor(file,mode){
   img.onload=()=>{
     profileCropNaturalWidth=img.naturalWidth;
     profileCropNaturalHeight=img.naturalHeight;
-
-    requestAnimationFrame(()=>{
-      cropMinScale=calculateCropMinScale();
-      cropScale=cropMinScale;
-      centerCropImage();
-      renderTouchCrop();
-    });
+    requestAnimationFrame(setupFullImageCrop);
   };
 
   img.src=profileCropSourceUrl;
@@ -9010,30 +9155,65 @@ function cropPointerCenter(){
   return {x:(a.x+b.x)/2,y:(a.y+b.y)/2};
 }
 
+function resizeCropFrameAroundCenter(newWidth,centerX,centerY){
+  const ratio=profileCropMode==="avatar"?1:(8/3);
+
+  let width=Math.max(cropFrameMinWidth,Math.min(cropFrameMaxWidth,newWidth));
+  let height=profileCropMode==="avatar"?width:width/ratio;
+
+  if(height>cropImageDrawHeight){
+    height=cropImageDrawHeight;
+    width=profileCropMode==="avatar"?height:height*ratio;
+  }
+
+  cropFrameWidth=width;
+  cropFrameHeight=height;
+  cropFrameX=centerX-width/2;
+  cropFrameY=centerY-height/2;
+  clampCropFrame();
+  renderFullImageCrop();
+}
+
 function initCropTouchGestures(){
   const viewport=$("cropViewport");
-  if(!viewport || viewport.dataset.touchReady==="1")return;
+  const frame=$("cropSelectionFrame");
+  if(!viewport||!frame||viewport.dataset.touchReady==="1")return;
   viewport.dataset.touchReady="1";
 
   viewport.addEventListener("pointerdown",e=>{
     e.preventDefault();
+
+    const rect=viewport.getBoundingClientRect();
+    const x=e.clientX-rect.left;
+    const y=e.clientY-rect.top;
+
+    const inside=
+      x>=cropFrameX &&
+      x<=cropFrameX+cropFrameWidth &&
+      y>=cropFrameY &&
+      y<=cropFrameY+cropFrameHeight;
+
+    if(!inside && cropPointers.size===0)return;
+
     viewport.setPointerCapture?.(e.pointerId);
     cropPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
 
     if(cropPointers.size===1){
       cropDragStart={
-        pointerId:e.pointerId,
         x:e.clientX,
         y:e.clientY,
-        offsetX:cropOffsetX,
-        offsetY:cropOffsetY
+        frameX:cropFrameX,
+        frameY:cropFrameY
       };
     }
 
     if(cropPointers.size===2){
+      const center=cropPointerCenter();
       cropPinchStart={
         distance:cropPointerDistance(),
-        scale:cropScale
+        width:cropFrameWidth,
+        centerX:center.x-rect.left,
+        centerY:center.y-rect.top
       };
       cropDragStart=null;
     }
@@ -9042,34 +9222,33 @@ function initCropTouchGestures(){
   viewport.addEventListener("pointermove",e=>{
     if(!cropPointers.has(e.pointerId))return;
     e.preventDefault();
+
     cropPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
 
     if(cropPointers.size===1 && cropDragStart){
       const current=[...cropPointers.values()][0];
-      cropOffsetX=cropDragStart.offsetX+(current.x-cropDragStart.x);
-      cropOffsetY=cropDragStart.offsetY+(current.y-cropDragStart.y);
-      renderTouchCrop();
+      cropFrameX=cropDragStart.frameX+(current.x-cropDragStart.x);
+      cropFrameY=cropDragStart.frameY+(current.y-cropDragStart.y);
+      clampCropFrame();
+      renderFullImageCrop();
       return;
     }
 
     if(cropPointers.size>=2 && cropPinchStart){
       const distance=cropPointerDistance();
-      if(!distance || !cropPinchStart.distance)return;
+      if(!distance||!cropPinchStart.distance)return;
 
-      const viewportRect=viewport.getBoundingClientRect();
-      const center=cropPointerCenter();
-      const cx=center.x-viewportRect.left;
-      const cy=center.y-viewportRect.top;
-
-      const previousScale=cropScale;
       const ratio=distance/cropPinchStart.distance;
-      cropScale=Math.min(cropMinScale*4,Math.max(cropMinScale,cropPinchStart.scale*ratio));
+      const newWidth=cropPinchStart.width*ratio;
 
-      const scaleRatio=cropScale/previousScale;
-      cropOffsetX=cx-(cx-cropOffsetX)*scaleRatio;
-      cropOffsetY=cy-(cy-cropOffsetY)*scaleRatio;
+      const rect=viewport.getBoundingClientRect();
+      const center=cropPointerCenter();
 
-      renderTouchCrop();
+      resizeCropFrameAroundCenter(
+        newWidth,
+        center.x-rect.left,
+        center.y-rect.top
+      );
     }
   },{passive:false});
 
@@ -9078,13 +9257,12 @@ function initCropTouchGestures(){
     try{viewport.releasePointerCapture?.(e.pointerId);}catch{}
 
     if(cropPointers.size===1){
-      const remaining=[...cropPointers.entries()][0];
+      const remaining=[...cropPointers.values()][0];
       cropDragStart={
-        pointerId:remaining[0],
-        x:remaining[1].x,
-        y:remaining[1].y,
-        offsetX:cropOffsetX,
-        offsetY:cropOffsetY
+        x:remaining.x,
+        y:remaining.y,
+        frameX:cropFrameX,
+        frameY:cropFrameY
       };
       cropPinchStart=null;
     }else{
@@ -9101,10 +9279,7 @@ initCropTouchGestures();
 
 window.addEventListener("resize",()=>{
   if($("profileCropModal")?.classList.contains("open")){
-    cropMinScale=calculateCropMinScale();
-    cropScale=Math.max(cropScale,cropMinScale);
-    clampCropOffsets();
-    renderTouchCrop();
+    setupFullImageCrop();
   }
 });
 
@@ -9119,19 +9294,17 @@ function cancelProfileCrop(){
 }
 
 async function createCroppedProfileFile(){
-  if(!profileCropSourceFile || !profileCropMode)throw new Error("切り抜く画像がありません");
+  if(!profileCropSourceFile||!profileCropMode)throw new Error("切り抜く画像がありません");
 
   const img=$("cropEditorImage");
-  const viewport=$("cropViewport");
-  const rect=viewport.getBoundingClientRect();
+
+  const sourceX=(cropFrameX-cropImageLeft)/cropImageFitScale;
+  const sourceY=(cropFrameY-cropImageTop)/cropImageFitScale;
+  const sourceWidth=cropFrameWidth/cropImageFitScale;
+  const sourceHeight=cropFrameHeight/cropImageFitScale;
 
   const outWidth=profileCropMode==="avatar"?512:1600;
   const outHeight=profileCropMode==="avatar"?512:600;
-
-  const sourceX=Math.max(0,-cropOffsetX/cropScale);
-  const sourceY=Math.max(0,-cropOffsetY/cropScale);
-  const sourceWidth=Math.min(img.naturalWidth,rect.width/cropScale);
-  const sourceHeight=Math.min(img.naturalHeight,rect.height/cropScale);
 
   const canvas=document.createElement("canvas");
   canvas.width=outWidth;
@@ -9179,6 +9352,7 @@ async function applyProfileCrop(){
       preview.src=previewUrl;
       preview.style.display="block";
       if(placeholder)placeholder.style.display="none";
+
     }else{
       if(selectedProfileBannerPreviewUrl)URL.revokeObjectURL(selectedProfileBannerPreviewUrl);
       selectedProfileBannerFile=cropped;
