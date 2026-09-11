@@ -7357,6 +7357,269 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.4.18 — CARD RIGHT-SIDE TEXT SIZE UP
+   Slight readability increase without changing layout.
+   ========================================================= */
+
+.v24-4-17-card .fixed-owner-copy b{
+  font-size:9.5px !important;
+}
+
+.v24-4-17-card .fixed-owner-copy small{
+  font-size:7px !important;
+}
+
+.v24-4-17-title{
+  font-size:17px !important;
+  line-height:1.34 !important;
+}
+
+.v24-4-17-one-more strong{
+  font-size:8.7px !important;
+}
+
+.v24-4-17-meta{
+  font-size:8.5px !important;
+  line-height:1.35 !important;
+}
+
+.v24-4-17-summary{
+  font-size:8.7px !important;
+  line-height:1.55 !important;
+}
+
+.v24-4-17-contact{
+  font-size:7.2px !important;
+  min-height:28px !important;
+}
+
+.v24-4-17-card .visibility-badge{
+  font-size:7.4px !important;
+}
+
+@media(max-width:360px){
+  .v24-4-17-title{
+    font-size:15px !important;
+  }
+
+  .v24-4-17-meta{
+    font-size:8px !important;
+  }
+
+  .v24-4-17-summary{
+    font-size:7.9px !important;
+  }
+
+  .v24-4-17-card .fixed-owner-copy b{
+    font-size:8.9px !important;
+  }
+}
+
+
+/* =========================================================
+   V24.4.19 — PEOPLE/BUDGET RIGHT + TAGS UNDER PHOTO
+   ========================================================= */
+
+.v24-4-19-card{
+  grid-template-columns:36% 64% !important;
+}
+
+/* 左：写真 + タグだけ */
+.v24-4-19-card .fixed-layout-left{
+  display:flex !important;
+  flex-direction:column !important;
+}
+
+.v24-4-19-card .fixed-layout-photo{
+  flex:1 1 auto !important;
+  height:auto !important;
+  min-height:250px !important;
+}
+
+.v24-4-19-tag-footer{
+  min-height:64px !important;
+  padding:10px 9px !important;
+  display:flex !important;
+  align-items:flex-start !important;
+  align-content:flex-start !important;
+  flex-wrap:wrap !important;
+  gap:5px !important;
+  border-top:1px solid #EEF1F4 !important;
+  background:#fff !important;
+  box-sizing:border-box !important;
+}
+
+.v24-4-19-tag-footer span{
+  max-width:100% !important;
+  padding:5px 7px !important;
+  border-radius:999px !important;
+  background:#F5F7FA !important;
+  color:#667085 !important;
+  font-size:7px !important;
+  font-weight:800 !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+
+.v24-4-19-tag-footer .v24-4-19-no-tag{
+  color:#98A2B3 !important;
+  background:transparent !important;
+  padding-left:0 !important;
+}
+
+/* 右：人数・予算を戻す */
+.v24-4-19-stats{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:6px !important;
+  margin-top:10px !important;
+}
+
+.v24-4-19-stats > span{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:5px !important;
+  min-height:28px !important;
+  padding:0 8px !important;
+  border-radius:999px !important;
+  background:#F5F7FA !important;
+  color:#475467 !important;
+}
+
+.v24-4-19-stats small{
+  color:#98A2B3 !important;
+  font-size:6.8px !important;
+  font-weight:800 !important;
+}
+
+.v24-4-19-stats strong{
+  color:#344054 !important;
+  font-size:8.3px !important;
+  font-weight:900 !important;
+}
+
+/* 右下：保存・詳細・参加は固定 */
+.v24-4-19-actions{
+  min-height:64px !important;
+  box-sizing:border-box !important;
+}
+
+/* 左のタグ欄と右のボタン欄の下端を揃える */
+.v24-4-19-card .fixed-layout-left,
+.v24-4-19-card .fixed-layout-right{
+  height:100% !important;
+}
+
+@media(max-width:360px){
+  .v24-4-19-card{
+    grid-template-columns:35% 65% !important;
+  }
+
+  .v24-4-19-card .fixed-layout-photo{
+    min-height:230px !important;
+  }
+
+  .v24-4-19-tag-footer{
+    min-height:60px !important;
+    padding:8px 7px !important;
+  }
+
+  .v24-4-19-stats{
+    gap:4px !important;
+  }
+
+  .v24-4-19-stats > span{
+    min-height:26px !important;
+    padding:0 6px !important;
+  }
+}
+
+
+/* =========================================================
+   V24.4.20 — DISCOVER CATEGORY FILTERS
+   ========================================================= */
+.v24-4-20-category-section{
+  margin:12px 13px 8px;
+  padding:13px 13px 12px;
+  border:1px solid var(--app-line,#E4E8EE);
+  border-radius:16px;
+  background:#fff;
+}
+.v24-4-20-category-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.v24-4-20-category-kicker{
+  color:#98A2B3;
+  font-size:7px;
+  font-weight:850;
+  letter-spacing:.14em;
+}
+.v24-4-20-category-title{
+  margin-top:2px;
+  color:#1C2932;
+  font-size:13px;
+  font-weight:850;
+}
+#discoverCategoryClear{
+  min-height:28px;
+  padding:0 9px;
+  border:0;
+  border-radius:999px;
+  background:#F3F5F7;
+  color:#667085;
+  font-size:7.5px;
+  font-weight:850;
+}
+#discoverCategoryClear.active{
+  background:#EEF4FF;
+  color:#2563EB;
+}
+.v24-4-20-category-row{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding-bottom:2px;
+  scrollbar-width:none;
+}
+.v24-4-20-category-row::-webkit-scrollbar{display:none}
+.v24-4-20-category-chip{
+  flex:0 0 auto;
+  min-height:34px;
+  padding:0 11px;
+  border:1px solid #E3E8EF;
+  border-radius:999px;
+  background:#fff;
+  color:#475467;
+  font-size:8px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.v24-4-20-category-chip.active{
+  border-color:#2563EB;
+  background:#2563EB;
+  color:#fff;
+}
+.discover-simple .discover-summary-row{margin-top:8px}
+@media(max-width:360px){
+  .v24-4-20-category-section{
+    margin-left:10px;
+    margin-right:10px;
+    padding:11px 10px 10px;
+  }
+  .v24-4-20-category-chip{
+    min-height:32px;
+    padding:0 9px;
+    font-size:7.5px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -7442,15 +7705,7 @@ html,body{
       <button class="home-feed-tab" data-homefilter="weekday">平日夜</button>
       <button class="home-feed-tab" data-homefilter="new">新着</button>
     </div>
-
-    <div class="home-section-row">
-      <div class="home-section-title">カテゴリから探す</div>
-      <button onclick="showPage('discover')">すべて見る ›</button>
-    </div>
-
-    <div id="homeCategoryRow" class="home-category-row"></div>
-
-    <div class="home-section-row home-recruit-head">
+<div class="home-section-row home-recruit-head">
       <div><span class="home-mini-label">FOR YOU</span><div class="home-section-title">おすすめの募集</div></div>
       <button onclick="showPage('discover')">すべて見る ›</button>
     </div>
@@ -7492,6 +7747,17 @@ html,body{
       <span class="discover-search-icon">⌕</span>
       <input id="discoverQuery" type="search" placeholder="募集名・場所・カテゴリで検索">
     </div>
+  </div>
+
+  <div class="v24-4-20-category-section">
+    <div class="v24-4-20-category-head">
+      <div>
+        <div class="v24-4-20-category-kicker">CATEGORY</div>
+        <div class="v24-4-20-category-title">カテゴリから探す</div>
+      </div>
+      <button id="discoverCategoryClear" type="button" onclick="setDiscoverCategory('all')">すべて</button>
+    </div>
+    <div id="discoverCategoryRow" class="v24-4-20-category-row"></div>
   </div>
 
   <div class="discover-summary-row">
@@ -8027,7 +8293,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_17_balanced_card_info";
+const KEY="tk_my_gathers_v24_4_20_discover_categories";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -8091,6 +8357,7 @@ yuta:[{from:"yuta",text:"BBQの食材、何か食べたいものある？",time:
 };
 const clone=x=>JSON.parse(JSON.stringify(x));
 let state=(()=>{try{return JSON.parse(localStorage.getItem(KEY))||clone(defaults)}catch(e){return clone(defaults)}})();
+if(!state.discoverCategory)state.discoverCategory="all";
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 const escjs=s=>String(s??"").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
 function save(){
@@ -9143,7 +9410,7 @@ function eventCard(e){
   const oneMore=remaining===1 && !e.joined;
   const summary=(e.note||e.description||"").trim();
 
-  return `<article class="card fixed-layout-card v24-4-17-card">
+  return `<article class="card fixed-layout-card v24-4-19-card">
     <div class="fixed-layout-left">
       <button class="fixed-layout-photo" onclick="openCardDetail(${arg})">
         <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
@@ -9151,22 +9418,10 @@ function eventCard(e){
         ${oneMore?`<span class="fixed-photo-urgency">あと1人</span>`:""}
       </button>
 
-      <div class="fixed-layout-left-meta">
-        <div class="fixed-left-meta-row">
-          <span>人数</span>
-          <strong>${e.people}/${e.capacity}人</strong>
-        </div>
-
-        <div class="fixed-left-meta-row">
-          <span>予算</span>
-          <strong>${esc(e.budget||"未定")}</strong>
-        </div>
-
-        ${(e.tags||[]).length?`
-          <div class="fixed-left-tags">
-            ${(e.tags||[]).slice(0,2).map(t=>`<span>${esc(t)}</span>`).join("")}
-          </div>
-        `:""}
+      <div class="v24-4-19-tag-footer">
+        ${(e.tags||[]).length
+          ? (e.tags||[]).slice(0,2).map(t=>`<span>${esc(t)}</span>`).join("")
+          : `<span class="v24-4-19-no-tag">タグなし</span>`}
       </div>
     </div>
 
@@ -9201,12 +9456,17 @@ function eventCard(e){
           <span>${esc(e.place)}</span>
         </div>
 
+        <div class="v24-4-19-stats">
+          <span><small>人数</small><strong>${e.people}/${e.capacity}人</strong></span>
+          <span><small>予算</small><strong>${esc(e.budget||"未定")}</strong></span>
+        </div>
+
         ${summary?`
           <p class="v24-4-17-summary">${esc(summary)}</p>
         `:""}
       </div>
 
-      <div class="fixed-layout-actions v24-4-17-actions">
+      <div class="fixed-layout-actions v24-4-17-actions v24-4-19-actions">
         <button class="v22-action-button ${e.saved?"saved":""}" onclick="toggleSave(${arg})">
           ${e.saved?"保存済み":"保存"}
         </button>
@@ -9267,6 +9527,57 @@ function renderHome(){
     : `<div class="tk-empty"><strong>まだこの条件の募集はありません</strong><span>自分で募集を作ってみる？</span><button onclick="openCreate()">募集を作成</button></div>`;
 }
 $("homeChips").addEventListener("click",e=>{const c=e.target.closest(".home-feed-tab");if(!c)return;state.tkSpecialFilter=null;clearTkMoodSelection();state.homeFilter=c.dataset.homefilter;document.querySelectorAll("#homeChips .home-feed-tab").forEach(x=>x.classList.toggle("active",x===c));renderHome()})
+
+const DISCOVER_CATEGORY_GROUPS=[
+  {label:"すべて",value:"all"},
+  {label:"食事・飲み",value:"食事・飲み"},
+  {label:"スポーツ",value:"スポーツ"},
+  {label:"ゲーム・遊び",value:"ゲーム・遊び"},
+  {label:"おでかけ",value:"おでかけ"},
+  {label:"カルチャー・趣味",value:"カルチャー・趣味"},
+  {label:"リラックス",value:"リラックス"},
+  {label:"学ぶ・作る",value:"学ぶ・作る"},
+  {label:"その他",value:"その他・オリジナル"}
+];
+
+function renderDiscoverCategories(){
+  const row=$("discoverCategoryRow");
+  if(!row)return;
+
+  const active=state.discoverCategory||"all";
+
+  row.innerHTML=DISCOVER_CATEGORY_GROUPS.map(item=>`
+    <button
+      type="button"
+      class="v24-4-20-category-chip ${active===item.value?"active":""}"
+      onclick="setDiscoverCategory('${escjs(item.value)}')"
+    >${esc(item.label)}</button>
+  `).join("");
+
+  const clear=$("discoverCategoryClear");
+  if(clear){
+    clear.textContent=active==="all"?"すべて":"解除";
+    clear.classList.toggle("active",active==="all");
+  }
+}
+
+function setDiscoverCategory(category){
+  state.discoverCategory=category||"all";
+  renderDiscoverCategories();
+  renderDiscover();
+}
+
+function discoverCategoryMatches(e){
+  const selected=state.discoverCategory||"all";
+  if(selected==="all")return true;
+
+  if(selected==="その他・オリジナル"){
+    return e.category==="その他・オリジナル" || e.category==="その他";
+  }
+
+  return e.category===selected;
+}
+
 function normalizeText(value){
   return String(value||"")
     .trim()
@@ -9348,11 +9659,12 @@ function discoverCard(e){
   </article>`;
 }
 function renderDiscover(){
+  renderDiscoverCategories();
   const query=($("discoverQuery")?.value||"").trim();
 
   const rows=(state.events||[]).filter(e=>{
     if(!e)return false;
-    return discoverKeywordMatches(e,query);
+    return discoverCategoryMatches(e) && discoverKeywordMatches(e,query);
   });
 
   if($("discoverCount")){
@@ -12015,6 +12327,7 @@ function updateAccountUI(){
 
 
 function renderHomeCategories(){
+  if(!$("homeCategoryRow"))return;
   const row=$("homeCategoryRow");
   if(!row)return;
 
