@@ -5488,6 +5488,19 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.4.4 — MY GATHERS / CALENDAR CLEANUP
+   ========================================================= */
+
+.mygathers-tabs-two{
+  grid-template-columns:repeat(2,1fr)!important;
+}
+
+.mygathers-tabs-two .mygathers-tab{
+  min-width:0;
+}
+
 </style>
 </head>
 <body>
@@ -5659,14 +5672,12 @@ html,body{
     </div>
   </div>
 
-  <div class="mygathers-tabs mygathers-tabs-three">
-    <button id="mySavedTab" class="mygathers-tab active" onclick="switchMyGathersTab('saved')">保存した募集</button>
-    <button id="myCreatedTab" class="mygathers-tab" onclick="switchMyGathersTab('created')">自分の募集</button>
+  <div class="mygathers-tabs mygathers-tabs-two">
+    <button id="myCreatedTab" class="mygathers-tab active" onclick="switchMyGathersTab('created')">自分の募集</button>
     <button id="myCalendarTab" class="mygathers-tab" onclick="switchMyGathersTab('calendar')">カレンダー</button>
   </div>
 
-  <div id="mySavedPanel" class="mygathers-panel"></div>
-  <div id="myCreatedPanel" class="mygathers-panel" hidden></div>
+  <div id="myCreatedPanel" class="mygathers-panel"></div>
   <div id="myCalendarPanel" class="mygathers-panel" hidden>
     <div class="calendar-shell">
       <div class="calendar-head">
@@ -6110,7 +6121,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_3_banner_fit_fix";
+const KEY="tk_my_gathers_v24_4_4_mygathers_calendar_cleanup";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -7755,15 +7766,12 @@ let calendarViewDate=new Date();
 let calendarSelectedDate=null;
 
 function switchMyGathersTab(tab){
-  const saved=tab==="saved";
   const created=tab==="created";
   const calendar=tab==="calendar";
 
-  $("mySavedTab").classList.toggle("active",saved);
   $("myCreatedTab").classList.toggle("active",created);
   $("myCalendarTab").classList.toggle("active",calendar);
 
-  $("mySavedPanel").hidden=!saved;
   $("myCreatedPanel").hidden=!created;
   $("myCalendarPanel").hidden=!calendar;
 
@@ -7950,24 +7958,17 @@ function myEventCard(e,mode){
   </div>`;
 }
 function renderMyGathers(){
-  const savedPanel=$("mySavedPanel");
   const createdPanel=$("myCreatedPanel");
-  if(!savedPanel||!createdPanel)return;
+  if(!createdPanel)return;
 
   if(!currentAuthUser){
-    savedPanel.innerHTML=`<div class="my-event-empty">ログインすると保存した募集を確認できます。</div>`;
     createdPanel.innerHTML=`<div class="my-event-empty">ログインすると自分の募集を確認できます。</div>`;
     renderMyCalendar();
     return;
   }
 
   const uid=currentAuthUser.id;
-  const saved=state.events.filter(e=>e.saved);
   const created=state.events.filter(e=>e.owner===uid);
-
-  savedPanel.innerHTML=saved.length
-    ? saved.map(e=>myEventCard(e,"saved")).join("")
-    : `<div class="my-event-empty">保存した募集はまだありません。</div>`;
 
   createdPanel.innerHTML=created.length
     ? created.map(e=>myEventCard(e,"created")).join("")
@@ -7975,7 +7976,6 @@ function renderMyGathers(){
 
   renderMyCalendar();
 }
-
 
 function isUuid(value){
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||""));
