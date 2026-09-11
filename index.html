@@ -5394,6 +5394,33 @@ html,body{
   font-weight:800 !important;
 }
 
+
+/* =========================================================
+   V24.4.2 — PROFILE SAVE FEEDBACK
+   ========================================================= */
+.profile-save-status{
+  min-height:18px;
+  margin-top:8px;
+  opacity:0;
+  transform:translateY(-2px);
+  color:#667085;
+  font-size:8px;
+  font-weight:750;
+  text-align:center;
+  transition:opacity .16s ease, transform .16s ease;
+}
+.profile-save-status.show{opacity:1;transform:translateY(0);}
+.profile-save-status.loading{color:#667085;}
+.profile-save-status.success{color:#17603A;}
+.profile-save-status.error{color:#B42318;}
+#profileSaveButton:disabled{cursor:default;opacity:.82;}
+#profileSaveButton.is-success{
+  background:#17603A !important;
+  border-color:#17603A !important;
+  color:#fff !important;
+  opacity:1;
+}
+
 </style>
 </head>
 <body>
@@ -5791,7 +5818,8 @@ html,body{
   <input id="profileBannerInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
   <div class="muted" style="margin-top:6px">JPEG・PNG・WebP / 5MBまで</div>
 </div>
-<button class="submit">保存する</button>
+<button class="submit" id="profileSaveButton">保存する</button>
+<div id="profileSaveStatus" class="profile-save-status" aria-live="polite"></div>
 </form>
 </div>
 </div>
@@ -6015,7 +6043,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_1_avatar_shape_fix";
+const KEY="tk_my_gathers_v24_4_2_profile_save_feedback";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -8290,6 +8318,8 @@ function openProfileEdit(){
   if(!requireAuth("プロフィール編集にはログインが必要です。"))return;
 
   resetProfileImageSelection();
+  profileSaveButtonState("保存する",false,false);
+  setProfileSaveStatus("");
 
   const m=me();
   $("editName").value=m.name;
@@ -8320,6 +8350,22 @@ function openProfileEdit(){
 
   openModal("profileEditModal");
 }
+
+function setProfileSaveStatus(message,type="loading"){
+  const el=$("profileSaveStatus");
+  if(!el)return;
+  el.textContent=message||"";
+  el.className=`profile-save-status ${message?`show ${type}`:""}`;
+}
+
+function profileSaveButtonState(text,disabled=true,success=false){
+  const button=$("profileSaveButton") || $("profileEditForm")?.querySelector(".submit");
+  if(!button)return;
+  button.disabled=disabled;
+  button.textContent=text;
+  button.classList.toggle("is-success",success);
+}
+
 $("profileEditForm").addEventListener("submit",async e=>{
   e.preventDefault();
 
@@ -8330,7 +8376,6 @@ $("profileEditForm").addEventListener("submit",async e=>{
   const rawHandle=$("editHandle").value.trim().replace(/^@/,"").replace(/\s+/g,"_");
   const newBio=$("editBio").value.trim();
   const newArea=$("editArea").value.trim();
-  const button=e.submitter||e.currentTarget.querySelector(".submit");
 
   if(!newName || !rawHandle){
     toast("名前とユーザー名を入力してください");
@@ -8342,27 +8387,51 @@ $("profileEditForm").addEventListener("submit",async e=>{
   let nextAvatar=m.avatar||null;
   let nextBanner=m.banner||null;
 
-  if(button){
-    button.disabled=true;
-    button.textContent="保存しています…";
-  }
+  profileSaveButtonState("保存中…",true,false);
+  setProfileSaveStatus("プロフィールを保存しています…","loading");
 
   try{
+    const uploadJobs=[];
+
     if(selectedProfileImageFile){
-      if(button)button.textContent="画像をアップロード中…";
-      uploadedAvatar=await uploadProfileAvatar(selectedProfileImageFile);
-      nextAvatar=uploadedAvatar.publicUrl;
+      uploadJobs.push(
+        uploadProfileAvatar(selectedProfileImageFile).then(result=>{
+          uploadedAvatar=result;
+          nextAvatar=result.publicUrl;
+        })
+      );
     }else if(profileImageRemoveRequested){
       nextAvatar=null;
     }
 
     if(selectedProfileBannerFile){
-      if(button)button.textContent="バナーをアップロード中…";
-      uploadedBanner=await uploadProfileBanner(selectedProfileBannerFile);
-      nextBanner=uploadedBanner.publicUrl;
+      uploadJobs.push(
+        uploadProfileBanner(selectedProfileBannerFile).then(result=>{
+          uploadedBanner=result;
+          nextBanner=result.publicUrl;
+        })
+      );
     }else if(profileBannerRemoveRequested){
       nextBanner=null;
     }
+
+    if(uploadJobs.length){
+      profileSaveButtonState(
+        uploadJobs.length===2 ? "画像を保存中…" : "画像をアップロード中…",
+        true,
+        false
+      );
+      setProfileSaveStatus(
+        uploadJobs.length===2
+          ? "プロフィール画像とバナーを同時にアップロードしています…"
+          : "画像をアップロードしています…",
+        "loading"
+      );
+      await Promise.all(uploadJobs);
+    }
+
+    profileSaveButtonState("プロフィールを更新中…",true,false);
+    setProfileSaveStatus("最後の更新を反映しています…","loading");
 
     const {data:updated,error}=await sb
       .from("profiles")
@@ -8381,7 +8450,6 @@ $("profileEditForm").addEventListener("submit",async e=>{
 
     if(error)throw error;
 
-    // Supabaseから返った最新プロフィールを唯一の正として同期
     const p=remoteProfileToPerson(updated);
 
     state.accounts[currentAuthUser.id]={
@@ -8409,9 +8477,17 @@ $("profileEditForm").addEventListener("submit",async e=>{
     renderMyGathers();
     renderMessages();
 
-    closeModal("profileEditModal");
-    resetProfileImageSelection();
+    profileSaveButtonState("保存しました",true,true);
+    setProfileSaveStatus("登録完了しました","success");
     toast("プロフィールを更新しました");
+
+    resetProfileImageSelection();
+
+    await new Promise(resolve=>setTimeout(resolve,650));
+    closeModal("profileEditModal");
+
+    profileSaveButtonState("保存する",false,false);
+    setProfileSaveStatus("");
 
   }catch(error){
     console.error("profile update:",error);
@@ -8432,15 +8508,12 @@ $("profileEditForm").addEventListener("submit",async e=>{
       }
     }
 
+    profileSaveButtonState("もう一度保存する",false,false);
+    setProfileSaveStatus("保存できませんでした。もう一度お試しください。","error");
     toast("プロフィール更新に失敗しました");
-
-  }finally{
-    if(button){
-      button.disabled=false;
-      button.textContent="保存する";
-    }
   }
 })
+
 $("profileImageInput").addEventListener("change",e=>{
   const file=e.target.files?.[0];
   if(!file)return;
