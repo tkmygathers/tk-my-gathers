@@ -5501,6 +5501,286 @@ html,body{
   min-width:0;
 }
 
+
+/* =========================================================
+   V24.4.5 — PROFILE REBUILD + CROP EDITOR
+   ========================================================= */
+
+/* ----- integrated profile hero ----- */
+.profile-hero{
+  position:relative;
+  width:100%;
+  margin:0;
+}
+
+.profile-hero .profile-cover.profile-banner{
+  width:100%;
+  height:210px !important;
+  min-height:210px !important;
+  aspect-ratio:auto !important;
+  overflow:hidden !important;
+  border-radius:0 !important;
+  background:#E9EEF4 !important;
+}
+
+.profile-hero .profile-cover.profile-banner img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  background:transparent !important;
+}
+
+.profile-hero-actions{
+  position:absolute;
+  right:14px;
+  bottom:14px;
+  z-index:4;
+  display:flex;
+  gap:7px;
+}
+
+.profile-hero-btn{
+  min-height:34px;
+  padding:0 12px;
+  border:1px solid rgba(255,255,255,.8);
+  border-radius:999px;
+  background:rgba(17,24,39,.52);
+  color:#fff;
+  font-size:8px;
+  font-weight:800;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  box-shadow:0 4px 14px rgba(16,24,40,.12);
+}
+
+.profile-avatar-overlap{
+  position:absolute !important;
+  left:18px;
+  bottom:-44px;
+  z-index:5;
+  margin:0 !important;
+}
+
+.profile-avatar-overlap .profile-avatar-inner{
+  width:94px !important;
+  height:94px !important;
+  border:4px solid #fff !important;
+  border-radius:50% !important;
+  overflow:hidden !important;
+  box-shadow:0 7px 20px rgba(16,24,40,.13);
+  background:#fff;
+}
+
+.profile-avatar-overlap .profile-avatar-inner img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  border-radius:50% !important;
+}
+
+.profile-wrap-connected{
+  padding-top:54px !important;
+  border-radius:0 !important;
+  background:#fff !important;
+}
+
+.profile-wrap-connected .profile-info{
+  padding-top:0 !important;
+}
+
+/* ----- edit previews ----- */
+.profile-avatar-edit-preview{
+  width:112px;
+  height:112px;
+  margin:4px auto 10px;
+  overflow:hidden;
+  border:3px solid #fff;
+  border-radius:50%;
+  background:#EEF2F6;
+  box-shadow:0 0 0 1px #DDE3EA;
+}
+
+.profile-avatar-edit-preview img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+
+.profile-image-placeholder{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+  color:#98A2B3;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.12em;
+}
+
+.profile-banner-edit{
+  width:100%;
+  height:auto !important;
+  min-height:0 !important;
+  aspect-ratio:8 / 3 !important;
+  overflow:hidden;
+  border:1px solid #DDE3EA;
+  border-radius:14px;
+  background:#EEF2F6 !important;
+}
+
+.profile-banner-edit .profile-banner-preview{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  background:transparent !important;
+}
+
+.profile-media-actions{
+  margin-top:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+/* ----- crop editor ----- */
+.profile-crop-modal{
+  z-index:190 !important;
+}
+
+.profile-crop-sheet{
+  max-width:430px;
+}
+
+.crop-editor-stage-wrap{
+  display:flex;
+  justify-content:center;
+  padding:12px 4px 16px;
+}
+
+.crop-viewport{
+  position:relative;
+  overflow:hidden;
+  background:#111827;
+  box-shadow:0 0 0 1px #D9DFE7,0 10px 28px rgba(16,24,40,.12);
+}
+
+.crop-viewport.crop-avatar{
+  width:min(72vw,280px);
+  aspect-ratio:1 / 1;
+  border-radius:50%;
+}
+
+.crop-viewport.crop-banner{
+  width:100%;
+  aspect-ratio:8 / 3;
+  border-radius:14px;
+}
+
+.crop-viewport img{
+  position:absolute;
+  max-width:none !important;
+  max-height:none !important;
+  user-select:none;
+  -webkit-user-drag:none;
+  pointer-events:none;
+}
+
+.crop-viewport.crop-avatar::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border:2px solid rgba(255,255,255,.88);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+.crop-viewport.crop-banner::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border:2px solid rgba(255,255,255,.88);
+  border-radius:14px;
+  pointer-events:none;
+}
+
+.crop-controls{
+  display:grid;
+  gap:12px;
+  margin-top:4px;
+}
+
+.crop-controls label{
+  display:grid;
+  grid-template-columns:42px 1fr;
+  align-items:center;
+  gap:10px;
+}
+
+.crop-controls label span{
+  color:#667085;
+  font-size:8px;
+  font-weight:800;
+}
+
+.crop-controls input[type="range"]{
+  width:100%;
+  accent-color:#2563EB;
+}
+
+.crop-help{
+  margin-top:10px;
+  color:#8B95A5;
+  font-size:7.5px;
+  text-align:center;
+}
+
+.crop-actions{
+  display:grid;
+  grid-template-columns:1fr 1.4fr;
+  gap:8px;
+  margin-top:14px;
+}
+
+.crop-actions .upload-btn,
+.crop-actions .submit{
+  margin:0 !important;
+  min-height:44px;
+}
+
+@media(max-width:360px){
+  .profile-hero .profile-cover.profile-banner{
+    height:180px !important;
+    min-height:180px !important;
+  }
+
+  .profile-hero-actions{
+    right:10px;
+    bottom:10px;
+  }
+
+  .profile-hero-btn{
+    padding:0 9px;
+    font-size:7.5px;
+  }
+
+  .profile-avatar-overlap{
+    left:14px;
+    bottom:-39px;
+  }
+
+  .profile-avatar-overlap .profile-avatar-inner{
+    width:84px !important;
+    height:84px !important;
+  }
+
+  .profile-wrap-connected{
+    padding-top:48px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -5709,15 +5989,20 @@ html,body{
 </section>
 
 <section id="profile" class="page">
-  <div id="profileBanner" class="profile-cover profile-banner"><div class="profile-banner-empty">BANNER</div></div>
-  <div class="profile-wrap">
-    <div class="profile-head">
-      <div class="profile-avatar"><div class="profile-avatar-inner" id="profileAvatar">TK</div></div>
-      <div class="profile-head-actions">
-        <button class="edit-btn" onclick="openProfileEdit()">プロフィール編集</button>
-        <button class="profile-account-btn" onclick="openAccountSwitcher()">アカウント</button>
-      </div>
+  <div class="profile-hero">
+    <div id="profileBanner" class="profile-cover profile-banner"><div class="profile-banner-empty">BANNER</div></div>
+
+    <div class="profile-hero-actions">
+      <button class="profile-hero-btn" onclick="openProfileEdit()">プロフィール編集</button>
+      <button class="profile-hero-btn" onclick="openAccountSwitcher()">アカウント</button>
     </div>
+
+    <div class="profile-avatar profile-avatar-overlap">
+      <div class="profile-avatar-inner" id="profileAvatar">TK</div>
+    </div>
+  </div>
+
+  <div class="profile-wrap profile-wrap-connected">
     <div class="profile-info">
       <div id="profileName" class="profile-name"></div>
       <div id="profileHandle" class="profile-handle"></div>
@@ -5882,15 +6167,27 @@ html,body{
 <form id="profileEditForm">
 <div class="step"><div class="field"><label class="label">名前</label><input id="editName" class="input" required></div><div class="field" style="margin-top:8px"><label class="label">@ユーザー名</label><input id="editHandle" class="input" required></div></div>
 <div class="step"><div class="field"><label class="label">自己紹介</label><textarea id="editBio" class="textarea"></textarea></div><div class="field" style="margin-top:8px"><label class="label">活動エリア</label><input id="editArea" class="input"></div></div>
-<div class="step"><div class="step-label">プロフィール画像</div><div class="upload-row"><img id="profileImagePreview" class="preview-img" style="display:none"><button type="button" class="upload-btn" onclick="$('profileImageInput').click()">写真を選ぶ</button><button type="button" class="upload-btn" onclick="clearProfileImage()">画像を外す</button></div><input id="profileImageInput" type="file" accept="image/*" hidden></div>
+<div class="step">
+  <div class="step-label">プロフィール画像</div>
+  <div class="profile-avatar-edit-preview">
+    <img id="profileImagePreview" style="display:none" alt="プロフィール画像プレビュー">
+    <div id="profileImagePlaceholder" class="profile-image-placeholder">PROFILE</div>
+  </div>
+  <div class="upload-row profile-media-actions">
+    <button type="button" class="upload-btn" onclick="$('profileImageInput').click()">写真を選ぶ・切り抜く</button>
+    <button type="button" class="upload-btn" onclick="clearProfileImage()">画像を外す</button>
+  </div>
+  <input id="profileImageInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+</div>
+
 <div class="step">
   <div class="step-label">プロフィールバナー</div>
   <div class="profile-banner-edit">
     <img id="profileBannerPreview" class="profile-banner-preview" style="display:none" alt="プロフィールバナー">
-    <div id="profileBannerPlaceholder" class="profile-banner-placeholder">横長の画像を設定できます</div>
+    <div id="profileBannerPlaceholder" class="profile-banner-placeholder">BANNER</div>
   </div>
-  <div class="upload-row" style="margin-top:8px">
-    <button type="button" class="upload-btn" onclick="$('profileBannerInput').click()">バナーを選ぶ</button>
+  <div class="upload-row profile-media-actions">
+    <button type="button" class="upload-btn" onclick="$('profileBannerInput').click()">バナーを選ぶ・切り抜く</button>
     <button type="button" class="upload-btn" onclick="clearProfileBanner()">画像を外す</button>
   </div>
   <input id="profileBannerInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
@@ -5900,6 +6197,48 @@ html,body{
 <div id="profileSaveStatus" class="profile-save-status" aria-live="polite"></div>
 </form>
 </div>
+</div>
+
+<!-- profile media crop editor -->
+<div id="profileCropModal" class="modal profile-crop-modal" onclick="backdropClose(event,'profileCropModal')">
+  <div class="sheet profile-crop-sheet">
+    <div class="handle"></div>
+    <div class="sheet-head">
+      <div>
+        <div id="cropEditorTitle" class="sheet-title">画像の位置を調整</div>
+        <div class="sheet-sub">実際に表示される範囲を確認して調整できます。</div>
+      </div>
+      <button class="close-btn" type="button" onclick="cancelProfileCrop()">×</button>
+    </div>
+
+    <div class="crop-editor-stage-wrap">
+      <div id="cropViewport" class="crop-viewport crop-avatar">
+        <img id="cropEditorImage" alt="切り抜きプレビュー">
+      </div>
+    </div>
+
+    <div class="crop-controls">
+      <label>
+        <span>拡大</span>
+        <input id="cropZoom" type="range" min="1" max="3" step="0.01" value="1">
+      </label>
+      <label>
+        <span>左右</span>
+        <input id="cropX" type="range" min="0" max="100" step="1" value="50">
+      </label>
+      <label>
+        <span>上下</span>
+        <input id="cropY" type="range" min="0" max="100" step="1" value="50">
+      </label>
+    </div>
+
+    <div class="crop-help">枠の中が、そのままプロフィールに表示されます。</div>
+
+    <div class="crop-actions">
+      <button type="button" class="upload-btn" onclick="cancelProfileCrop()">選び直す</button>
+      <button type="button" class="submit crop-apply-btn" onclick="applyProfileCrop()">この位置で決定</button>
+    </div>
+  </div>
 </div>
 
 <!-- want -->
@@ -6121,7 +6460,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_4_mygathers_calendar_cleanup";
+const KEY="tk_my_gathers_v24_4_5_profile_rebuild";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -8275,6 +8614,12 @@ let selectedProfileImageFile=null;
 let selectedProfileImagePreviewUrl=null;
 let profileImageRemoveRequested=false;
 
+let profileCropMode=null;
+let profileCropSourceFile=null;
+let profileCropSourceUrl=null;
+let profileCropNaturalWidth=0;
+let profileCropNaturalHeight=0;
+
 function profileImageExtension(file){
   const byMime={
     "image/jpeg":"jpg",
@@ -8357,6 +8702,212 @@ async function uploadProfileAvatar(file){
   };
 }
 
+
+function revokeProfileCropSource(){
+  if(profileCropSourceUrl){
+    URL.revokeObjectURL(profileCropSourceUrl);
+    profileCropSourceUrl=null;
+  }
+  profileCropSourceFile=null;
+  profileCropNaturalWidth=0;
+  profileCropNaturalHeight=0;
+  profileCropMode=null;
+}
+
+function openProfileCropEditor(file,mode){
+  if(!file || !validateProfileImageFile(file))return;
+
+  revokeProfileCropSource();
+
+  profileCropMode=mode;
+  profileCropSourceFile=file;
+  profileCropSourceUrl=URL.createObjectURL(file);
+
+  const viewport=$("cropViewport");
+  const img=$("cropEditorImage");
+
+  viewport.classList.toggle("crop-avatar",mode==="avatar");
+  viewport.classList.toggle("crop-banner",mode==="banner");
+  $("cropEditorTitle").textContent=mode==="avatar"
+    ? "プロフィール画像を切り抜く"
+    : "バナー画像を切り抜く";
+
+  $("cropZoom").value="1";
+  $("cropX").value="50";
+  $("cropY").value="50";
+
+  img.onload=()=>{
+    profileCropNaturalWidth=img.naturalWidth;
+    profileCropNaturalHeight=img.naturalHeight;
+    updateProfileCropPreview();
+  };
+
+  img.src=profileCropSourceUrl;
+  openModal("profileCropModal");
+
+  requestAnimationFrame(()=>updateProfileCropPreview());
+}
+
+function cropGeometry(viewWidth,viewHeight){
+  const nw=profileCropNaturalWidth||1;
+  const nh=profileCropNaturalHeight||1;
+  const zoom=Number($("cropZoom")?.value||1);
+  const xPct=Number($("cropX")?.value||50)/100;
+  const yPct=Number($("cropY")?.value||50)/100;
+
+  const baseScale=Math.max(viewWidth/nw,viewHeight/nh);
+  const scale=baseScale*zoom;
+  const displayWidth=nw*scale;
+  const displayHeight=nh*scale;
+
+  const overflowX=Math.max(0,displayWidth-viewWidth);
+  const overflowY=Math.max(0,displayHeight-viewHeight);
+
+  return {
+    scale,
+    displayWidth,
+    displayHeight,
+    left:-overflowX*xPct,
+    top:-overflowY*yPct
+  };
+}
+
+function updateProfileCropPreview(){
+  const viewport=$("cropViewport");
+  const img=$("cropEditorImage");
+  if(!viewport||!img||!profileCropNaturalWidth||!profileCropNaturalHeight)return;
+
+  const rect=viewport.getBoundingClientRect();
+  if(!rect.width||!rect.height)return;
+
+  const g=cropGeometry(rect.width,rect.height);
+
+  img.style.width=`${g.displayWidth}px`;
+  img.style.height=`${g.displayHeight}px`;
+  img.style.left=`${g.left}px`;
+  img.style.top=`${g.top}px`;
+}
+
+["cropZoom","cropX","cropY"].forEach(id=>{
+  $(id)?.addEventListener("input",updateProfileCropPreview);
+});
+
+window.addEventListener("resize",()=>{
+  if($("profileCropModal")?.classList.contains("open")){
+    updateProfileCropPreview();
+  }
+});
+
+function cancelProfileCrop(){
+  closeModal("profileCropModal");
+  revokeProfileCropSource();
+
+  const avatarInput=$("profileImageInput");
+  const bannerInput=$("profileBannerInput");
+  if(avatarInput)avatarInput.value="";
+  if(bannerInput)bannerInput.value="";
+}
+
+async function createCroppedProfileFile(){
+  if(!profileCropSourceFile || !profileCropMode)throw new Error("切り抜く画像がありません");
+
+  const img=$("cropEditorImage");
+  const zoom=Number($("cropZoom").value||1);
+  const xPct=Number($("cropX").value||50)/100;
+  const yPct=Number($("cropY").value||50)/100;
+
+  const outWidth=profileCropMode==="avatar"?512:1600;
+  const outHeight=profileCropMode==="avatar"?512:600;
+
+  const nw=img.naturalWidth;
+  const nh=img.naturalHeight;
+
+  const baseScale=Math.max(outWidth/nw,outHeight/nh);
+  const scale=baseScale*zoom;
+
+  const sourceWidth=Math.min(nw,outWidth/scale);
+  const sourceHeight=Math.min(nh,outHeight/scale);
+  const maxX=Math.max(0,nw-sourceWidth);
+  const maxY=Math.max(0,nh-sourceHeight);
+
+  const sourceX=maxX*xPct;
+  const sourceY=maxY*yPct;
+
+  const canvas=document.createElement("canvas");
+  canvas.width=outWidth;
+  canvas.height=outHeight;
+
+  const ctx=canvas.getContext("2d");
+  ctx.drawImage(
+    img,
+    sourceX,sourceY,sourceWidth,sourceHeight,
+    0,0,outWidth,outHeight
+  );
+
+  const blob=await new Promise((resolve,reject)=>{
+    canvas.toBlob(
+      result=>result?resolve(result):reject(new Error("画像の切り抜きに失敗しました")),
+      "image/jpeg",
+      0.9
+    );
+  });
+
+  const filename=profileCropMode==="avatar"?"profile-avatar.jpg":"profile-banner.jpg";
+  return new File([blob],filename,{type:"image/jpeg"});
+}
+
+async function applyProfileCrop(){
+  const button=document.querySelector(".crop-apply-btn");
+  if(button){
+    button.disabled=true;
+    button.textContent="切り抜いています…";
+  }
+
+  try{
+    const mode=profileCropMode;
+    const cropped=await createCroppedProfileFile();
+    const previewUrl=URL.createObjectURL(cropped);
+
+    if(mode==="avatar"){
+      if(selectedProfileImagePreviewUrl)URL.revokeObjectURL(selectedProfileImagePreviewUrl);
+      selectedProfileImageFile=cropped;
+      selectedProfileImagePreviewUrl=previewUrl;
+      profileImageRemoveRequested=false;
+
+      const preview=$("profileImagePreview");
+      const placeholder=$("profileImagePlaceholder");
+      preview.src=previewUrl;
+      preview.style.display="block";
+      if(placeholder)placeholder.style.display="none";
+
+    }else{
+      if(selectedProfileBannerPreviewUrl)URL.revokeObjectURL(selectedProfileBannerPreviewUrl);
+      selectedProfileBannerFile=cropped;
+      selectedProfileBannerPreviewUrl=previewUrl;
+      profileBannerRemoveRequested=false;
+
+      const preview=$("profileBannerPreview");
+      const placeholder=$("profileBannerPlaceholder");
+      preview.src=previewUrl;
+      preview.style.display="block";
+      if(placeholder)placeholder.style.display="none";
+    }
+
+    closeModal("profileCropModal");
+    revokeProfileCropSource();
+    toast("表示位置を決定しました");
+
+  }catch(error){
+    console.error("profile crop:",error);
+    toast("画像の切り抜きに失敗しました");
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent="この位置で決定";
+    }
+  }
+}
+
 function resetProfileImageSelection(){
   selectedProfileImageFile=null;
   profileImageRemoveRequested=false;
@@ -8395,12 +8946,15 @@ function openProfileEdit(){
   $("editArea").value=m.area;
 
   const preview=$("profileImagePreview");
+  const imagePlaceholder=$("profileImagePlaceholder");
   if(m.avatar){
     preview.src=m.avatar;
     preview.style.display="block";
+    if(imagePlaceholder)imagePlaceholder.style.display="none";
   }else{
     preview.removeAttribute("src");
     preview.style.display="none";
+    if(imagePlaceholder)imagePlaceholder.style.display="grid";
   }
 
   const bannerPreview=$("profileBannerPreview");
@@ -8457,6 +9011,7 @@ $("profileEditForm").addEventListener("submit",async e=>{
   profileSaveButtonState("保存中…",true,false);
   setProfileSaveStatus("プロフィールを保存しています…","loading");
 
+  // STEP 1: 画像アップロード。ここで失敗した場合だけ保存失敗。
   try{
     const uploadJobs=[];
 
@@ -8483,24 +9038,26 @@ $("profileEditForm").addEventListener("submit",async e=>{
     }
 
     if(uploadJobs.length){
-      profileSaveButtonState(
-        uploadJobs.length===2 ? "画像を保存中…" : "画像をアップロード中…",
-        true,
-        false
-      );
-      setProfileSaveStatus(
-        uploadJobs.length===2
-          ? "プロフィール画像とバナーを同時にアップロードしています…"
-          : "画像をアップロードしています…",
-        "loading"
-      );
+      profileSaveButtonState("画像を保存中…",true,false);
+      setProfileSaveStatus("画像をアップロードしています…","loading");
       await Promise.all(uploadJobs);
     }
+  }catch(error){
+    console.error("profile media upload:",error);
+    profileSaveButtonState("もう一度保存する",false,false);
+    setProfileSaveStatus("画像を保存できませんでした。もう一度お試しください。","error");
+    toast("画像の保存に失敗しました");
+    return;
+  }
 
-    profileSaveButtonState("プロフィールを更新中…",true,false);
-    setProfileSaveStatus("最後の更新を反映しています…","loading");
+  // STEP 2: DB更新。この成功を保存成功の基準にする。
+  profileSaveButtonState("プロフィールを更新中…",true,false);
+  setProfileSaveStatus("最後の更新を反映しています…","loading");
 
-    const {data:updated,error}=await sb
+  let updated=null;
+
+  try{
+    const result=await sb
       .from("profiles")
       .update({
         display_name:newName,
@@ -8515,8 +9072,34 @@ $("profileEditForm").addEventListener("submit",async e=>{
       .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
       .single();
 
-    if(error)throw error;
+    if(result.error)throw result.error;
+    updated=result.data;
 
+  }catch(error){
+    console.error("profile database update:",error);
+
+    if(uploadedAvatar?.path){
+      try{await sb.storage.from("profile-media").remove([uploadedAvatar.path]);}
+      catch(cleanupError){console.warn("avatar cleanup:",cleanupError);}
+    }
+
+    if(uploadedBanner?.path){
+      try{await sb.storage.from("profile-media").remove([uploadedBanner.path]);}
+      catch(cleanupError){console.warn("banner cleanup:",cleanupError);}
+    }
+
+    profileSaveButtonState("もう一度保存する",false,false);
+    setProfileSaveStatus("保存できませんでした。もう一度お試しください。","error");
+    toast("プロフィール更新に失敗しました");
+    return;
+  }
+
+  // ここまで来たらSupabase保存は成功。以降の画面描画エラーで失敗表示にしない。
+  profileSaveButtonState("保存しました",true,true);
+  setProfileSaveStatus("登録完了しました","success");
+  toast("プロフィールを更新しました");
+
+  try{
     const p=remoteProfileToPerson(updated);
 
     state.accounts[currentAuthUser.id]={
@@ -8535,72 +9118,42 @@ $("profileEditForm").addEventListener("submit",async e=>{
     };
 
     state.currentUserId=currentAuthUser.id;
-
     save();
-    renderProfile();
-    updateAccountUI();
-    renderHome();
-    renderDiscover();
-    renderMyGathers();
-    renderMessages();
 
-    profileSaveButtonState("保存しました",true,true);
-    setProfileSaveStatus("登録完了しました","success");
-    toast("プロフィールを更新しました");
+    const redraws=[
+      renderProfile,
+      updateAccountUI,
+      renderHome,
+      renderDiscover,
+      renderMyGathers,
+      renderMessages
+    ];
 
-    resetProfileImageSelection();
+    redraws.forEach(fn=>{
+      try{fn();}
+      catch(renderError){console.warn("profile post-save redraw:",renderError);}
+    });
 
-    await new Promise(resolve=>setTimeout(resolve,650));
-    closeModal("profileEditModal");
-
-    profileSaveButtonState("保存する",false,false);
-    setProfileSaveStatus("");
-
-  }catch(error){
-    console.error("profile update:",error);
-
-    if(uploadedAvatar?.path){
-      try{
-        await sb.storage.from("profile-media").remove([uploadedAvatar.path]);
-      }catch(cleanupError){
-        console.warn("profile image cleanup:",cleanupError);
-      }
-    }
-
-    if(uploadedBanner?.path){
-      try{
-        await sb.storage.from("profile-media").remove([uploadedBanner.path]);
-      }catch(cleanupError){
-        console.warn("profile banner cleanup:",cleanupError);
-      }
-    }
-
-    profileSaveButtonState("もう一度保存する",false,false);
-    setProfileSaveStatus("保存できませんでした。もう一度お試しください。","error");
-    toast("プロフィール更新に失敗しました");
+  }catch(syncError){
+    console.warn("profile saved but local sync had an issue:",syncError);
   }
+
+  resetProfileImageSelection();
+
+  await new Promise(resolve=>setTimeout(resolve,700));
+  closeModal("profileEditModal");
+  profileSaveButtonState("保存する",false,false);
+  setProfileSaveStatus("");
 })
 
 $("profileImageInput").addEventListener("change",e=>{
   const file=e.target.files?.[0];
   if(!file)return;
-
   if(!validateProfileImageFile(file)){
     e.target.value="";
     return;
   }
-
-  if(selectedProfileImagePreviewUrl){
-    URL.revokeObjectURL(selectedProfileImagePreviewUrl);
-  }
-
-  selectedProfileImageFile=file;
-  profileImageRemoveRequested=false;
-  selectedProfileImagePreviewUrl=URL.createObjectURL(file);
-
-  const preview=$("profileImagePreview");
-  preview.src=selectedProfileImagePreviewUrl;
-  preview.style.display="block";
+  openProfileCropEditor(file,"avatar");
 });
 
 function clearProfileImage(){
@@ -8616,32 +9169,21 @@ function clearProfileImage(){
   if(input)input.value="";
 
   const preview=$("profileImagePreview");
+  const placeholder=$("profileImagePlaceholder");
+
   preview.removeAttribute("src");
   preview.style.display="none";
+  if(placeholder)placeholder.style.display="grid";
 }
 
 $("profileBannerInput").addEventListener("change",e=>{
   const file=e.target.files?.[0];
   if(!file)return;
-
   if(!validateProfileImageFile(file)){
     e.target.value="";
     return;
   }
-
-  if(selectedProfileBannerPreviewUrl){
-    URL.revokeObjectURL(selectedProfileBannerPreviewUrl);
-  }
-
-  selectedProfileBannerFile=file;
-  profileBannerRemoveRequested=false;
-  selectedProfileBannerPreviewUrl=URL.createObjectURL(file);
-
-  const preview=$("profileBannerPreview");
-  const placeholder=$("profileBannerPlaceholder");
-  preview.src=selectedProfileBannerPreviewUrl;
-  preview.style.display="block";
-  placeholder.style.display="none";
+  openProfileCropEditor(file,"banner");
 });
 
 function clearProfileBanner(){
@@ -8658,9 +9200,10 @@ function clearProfileBanner(){
 
   const preview=$("profileBannerPreview");
   const placeholder=$("profileBannerPlaceholder");
+
   preview.removeAttribute("src");
   preview.style.display="none";
-  placeholder.style.display="flex";
+  if(placeholder)placeholder.style.display="flex";
 }
 
 function openWant(){openModal("wantModal")}
