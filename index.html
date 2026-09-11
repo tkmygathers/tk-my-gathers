@@ -5421,6 +5421,73 @@ html,body{
   opacity:1;
 }
 
+
+/* =========================================================
+   V24.4.3 — PROFILE BANNER FIT FIX
+   ========================================================= */
+
+/* 自分のプロフィールバナーは全体を見せる */
+.profile-cover.profile-banner{
+  position:relative;
+  height:auto !important;
+  min-height:132px;
+  aspect-ratio:16 / 6;
+  background:#EEF2F6 !important;
+  overflow:hidden !important;
+}
+
+.profile-cover.profile-banner img{
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  background:#EEF2F6 !important;
+}
+
+/* 編集画面のプレビューも本番表示と同じ見え方にする */
+.profile-banner-edit{
+  height:auto !important;
+  min-height:120px;
+  aspect-ratio:16 / 6;
+  background:#EEF2F6 !important;
+}
+
+.profile-banner-preview{
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  background:#EEF2F6 !important;
+}
+
+/* 他ユーザーのプロフィールでも同じルール */
+.other-profile-banner{
+  height:auto !important;
+  min-height:120px;
+  aspect-ratio:16 / 6;
+  background:#EEF2F6 !important;
+}
+
+.other-profile-banner img{
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  background:#EEF2F6 !important;
+}
+
+@media(max-width:360px){
+  .profile-cover.profile-banner,
+  .profile-banner-edit,
+  .other-profile-banner{
+    min-height:108px;
+    aspect-ratio:16 / 6;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -6043,7 +6110,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_2_profile_save_feedback";
+const KEY="tk_my_gathers_v24_4_3_banner_fit_fix";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
