@@ -7879,6 +7879,275 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.4.24 — RICH OTHER USER PROFILE
+   ========================================================= */
+
+#otherProfileModal .sheet{
+  padding-top:0 !important;
+  overflow:hidden !important;
+}
+
+#otherProfileModal .sheet-head{
+  padding:14px 16px 11px !important;
+}
+
+.v24-4-24-profile-shell{
+  margin:0 -16px -8px;
+  background:#fff;
+}
+
+.v24-4-24-banner{
+  position:relative;
+  height:142px;
+  overflow:visible;
+  background:linear-gradient(135deg,#27313B,#596776);
+}
+
+.v24-4-24-banner img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+
+.v24-4-24-banner-fallback{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-end;
+  padding:13px;
+  color:rgba(255,255,255,.42);
+  font-size:7px;
+  font-weight:850;
+  letter-spacing:.16em;
+  box-sizing:border-box;
+}
+
+.v24-4-24-avatar{
+  position:absolute;
+  left:16px;
+  bottom:-35px;
+  width:76px;
+  height:76px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border:4px solid #fff;
+  border-radius:50%;
+  background:#263847;
+  color:#fff;
+  font-size:18px;
+  font-weight:900;
+  box-sizing:border-box;
+}
+
+.v24-4-24-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.v24-4-24-profile-main{
+  padding:43px 16px 18px;
+}
+
+.v24-4-24-name-row{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.v24-4-24-name-block{
+  min-width:0;
+}
+
+.v24-4-24-relation{
+  flex:0 0 auto;
+  min-height:26px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 9px;
+  border-radius:999px;
+  background:#F3F5F7;
+  color:#667085;
+  font-size:7px;
+  font-weight:850;
+}
+
+.v24-4-24-relation.following{
+  background:#EEF4FF;
+  color:#2563EB;
+}
+
+.v24-4-24-relation.mutual{
+  background:#EEF8F4;
+  color:#207A61;
+}
+
+.v24-4-24-bio{
+  margin-top:13px !important;
+  font-size:10.5px !important;
+  line-height:1.65 !important;
+}
+
+.v24-4-24-area{
+  margin-top:7px;
+  color:#667085;
+  font-size:8.5px;
+  font-weight:700;
+}
+
+.v24-4-24-counts{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  margin-top:15px;
+  border:1px solid #E9EDF2;
+  border-radius:13px;
+  overflow:hidden;
+  background:#E9EDF2;
+}
+
+.v24-4-24-count{
+  padding:10px 5px;
+  background:#fff;
+  text-align:center;
+}
+
+.v24-4-24-count strong{
+  display:block;
+  color:#1F2937;
+  font-size:14px;
+  font-weight:900;
+}
+
+.v24-4-24-count span{
+  display:block;
+  margin-top:2px;
+  color:#98A2B3;
+  font-size:7px;
+  font-weight:750;
+}
+
+.v24-4-24-actions{
+  margin-top:12px;
+}
+
+.v24-4-24-section{
+  margin-top:19px;
+  padding-top:15px;
+  border-top:1px solid #EEF1F4;
+}
+
+.v24-4-24-section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.v24-4-24-section-head strong{
+  color:#1F2937;
+  font-size:10px;
+  font-weight:900;
+}
+
+.v24-4-24-section-head span{
+  color:#98A2B3;
+  font-size:7px;
+  font-weight:750;
+}
+
+.v24-4-24-interests{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+.v24-4-24-interests > span{
+  min-height:28px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 9px;
+  border:1px solid #E3E8EF;
+  border-radius:999px;
+  background:#F8FAFC;
+  color:#475467;
+  font-size:7.5px;
+  font-weight:800;
+}
+
+.v24-4-24-hosted-list{
+  display:grid;
+  gap:8px;
+}
+
+.v24-4-24-hosted-card{
+  width:100%;
+  display:grid;
+  grid-template-columns:62px minmax(0,1fr);
+  gap:10px;
+  align-items:center;
+  padding:7px;
+  border:1px solid #E5EAF0;
+  border-radius:12px;
+  background:#fff;
+  text-align:left;
+}
+
+.v24-4-24-hosted-card img{
+  width:62px;
+  height:62px;
+  display:block;
+  object-fit:cover;
+  border-radius:9px;
+}
+
+.v24-4-24-hosted-copy{
+  min-width:0;
+  display:grid;
+}
+
+.v24-4-24-hosted-copy b{
+  overflow:hidden;
+  color:#1F2937;
+  font-size:9px;
+  line-height:1.35;
+  font-weight:900;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.v24-4-24-hosted-copy small{
+  margin-top:4px;
+  overflow:hidden;
+  color:#667085;
+  font-size:7.2px;
+  line-height:1.4;
+  font-weight:700;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.v24-4-24-hosted-copy em{
+  margin-top:5px;
+  color:#2563EB;
+  font-size:7px;
+  font-style:normal;
+  font-weight:850;
+}
+
+.v24-4-24-empty-copy{
+  color:#98A2B3;
+  font-size:8px;
+  line-height:1.5;
+}
+
 </style>
 </head>
 <body>
@@ -8570,7 +8839,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_23_category_button_in_header";
+const KEY="tk_my_gathers_v24_4_24_rich_other_profile";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -10822,43 +11091,104 @@ async function renderOtherProfile(id){
     if(isRealUserId(id))counts=await fetchProfileCounts(id);
 
     const following=isFollowing(id);
+    const follower=isFollower(id);
     const mutual=isMutualFollow(id);
 
+    const hostedEvents=(state.events||[])
+      .filter(e=>e && e.owner===id && e.status==="upcoming")
+      .slice(0,3);
+
+    const interestList=Array.isArray(p.interests)?p.interests.filter(Boolean).slice(0,10):[];
+    const connectionLabel=mutual?"友だち":following?"フォロー中":follower?"フォロワー":"未接続";
+
     box.innerHTML=`
-      ${p.banner?`<div class="other-profile-banner"><img src="${esc(p.banner)}" alt=""></div>`:""}
-      <div class="other-profile-top">
-        <div class="other-profile-avatar">${avatarHtml(p)}</div>
-        <div>
-          <div class="other-profile-name">${esc(p.name)}</div>
-          <div class="other-profile-handle">${esc(p.handle||"")}</div>
-          ${mutual?`<span class="follow-mutual">友だち</span>`:""}
+      <div class="v24-4-24-profile-shell">
+        <div class="v24-4-24-banner ${p.banner?"has-image":""}">
+          ${p.banner?`<img src="${esc(p.banner)}" alt="">`:`<div class="v24-4-24-banner-fallback">TK MY GATHERS</div>`}
+
+          <div class="v24-4-24-avatar">
+            ${avatarHtml(p)}
+          </div>
         </div>
-      </div>
 
-      ${p.bio?`<div class="other-profile-bio">${esc(p.bio)}</div>`:""}
-      ${p.area?`<div class="other-profile-area">${esc(p.area)}</div>`:""}
+        <div class="v24-4-24-profile-main">
+          <div class="v24-4-24-name-row">
+            <div class="v24-4-24-name-block">
+              <div class="other-profile-name">${esc(p.name)}</div>
+              <div class="other-profile-handle">${esc(p.handle||"")}</div>
+            </div>
+            <span class="v24-4-24-relation ${mutual?"mutual":following?"following":""}">${esc(connectionLabel)}</span>
+          </div>
 
-      <div class="follow-counts">
-        <div class="follow-count-box">
-          <strong>${counts.followers}</strong>
-          <span>フォロワー</span>
+          ${p.bio?`<div class="other-profile-bio v24-4-24-bio">${esc(p.bio)}</div>`:`<div class="v24-4-24-empty-copy">自己紹介はまだありません。</div>`}
+          ${p.area?`<div class="v24-4-24-area">${esc(p.area)}</div>`:""}
+
+          <div class="v24-4-24-counts">
+            <div class="v24-4-24-count">
+              <strong>${counts.followers}</strong>
+              <span>フォロワー</span>
+            </div>
+            <div class="v24-4-24-count">
+              <strong>${counts.following}</strong>
+              <span>フォロー中</span>
+            </div>
+            <div class="v24-4-24-count">
+              <strong>${hostedEvents.length}</strong>
+              <span>募集中</span>
+            </div>
+          </div>
+
+          <div class="follow-actions v24-4-24-actions">
+            <button
+              class="follow-primary ${following?"following":""}"
+              onclick="toggleFollow('${escjs(id)}')"
+              ${!isRealUserId(id)?"disabled":""}
+            >${!isRealUserId(id)?"旧デモデータ":following?"フォロー中":"フォローする"}</button>
+
+            <button
+              class="follow-secondary"
+              onclick="closeModal('otherProfileModal');startChat('${escjs(id)}')"
+              ${!isRealUserId(id)?"disabled":""}
+            >メッセージ</button>
+          </div>
+
+          <section class="v24-4-24-section">
+            <div class="v24-4-24-section-head">
+              <strong>興味・関心</strong>
+              <span>${interestList.length?`${interestList.length}件`:""}</span>
+            </div>
+            <div class="v24-4-24-interests">
+              ${interestList.length
+                ? interestList.map(x=>`<span>${esc(x)}</span>`).join("")
+                : `<div class="v24-4-24-empty-copy">まだ登録されていません。</div>`}
+            </div>
+          </section>
+
+          <section class="v24-4-24-section">
+            <div class="v24-4-24-section-head">
+              <strong>この人の募集</strong>
+              <span>${hostedEvents.length?`${hostedEvents.length}件`:""}</span>
+            </div>
+
+            <div class="v24-4-24-hosted-list">
+              ${hostedEvents.length
+                ? hostedEvents.map(e=>{
+                    const arg=eventIdArg(e.id);
+                    return `
+                      <button class="v24-4-24-hosted-card" onclick="closeModal('otherProfileModal');openCardDetail(${arg})">
+                        <img src="${eventImageSrc(e)}" alt="${esc(e.sub||e.category)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
+                        <span class="v24-4-24-hosted-copy">
+                          <b>${esc(e.title)}</b>
+                          <small>${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</small>
+                          <em>${e.people}/${e.capacity}人</em>
+                        </span>
+                      </button>
+                    `;
+                  }).join("")
+                : `<div class="v24-4-24-empty-copy">現在表示できる募集はありません。</div>`}
+            </div>
+          </section>
         </div>
-        <div class="follow-count-box">
-          <strong>${counts.following}</strong>
-          <span>フォロー中</span>
-        </div>
-      </div>
-
-      <div class="follow-actions">
-        <button
-          class="follow-primary ${following?"following":""}"
-          onclick="toggleFollow('${escjs(id)}')"
-          ${!isRealUserId(id)?"disabled":""}
-        >${!isRealUserId(id)?"旧デモデータ":following?"フォロー中":"フォローする"}</button>
-
-        <button class="follow-secondary" onclick="closeModal('otherProfileModal');startChat('${escjs(id)}')" ${!isRealUserId(id)?"disabled":""}>
-          メッセージ
-        </button>
       </div>
     `;
 
@@ -10867,6 +11197,7 @@ async function renderOtherProfile(id){
     box.innerHTML=`<div class="message-state">プロフィールを読み込めませんでした。</div>`;
   }
 }
+
 async function openOtherProfile(id){
   if(id===meId() || id===currentAuthUser?.id){
     openMyProfile();
