@@ -6090,6 +6090,179 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.4.8 — PROFILE HEADER LAYOUT FIX
+   Banner owns avatar + action buttons. Content starts below.
+   ========================================================= */
+
+.profile-hero{
+  position:relative !important;
+  width:100% !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:#E9EEF4 !important;
+  overflow:hidden !important;
+}
+
+/* バナーを独立した背景として表示 */
+.profile-hero .profile-cover.profile-banner{
+  position:relative !important;
+  width:100% !important;
+  height:220px !important;
+  min-height:220px !important;
+  margin:0 !important;
+  padding:0 !important;
+  border-radius:0 !important;
+  overflow:hidden !important;
+  background:#E9EEF4 !important;
+}
+
+.profile-hero .profile-cover.profile-banner img{
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  object-fit:cover !important;
+  object-position:center !important;
+}
+
+/* バナー下部の文字・ボタンを見やすくする薄いグラデーション */
+.profile-hero::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:92px;
+  z-index:2;
+  pointer-events:none;
+  background:linear-gradient(
+    to bottom,
+    rgba(0,0,0,0),
+    rgba(0,0,0,.24)
+  );
+}
+
+/* アイコンは完全にバナーの中 */
+.profile-avatar-overlap{
+  position:absolute !important;
+  left:18px !important;
+  bottom:16px !important;
+  z-index:6 !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+
+.profile-avatar-overlap .profile-avatar-inner{
+  width:92px !important;
+  height:92px !important;
+  border:4px solid rgba(255,255,255,.96) !important;
+  border-radius:50% !important;
+  overflow:hidden !important;
+  background:#fff !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.20) !important;
+}
+
+.profile-avatar-overlap .profile-avatar-inner img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  border-radius:50% !important;
+}
+
+/* 編集・アカウントも完全にバナーの中、右下 */
+.profile-hero-actions{
+  position:absolute !important;
+  right:14px !important;
+  bottom:18px !important;
+  z-index:7 !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:7px !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+
+.profile-hero-btn{
+  min-height:34px !important;
+  padding:0 11px !important;
+  border:1px solid rgba(255,255,255,.78) !important;
+  border-radius:999px !important;
+  background:rgba(17,24,39,.58) !important;
+  color:#fff !important;
+  font-size:8px !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  box-shadow:0 4px 14px rgba(0,0,0,.16) !important;
+}
+
+/* 白いプロフィール本文はバナーが終わってから開始 */
+.profile-wrap-connected{
+  position:relative !important;
+  z-index:1 !important;
+  margin:0 !important;
+  padding:22px 18px 0 !important;
+  background:#fff !important;
+  border-radius:0 !important;
+  transform:none !important;
+  top:auto !important;
+}
+
+.profile-wrap-connected .profile-info{
+  position:relative !important;
+  z-index:1 !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+
+.profile-wrap-connected .profile-name{
+  margin:0 !important;
+  padding:0 !important;
+}
+
+/* 旧レイアウト由来の上方向への重なりを殺す */
+.profile-wrap,
+.profile-wrap-connected{
+  margin-top:0 !important;
+}
+
+@media(max-width:360px){
+  .profile-hero .profile-cover.profile-banner{
+    height:190px !important;
+    min-height:190px !important;
+  }
+
+  .profile-avatar-overlap{
+    left:14px !important;
+    bottom:14px !important;
+  }
+
+  .profile-avatar-overlap .profile-avatar-inner{
+    width:80px !important;
+    height:80px !important;
+  }
+
+  .profile-hero-actions{
+    right:10px !important;
+    bottom:14px !important;
+    gap:5px !important;
+  }
+
+  .profile-hero-btn{
+    min-height:32px !important;
+    padding:0 8px !important;
+    font-size:7.2px !important;
+  }
+
+  .profile-wrap-connected{
+    padding:20px 14px 0 !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -6760,7 +6933,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_7_full_image_crop_frame";
+const KEY="tk_my_gathers_v24_4_8_profile_header_layout_fix";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
