@@ -9006,7 +9006,7 @@ html,body{
           <div class="v25-home-hero-copy v25-0-2-hero-copy">
             <small>TK MY GATHERS / TOKYO</small>
             <h1>やりたいことから、集まる。</h1>
-            <p>飲み会でも、麻雀でも、散歩でも。</p>
+            <p>ごはんでも、スポーツでも、散歩でも。</p>
           </div>
         </article>
 
@@ -9593,10 +9593,10 @@ html,body{
         <small>軽く一杯から</small>
       </button>
 
-      <button onclick="startQuickCreate('ゲーム・遊び','麻雀')">
-        <span class="quick-action-icon">MJ</span>
-        <b>麻雀したい</b>
-        <small>人数集めたいときに</small>
+      <button onclick="startQuickCreate('おでかけ','街歩き')">
+        <span class="quick-action-icon">WK</span>
+        <b>外に出たい</b>
+        <small>散歩や街歩きから</small>
       </button>
 
       <button onclick="startQuickCreate('スポーツ','キャッチボール')">
@@ -9651,7 +9651,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v25_0_5_home_focus_cleanup";
+const KEY="tk_my_gathers_v25_0_6_mahjong_deemphasis";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -9685,7 +9685,7 @@ sport:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http:/
 sauna:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#1d3030"/><stop offset="1" stop-color="#765a43"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><text x="50%" y="52%" text-anchor="middle" fill="white" font-size="70" font-family="sans-serif" font-weight="700">SAUNA</text></svg>`)
 };
 const defaults={
-homeFilter:"all",tkSpecialFilter:null,discoverDateFilter:"weekend",discoverCategory:null,selectedMembers:[],selectedTags:[],cat:"ゲーム・遊び",sub:"麻雀",eventImage:null,currentEventId:null,currentChatUserId:null,currentFunEvent:null,
+homeFilter:"all",tkSpecialFilter:null,discoverDateFilter:"weekend",discoverCategory:null,selectedMembers:[],selectedTags:[],cat:"おでかけ",sub:"街歩き",eventImage:null,currentEventId:null,currentChatUserId:null,currentFunEvent:null,
 currentUserId:"shuzo",
 accounts:{
 shuzo:{id:"shuzo",name:"しゅうぞう",handle:"@shuzo",bio:"やりたいことから、つながっていく。麻雀、飲み会、BBQ、サウナあたり。",area:"東京",avatar:null,followers:12,following:9,fun:18,interests:["麻雀","飲み会","BBQ","サウナ","ボードゲーム"]},
@@ -10883,7 +10883,12 @@ function renderHome(){
   const uid=currentAuthUser?.id||meId();
   const upcoming=(state.events||[]).filter(e=>e && e.status==="upcoming");
 const oneMore=upcoming
-    .filter(e=>e.owner!==uid && !e.joined && Math.max(0,e.capacity-e.people)===1)
+    .filter(e=>
+      e.owner!==uid &&
+      !e.joined &&
+      Math.max(0,e.capacity-e.people)===1 &&
+      e.sub!=="麻雀"
+    )
     .slice(0,2);
 
   const feed=$("feed");
