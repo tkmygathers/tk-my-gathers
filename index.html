@@ -7709,6 +7709,176 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.4.22 — COMPACT CATEGORY FILTER BUTTON
+   ========================================================= */
+
+.v24-4-22-filter-wrap{
+  margin:10px 13px 8px;
+}
+
+.v24-4-22-filter-bar{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.v24-4-22-filter-trigger{
+  min-height:38px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:0 12px;
+  border:1px solid #DDE4EC;
+  border-radius:11px;
+  background:#fff;
+  color:#344054;
+  font-size:8.5px;
+  font-weight:850;
+}
+
+.v24-4-22-filter-trigger b{
+  color:#2563EB;
+  font-size:14px;
+  line-height:1;
+}
+
+.v24-4-22-filter-clear{
+  min-height:38px;
+  padding:0 10px;
+  border:0;
+  border-radius:11px;
+  background:#F3F5F7;
+  color:#667085;
+  font-size:7.7px;
+  font-weight:850;
+}
+
+.v24-4-22-filter-clear[hidden]{
+  display:none !important;
+}
+
+.v24-4-22-current-filter{
+  margin-top:7px;
+}
+
+.v24-4-22-current-filter[hidden]{
+  display:none !important;
+}
+
+.v24-4-22-current-filter span{
+  display:inline-flex;
+  align-items:center;
+  min-height:27px;
+  padding:0 9px;
+  border-radius:999px;
+  background:#EEF4FF;
+  color:#2563EB;
+  font-size:7.4px;
+  font-weight:850;
+}
+
+.v24-4-22-category-panel{
+  margin-top:8px;
+  padding:11px 11px 12px;
+  border:1px solid #E3E8EF;
+  border-radius:14px;
+  background:#fff;
+}
+
+.v24-4-22-category-panel[hidden]{
+  display:none !important;
+}
+
+.v24-4-22-panel-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:9px;
+}
+
+.v24-4-22-panel-head strong{
+  color:#1F2937;
+  font-size:9px;
+  font-weight:900;
+}
+
+.v24-4-22-panel-head button{
+  min-height:27px;
+  padding:0 8px;
+  border:0;
+  border-radius:999px;
+  background:#F3F5F7;
+  color:#667085;
+  font-size:7px;
+  font-weight:800;
+}
+
+.v24-4-22-category-panel .v24-4-20-category-row{
+  flex-wrap:wrap;
+  overflow:visible;
+  padding-bottom:0;
+}
+
+.v24-4-22-category-panel .v24-4-20-category-chip{
+  min-height:31px;
+  padding:0 9px;
+}
+
+@media(max-width:360px){
+  .v24-4-22-filter-wrap{
+    margin-left:10px;
+    margin-right:10px;
+  }
+
+  .v24-4-22-filter-trigger{
+    min-height:36px;
+    padding:0 10px;
+  }
+}
+
+
+/* =========================================================
+   V24.4.23 — CATEGORY BUTTON IN DISCOVER HEADER
+   ========================================================= */
+
+.v24-4-23-discover-head{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:12px !important;
+}
+
+.v24-4-23-header-filter{
+  flex:0 0 auto !important;
+  min-height:36px !important;
+  padding:0 11px !important;
+  margin-top:2px !important;
+}
+
+.v24-4-23-filter-status{
+  justify-content:flex-end !important;
+}
+
+.v24-4-22-filter-wrap{
+  margin-top:4px !important;
+}
+
+.v24-4-23-filter-status:has(.v24-4-22-filter-clear[hidden]){
+  display:none !important;
+}
+
+@media(max-width:360px){
+  .v24-4-23-header-filter{
+    min-height:34px !important;
+    padding:0 9px !important;
+    font-size:7.8px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -7824,11 +7994,16 @@ html,body{
 
 
 <section id="discover" class="page discover-v23 discover-simple">
-  <div class="discover-head-row">
+  <div class="discover-head-row v24-4-23-discover-head">
     <div>
       <div class="eyebrow">DISCOVER</div>
       <div class="page-title">探す</div>
     </div>
+
+    <button id="discoverCategoryTrigger" class="v24-4-22-filter-trigger v24-4-23-header-filter" type="button" onclick="toggleDiscoverCategoryPanel()">
+      <span>カテゴリで検索</span>
+      <b>＋</b>
+    </button>
   </div>
 
   <div class="discover-search-row discover-search-only">
@@ -7838,21 +8013,27 @@ html,body{
     </div>
   </div>
 
-  <div class="v24-4-20-category-section">
-    <div class="v24-4-20-category-head">
-      <div>
-        <div class="v24-4-20-category-kicker">CATEGORY</div>
-        <div class="v24-4-20-category-title">カテゴリから探す</div>
-      </div>
-      <button id="discoverCategoryClear" type="button" onclick="setDiscoverCategory('all')">すべて</button>
+  <div class="v24-4-22-filter-wrap">
+    <div class="v24-4-22-filter-bar v24-4-23-filter-status">
+      <button id="discoverCategoryClear" class="v24-4-22-filter-clear" type="button" onclick="setDiscoverCategory('all')">解除</button>
     </div>
-    <div id="discoverCategoryRow" class="v24-4-20-category-row"></div>
 
-    <div id="discoverSubcategoryArea" class="v24-4-21-subcategory-area" hidden>
-      <div class="v24-4-21-subcategory-head">
-        <div id="discoverSubcategoryTitle" class="v24-4-21-subcategory-title"></div>
+    <div id="discoverCategoryCurrent" class="v24-4-22-current-filter"></div>
+
+    <div id="discoverCategoryPanel" class="v24-4-22-category-panel" hidden>
+      <div class="v24-4-22-panel-head">
+        <strong>カテゴリを選ぶ</strong>
+        <button type="button" onclick="closeDiscoverCategoryPanel()">閉じる</button>
       </div>
-      <div id="discoverSubcategoryRow" class="v24-4-21-subcategory-row"></div>
+
+      <div id="discoverCategoryRow" class="v24-4-20-category-row"></div>
+
+      <div id="discoverSubcategoryArea" class="v24-4-21-subcategory-area" hidden>
+        <div class="v24-4-21-subcategory-head">
+          <div id="discoverSubcategoryTitle" class="v24-4-21-subcategory-title"></div>
+        </div>
+        <div id="discoverSubcategoryRow" class="v24-4-21-subcategory-row"></div>
+      </div>
     </div>
   </div>
 
@@ -8389,7 +8570,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_21_discover_category_drilldown";
+const KEY="tk_my_gathers_v24_4_23_category_button_in_header";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -9641,7 +9822,53 @@ function discoverCategoryDisplayName(value){
   return value==="その他・オリジナル" ? "オリジナル" : value;
 }
 
+
+function toggleDiscoverCategoryPanel(){
+  const panel=$("discoverCategoryPanel");
+  if(!panel)return;
+  panel.hidden=!panel.hidden;
+  updateDiscoverCategoryTrigger();
+}
+
+function closeDiscoverCategoryPanel(){
+  const panel=$("discoverCategoryPanel");
+  if(panel)panel.hidden=true;
+  updateDiscoverCategoryTrigger();
+}
+
+function updateDiscoverCategoryTrigger(){
+  const trigger=$("discoverCategoryTrigger");
+  const current=$("discoverCategoryCurrent");
+  const clear=$("discoverCategoryClear");
+  const panel=$("discoverCategoryPanel");
+
+  const category=state.discoverCategory||"all";
+  const sub=state.discoverSub||"all";
+
+  if(trigger){
+    const b=trigger.querySelector("b");
+    if(b)b.textContent=(panel && !panel.hidden)?"−":"＋";
+  }
+
+  if(current){
+    if(category==="all"){
+      current.innerHTML="";
+      current.hidden=true;
+    }else{
+      const categoryLabel=discoverCategoryDisplayName(category);
+      const text=sub!=="all" ? `${categoryLabel} / ${sub}` : categoryLabel;
+      current.hidden=false;
+      current.innerHTML=`<span>${esc(text)}</span>`;
+    }
+  }
+
+  if(clear){
+    clear.hidden=category==="all";
+  }
+}
+
 function renderDiscoverCategories(){
+  updateDiscoverCategoryTrigger();
   const row=$("discoverCategoryRow");
   const subArea=$("discoverSubcategoryArea");
   const subRow=$("discoverSubcategoryRow");
@@ -9713,12 +9940,21 @@ function setDiscoverCategory(category){
   state.discoverSub="all";
   renderDiscoverCategories();
   renderDiscover();
+
+  if((category||"all")==="all"){
+    closeDiscoverCategoryPanel();
+  }else{
+    const panel=$("discoverCategoryPanel");
+    if(panel)panel.hidden=false;
+    updateDiscoverCategoryTrigger();
+  }
 }
 
 function setDiscoverSub(sub){
   state.discoverSub=sub||"all";
   renderDiscoverCategories();
   renderDiscover();
+  closeDiscoverCategoryPanel();
 }
 
 function discoverCategoryMatches(e){
