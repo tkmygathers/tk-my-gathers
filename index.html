@@ -9036,9 +9036,33 @@ html,body{
   }
 }
 
+
+/* V25.0.9 — MOBILE LEFT-GAP FIX */
+html,body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+body{
+  margin:0;
+}
+.shell{
+  margin:0 auto;
+}
+@media(max-width:430px){
+  body{
+    display:block !important;
+  }
+  .shell{
+    width:100% !important;
+    max-width:100% !important;
+    margin:0 !important;
+  }
+}
 </style>
 </head>
-<body> v25.0.8: lightweight hero images + header message button removed 
+<body>
+<!-- v25.0.9 mobile layout fix -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
