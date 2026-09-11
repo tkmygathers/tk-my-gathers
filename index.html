@@ -5349,6 +5349,51 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.4.1 — TOP-RIGHT PROFILE AVATAR SHAPE FIX
+   ========================================================= */
+
+#accountAvatarBtn{
+  width:36px !important;
+  height:36px !important;
+  min-width:36px !important;
+  min-height:36px !important;
+  max-width:36px !important;
+  max-height:36px !important;
+  flex:0 0 36px !important;
+  aspect-ratio:1 / 1 !important;
+  padding:0 !important;
+  margin:0 !important;
+  border-radius:50% !important;
+  overflow:hidden !important;
+  display:grid !important;
+  place-items:center !important;
+  line-height:1 !important;
+  box-sizing:border-box !important;
+  appearance:none !important;
+  -webkit-appearance:none !important;
+}
+
+#accountAvatarBtn img{
+  width:100% !important;
+  height:100% !important;
+  min-width:100% !important;
+  min-height:100% !important;
+  display:block !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  border:0 !important;
+  border-radius:50% !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+
+#accountAvatarBtn:not(:has(img)){
+  font-size:11px !important;
+  font-weight:800 !important;
+}
+
 </style>
 </head>
 <body>
@@ -5970,7 +6015,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_3_calendar";
+const KEY="tk_my_gathers_v24_4_1_avatar_shape_fix";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
