@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F5F8FC">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<meta content="#F5F8FC" name="theme-color"/>
 <title>TK MY GATHERS</title>
 <style>
 :root{
@@ -8939,719 +8940,701 @@ html,body{
   margin-bottom:0 !important;
 }
 
+
+/* =========================================================
+   V25.0.7 — REAL PHOTO ROTATING BANNER
+   ========================================================= */
+
+.v25-0-7-photo-hero{
+  background:#1F2937 !important;
+}
+
+.v25-0-7-photo-slide{
+  overflow:hidden;
+}
+
+.v25-0-7-banner-img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  object-position:center;
+}
+
+.v25-0-7-photo-overlay{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg,
+      rgba(14,20,28,.64) 0%,
+      rgba(14,20,28,.33) 46%,
+      rgba(14,20,28,.08) 100%);
+}
+
+.v25-0-7-photo-overlay-soft{
+  background:
+    linear-gradient(90deg,
+      rgba(14,20,28,.56) 0%,
+      rgba(14,20,28,.26) 48%,
+      rgba(14,20,28,.06) 100%);
+}
+
+.v25-0-7-slide-copy{
+  position:absolute;
+  z-index:3;
+  left:20px;
+  right:18px;
+  top:50%;
+  transform:translateY(-50%);
+  display:grid;
+  gap:6px;
+  color:#fff;
+}
+
+.v25-0-7-slide-copy small{
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.16em;
+  opacity:.76;
+}
+
+.v25-0-7-slide-copy strong{
+  font-size:22px;
+  line-height:1.25;
+  font-weight:950;
+  letter-spacing:-.025em;
+  text-shadow:0 1px 12px rgba(0,0,0,.18);
+}
+
+.v25-0-7-slide-copy span{
+  max-width:80%;
+  color:rgba(255,255,255,.82);
+  font-size:8px;
+  line-height:1.55;
+  font-weight:650;
+}
+
+.v25-0-7-photo-hero .v25-home-hero-copy{
+  z-index:3;
+}
+
+@media(max-width:360px){
+  .v25-0-7-slide-copy{
+    left:17px;
+    right:14px;
+  }
+
+  .v25-0-7-slide-copy strong{
+    font-size:20px;
+  }
+
+  .v25-0-7-slide-copy span{
+    max-width:88%;
+    font-size:7.4px;
+  }
+}
+
 </style>
 </head>
-<body>
+<body> v25.0.8: lightweight hero images + header message button removed 
 <main class="shell">
 <header class="topbar">
-  <div class="toprow">
-    <button type="button" class="brand brand-home-btn" onclick="goHomeFromLogo()" aria-label="ホームに戻る">
-      <div class="tk-mark"><span class="t">T</span><span class="k">K</span><span class="slash"></span></div>
-      <div class="brand-copy">
-        <div class="brand-title">TK <em>MY</em> GATHERS</div>
-        <div class="brand-sub">やりたいことから、集まる</div>
-      </div>
-    </button>
-    <div class="top-actions">
-      <button class="icon-btn" onclick="showPage('messages')" aria-label="メッセージ">✉</button>
-      <div class="header-actions">
-  <button class="notification-btn" onclick="openNotifications()" aria-label="通知">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
-      <path d="M13.7 21a2 2 0 0 1-3.4 0"></path>
-    </svg>
-    <span id="notificationBadge" class="notification-badge"></span>
-  </button>
-  <button class="avatar-btn" id="accountAvatarBtn" onclick="openMyProfile()" aria-label="プロフィール">修</button>
+<div class="toprow">
+<button aria-label="ホームに戻る" class="brand brand-home-btn" onclick="goHomeFromLogo()" type="button">
+<div class="tk-mark"><span class="t">T</span><span class="k">K</span><span class="slash"></span></div>
+<div class="brand-copy">
+<div class="brand-title">TK <em>MY</em> GATHERS</div>
+<div class="brand-sub">やりたいことから、集まる</div>
 </div>
-    </div>
-  </div>
+</button>
+<div class="top-actions">
+
+<div class="header-actions">
+<button aria-label="通知" class="notification-btn" onclick="openNotifications()">
+<svg aria-hidden="true" viewbox="0 0 24 24">
+<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+<path d="M13.7 21a2 2 0 0 1-3.4 0"></path>
+</svg>
+<span class="notification-badge" id="notificationBadge"></span>
+</button>
+<button aria-label="プロフィール" class="avatar-btn" id="accountAvatarBtn" onclick="openMyProfile()">修</button>
+</div>
+</div>
+</div>
 </header>
-
-<section id="home" class="page active">
-  <div class="mobile-home home-v25">
-
-    <section class="v25-home-hero v25-0-2-hero">
-      <div id="v25HeroTrack" class="v25-0-2-hero-track">
-
-        <article class="v25-0-2-slide active" data-hero-slide="0" data-kind="brand">
-          <div class="v25-home-hero-art" aria-hidden="true">
-            <svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="v25sky2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#d7c8bf"/>
-                  <stop offset="58%" stop-color="#a99e9c"/>
-                  <stop offset="100%" stop-color="#4f535b"/>
-                </linearGradient>
-                <linearGradient id="v25city2" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#596067"/>
-                  <stop offset="100%" stop-color="#252a31"/>
-                </linearGradient>
-              </defs>
-              <rect width="900" height="360" fill="url(#v25sky2)"/>
-              <circle cx="696" cy="82" r="38" fill="#f2e2be" opacity=".88"/>
-              <rect y="250" width="900" height="110" fill="#30353c"/>
-              <g fill="url(#v25city2)">
-                <rect x="44" y="175" width="92" height="75" rx="3"/>
-                <rect x="158" y="145" width="78" height="105" rx="3"/>
-                <rect x="260" y="190" width="116" height="60" rx="3"/>
-                <rect x="395" y="135" width="94" height="115" rx="3"/>
-                <rect x="510" y="172" width="104" height="78" rx="3"/>
-                <rect x="636" y="120" width="90" height="130" rx="3"/>
-                <rect x="744" y="158" width="118" height="92" rx="3"/>
-              </g>
-            </svg>
-          </div>
-          <div class="v25-home-hero-overlay"></div>
-          <div class="v25-home-hero-copy v25-0-2-hero-copy">
-            <small>TK MY GATHERS / TOKYO</small>
-            <h1>やりたいことから、集まる。</h1>
-            <p>ごはんでも、スポーツでも、散歩でも。</p>
-          </div>
-        </article>
-
-        <article class="v25-0-2-slide" data-hero-slide="1" data-kind="feature">
-          <div class="v25-0-2-feature-bg"></div>
-          <div class="v25-0-2-feature-copy">
-            <small>FEATURE</small>
-            <strong>思いついたら、すぐ募集。</strong>
-            <span>ホームの「募集をつくる」から始められます。</span>
-          </div>
-        </article>
-
-        <article class="v25-0-2-slide" data-hero-slide="2" data-kind="future-ad">
-          <div class="v25-0-2-ad-placeholder">
-            <small>FUTURE SLOT</small>
-            <strong>特集・お知らせ・広告</strong>
-            <span>将来ここに外部広告やキャンペーンを差し替え可能</span>
-          </div>
-        </article>
-
-      </div>
-
-      <div class="v25-0-2-hero-dots" id="v25HeroDots">
-        <button type="button" class="active" onclick="setHomeHeroSlide(0)" aria-label="1枚目"></button>
-        <button type="button" onclick="setHomeHeroSlide(1)" aria-label="2枚目"></button>
-        <button type="button" onclick="setHomeHeroSlide(2)" aria-label="3枚目"></button>
-      </div>
-    </section>
-
-    <section class="v25-create-block v25-0-4-create-hub">
-      <div class="v25-0-4-create-intro">
-        <small>START A GATHER</small>
-        <h2>今、なにしたい？</h2>
-        <p>やりたいことをそのまま募集にして、仲間を集めよう。</p>
-      </div>
-
-      <button class="v25-0-4-create-main" type="button" onclick="openQuickAction()">
-        <span class="v25-0-4-create-icon">＋</span>
-        <span class="v25-0-4-create-copy">
-          <strong>募集をつくる</strong>
-          <small>やりたいことから、集まる。</small>
-        </span>
-        <span class="v25-0-4-create-arrow">›</span>
-      </button>
-
-      <div class="v25-0-4-example-row" aria-label="募集例">
-        <span>ごはん・飲み</span>
-        <span>スポーツ</span>
-        <span>おでかけ</span>
-        <span>オリジナル</span>
-      </div>
-    </section>
+<section class="page active" id="home">
+<div class="mobile-home home-v25">
+<section class="v25-home-hero v25-0-2-hero v25-0-7-photo-hero">
+<div class="v25-0-2-hero-track" id="v25HeroTrack">
+<article class="v25-0-2-slide active v25-0-7-photo-slide" data-hero-slide="0" data-kind="brand">
+<img alt="やりたいことから、集まる。" class="v25-0-7-banner-img" decoding="async" fetchpriority="high" src="hero_banner_gather.webp"/>
+<div class="v25-0-7-photo-overlay"></div>
+<div class="v25-home-hero-copy v25-0-2-hero-copy">
+<small>TK MY GATHERS / TOKYO</small>
+<h1>やりたいことから、集まる。</h1>
+<p>ごはんでも、スポーツでも、散歩でも。</p>
+</div>
+</article>
+<article class="v25-0-2-slide v25-0-7-photo-slide" data-hero-slide="1" data-kind="feature">
+<img alt="思いついたら、すぐ募集。" class="v25-0-7-banner-img" decoding="async" loading="lazy" src="hero_banner_create.webp"/>
+<div class="v25-0-7-photo-overlay"></div>
+<div class="v25-0-7-slide-copy">
+<small>FEATURE</small>
+<strong>思いついたら、すぐ募集。</strong>
+<span>「募集をつくる」から、やりたいことを形に。</span>
+</div>
+</article>
+<article class="v25-0-2-slide v25-0-7-photo-slide" data-hero-slide="2" data-kind="future-ad">
+<img alt="東京で、いい時間を。" class="v25-0-7-banner-img" decoding="async" loading="lazy" src="hero_banner_tokyo.webp"/>
+<div class="v25-0-7-photo-overlay v25-0-7-photo-overlay-soft"></div>
+<div class="v25-0-7-slide-copy">
+<small>PICK UP</small>
+<strong>東京で、いい時間を。</strong>
+<span>将来はここを特集・キャンペーン・広告にも使えるスペースに。</span>
+</div>
+</article>
+</div>
+<div class="v25-0-2-hero-dots" id="v25HeroDots">
+<button aria-label="1枚目" class="active" onclick="setHomeHeroSlide(0)" type="button"></button>
+<button aria-label="2枚目" onclick="setHomeHeroSlide(1)" type="button"></button>
+<button aria-label="3枚目" onclick="setHomeHeroSlide(2)" type="button"></button>
+</div>
+</section>
+<section class="v25-create-block v25-0-4-create-hub">
+<div class="v25-0-4-create-intro">
+<small>START A GATHER</small>
+<h2>今、なにしたい？</h2>
+<p>やりたいことをそのまま募集にして、仲間を集めよう。</p>
+</div>
+<button class="v25-0-4-create-main" onclick="openQuickAction()" type="button">
+<span class="v25-0-4-create-icon">＋</span>
+<span class="v25-0-4-create-copy">
+<strong>募集をつくる</strong>
+<small>やりたいことから、集まる。</small>
+</span>
+<span class="v25-0-4-create-arrow">›</span>
+</button>
+<div aria-label="募集例" class="v25-0-4-example-row">
+<span>ごはん・飲み</span>
+<span>スポーツ</span>
+<span>おでかけ</span>
+<span>オリジナル</span>
+</div>
+</section>
 <section class="v25-one-more-section">
-      <div class="v25-section-head">
-        <div>
-          <small>ONE MORE</small>
-          <strong>あと1人で開催</strong>
-        </div>
-        <button type="button" onclick="showPage('discover')">すべて見る</button>
-      </div>
-
-      <div id="dbStatus" class="db-status"></div>
-      <div class="feed mobile-feed v25-home-feed" id="feed"></div>
-    </section>
-
-  </div>
+<div class="v25-section-head">
+<div>
+<small>ONE MORE</small>
+<strong>あと1人で開催</strong>
+</div>
+<button onclick="showPage('discover')" type="button">すべて見る</button>
+</div>
+<div class="db-status" id="dbStatus"></div>
+<div class="feed mobile-feed v25-home-feed" id="feed"></div>
 </section>
-
-
-
-<section id="discover" class="page discover-v23 discover-simple">
-  <div class="discover-head-row v24-4-23-discover-head">
-    <div>
-      <div class="eyebrow">DISCOVER</div>
-      <div class="page-title">探す</div>
-    </div>
-
-    <button id="discoverCategoryTrigger" class="v24-4-22-filter-trigger v24-4-23-header-filter" type="button" onclick="toggleDiscoverCategoryPanel()">
-      <span>カテゴリで検索</span>
-      <b>＋</b>
-    </button>
-  </div>
-
-  <div class="discover-search-row discover-search-only">
-    <div class="discover-searchbox">
-      <span class="discover-search-icon">⌕</span>
-      <input id="discoverQuery" type="search" placeholder="募集名・場所・カテゴリで検索">
-    </div>
-  </div>
-
-  <div class="v24-4-22-filter-wrap">
-    <div class="v24-4-22-filter-bar v24-4-23-filter-status">
-      <button id="discoverCategoryClear" class="v24-4-22-filter-clear" type="button" onclick="setDiscoverCategory('all')">解除</button>
-    </div>
-
-    <div id="discoverCategoryCurrent" class="v24-4-22-current-filter"></div>
-
-    <div id="discoverCategoryPanel" class="v24-4-22-category-panel" hidden>
-      <div class="v24-4-22-panel-head">
-        <strong>カテゴリを選ぶ</strong>
-        <button type="button" onclick="closeDiscoverCategoryPanel()">閉じる</button>
-      </div>
-
-      <div id="discoverCategoryRow" class="v24-4-20-category-row"></div>
-
-      <div id="discoverSubcategoryArea" class="v24-4-21-subcategory-area" hidden>
-        <div class="v24-4-21-subcategory-head">
-          <div id="discoverSubcategoryTitle" class="v24-4-21-subcategory-title"></div>
-        </div>
-        <div id="discoverSubcategoryRow" class="v24-4-21-subcategory-row"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="discover-summary-row">
-    <div id="discoverCount" class="discover-count">0件見つかりました</div>
-  </div>
-
-  <div id="discoverResults" class="discover-results v24-4-21-home-card-results"></div>
+</div>
 </section>
-
-
-
-
-<section id="messages" class="page">
-  <div id="messageListView">
-    <div class="message-page-head">
-      <div class="page-title">メッセージ</div>
-      <button class="new-message-btn" onclick="openNewMessage()">新しいメッセージ</button>
-    </div>
-    <div class="list" id="messageList"></div>
-  </div>
-  <div id="chatView" class="chat-wrap">
-    <div class="chat-head"><button class="back-btn" onclick="closeChat()">←</button><div><div id="chatName" class="friend-name"></div><div id="chatHandle" class="muted"></div></div></div>
-    <div id="chatMessages" class="chat-messages"></div>
-    <form id="chatForm" class="input-row"><input id="chatInput" placeholder="メッセージを入力"><button class="send-btn">送信</button></form>
-  </div>
+<section class="page discover-v23 discover-simple" id="discover">
+<div class="discover-head-row v24-4-23-discover-head">
+<div>
+<div class="eyebrow">DISCOVER</div>
+<div class="page-title">探す</div>
+</div>
+<button class="v24-4-22-filter-trigger v24-4-23-header-filter" id="discoverCategoryTrigger" onclick="toggleDiscoverCategoryPanel()" type="button">
+<span>カテゴリで検索</span>
+<b>＋</b>
+</button>
+</div>
+<div class="discover-search-row discover-search-only">
+<div class="discover-searchbox">
+<span class="discover-search-icon">⌕</span>
+<input id="discoverQuery" placeholder="募集名・場所・カテゴリで検索" type="search"/>
+</div>
+</div>
+<div class="v24-4-22-filter-wrap">
+<div class="v24-4-22-filter-bar v24-4-23-filter-status">
+<button class="v24-4-22-filter-clear" id="discoverCategoryClear" onclick="setDiscoverCategory('all')" type="button">解除</button>
+</div>
+<div class="v24-4-22-current-filter" id="discoverCategoryCurrent"></div>
+<div class="v24-4-22-category-panel" hidden="" id="discoverCategoryPanel">
+<div class="v24-4-22-panel-head">
+<strong>カテゴリを選ぶ</strong>
+<button onclick="closeDiscoverCategoryPanel()" type="button">閉じる</button>
+</div>
+<div class="v24-4-20-category-row" id="discoverCategoryRow"></div>
+<div class="v24-4-21-subcategory-area" hidden="" id="discoverSubcategoryArea">
+<div class="v24-4-21-subcategory-head">
+<div class="v24-4-21-subcategory-title" id="discoverSubcategoryTitle"></div>
+</div>
+<div class="v24-4-21-subcategory-row" id="discoverSubcategoryRow"></div>
+</div>
+</div>
+</div>
+<div class="discover-summary-row">
+<div class="discover-count" id="discoverCount">0件見つかりました</div>
+</div>
+<div class="discover-results v24-4-21-home-card-results" id="discoverResults"></div>
 </section>
-
-
-<section id="mygathers" class="page">
-  <div class="page-title-row">
-    <div>
-      <div class="eyebrow">MY GATHERS</div>
-      <div class="page-title">マイ募集</div>
-    </div>
-  </div>
-
-  <div class="mygathers-tabs mygathers-tabs-two">
-    <button id="myCreatedTab" class="mygathers-tab active" onclick="switchMyGathersTab('created')">自分の募集</button>
-    <button id="myCalendarTab" class="mygathers-tab" onclick="switchMyGathersTab('calendar')">カレンダー</button>
-  </div>
-
-  <div id="myCreatedPanel" class="mygathers-panel"></div>
-  <div id="myCalendarPanel" class="mygathers-panel" hidden>
-    <div class="calendar-shell">
-      <div class="calendar-head">
-        <button type="button" class="calendar-nav-btn" onclick="changeCalendarMonth(-1)" aria-label="前の月">‹</button>
-        <div>
-          <div class="calendar-eyebrow">SCHEDULE</div>
-          <div id="calendarMonthLabel" class="calendar-month-label"></div>
-        </div>
-        <button type="button" class="calendar-nav-btn" onclick="changeCalendarMonth(1)" aria-label="次の月">›</button>
-      </div>
-
-      <div class="calendar-legend">
-        <span><i class="calendar-dot own"></i>自分の募集</span>
-        <span><i class="calendar-dot joined"></i>参加予定</span>
-      </div>
-
-      <div class="calendar-weekdays">
-        <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
-      </div>
-
-      <div id="calendarGrid" class="calendar-grid"></div>
-
-      <div class="calendar-day-section">
-        <div id="calendarSelectedLabel" class="calendar-selected-label"></div>
-        <div id="calendarDayEvents" class="calendar-day-events"></div>
-      </div>
-    </div>
-  </div>
+<section class="page" id="messages">
+<div id="messageListView">
+<div class="message-page-head">
+<div class="page-title">メッセージ</div>
+<button class="new-message-btn" onclick="openNewMessage()">新しいメッセージ</button>
+</div>
+<div class="list" id="messageList"></div>
+</div>
+<div class="chat-wrap" id="chatView">
+<div class="chat-head"><button class="back-btn" onclick="closeChat()">←</button><div><div class="friend-name" id="chatName"></div><div class="muted" id="chatHandle"></div></div></div>
+<div class="chat-messages" id="chatMessages"></div>
+<form class="input-row" id="chatForm"><input id="chatInput" placeholder="メッセージを入力"/><button class="send-btn">送信</button></form>
+</div>
 </section>
-
-<section id="profile" class="page">
-  <div class="profile-hero">
-    <div id="profileBanner" class="profile-cover profile-banner"><div class="profile-banner-empty">BANNER</div></div>
-
-    <div class="profile-hero-actions">
-      <button class="profile-hero-btn" onclick="openProfileEdit()">プロフィール編集</button>
-      <button class="profile-hero-btn" onclick="openAccountSwitcher()">アカウント</button>
-    </div>
-
-    <div class="profile-avatar profile-avatar-overlap">
-      <div class="profile-avatar-inner" id="profileAvatar">TK</div>
-    </div>
-  </div>
-
-  <div class="profile-wrap profile-wrap-connected">
-    <div class="profile-info">
-      <div id="profileName" class="profile-name"></div>
-      <div id="profileHandle" class="profile-handle"></div>
-      <p id="profileBio" class="bio"></p>
-      <div id="profileArea" class="muted"></div>
-      <div class="counts">
-        <button class="count-btn" onclick="showFollowList('followers')"><strong id="followersCount">0</strong>フォロワー</button>
-        <button class="count-btn" onclick="showFollowList('following')"><strong id="followingCount">0</strong>フォロー中</button>
-        <button class="count-btn" onclick="showMutuals()"><strong id="mutualCount">0</strong>友だち</button>
-      </div>
-      <div class="fun-total">
-        <div><small>楽しかった！</small><strong id="myFunTotal">0</strong></div>
-        <svg class="fun-spark" viewBox="0 0 120 36"><path d="M3 29 C18 30, 24 21, 37 23 S57 16, 70 18 S91 8,117 7" fill="none" stroke="#C47A3A" stroke-width="2.4"/><circle cx="117" cy="7" r="3" fill="#C47A3A"/></svg>
-      </div>
-    </div>
-    <div class="section-head"><div><div class="section-title">興味・関心</div><div class="section-note">やりたいことをプロフィールに表示</div></div><button class="text-btn" onclick="openWant()">追加</button></div>
-    <div class="interest-grid" id="interestGrid"></div>
-    <div class="profile-tabs">
-      <button class="profile-tab active" data-tab="upcoming" onclick="switchProfileTab('upcoming')">参加予定</button>
-      <button class="profile-tab" data-tab="created" onclick="switchProfileTab('created')">自分の募集</button>
-      <button class="profile-tab" data-tab="history" onclick="switchProfileTab('history')">履歴</button>
-    </div>
-    <div id="upcoming" class="tab-panel active"></div>
-    <div id="created" class="tab-panel"></div>
-    <div id="history" class="tab-panel"></div>
-  </div>
+<section class="page" id="mygathers">
+<div class="page-title-row">
+<div>
+<div class="eyebrow">MY GATHERS</div>
+<div class="page-title">マイ募集</div>
+</div>
+</div>
+<div class="mygathers-tabs mygathers-tabs-two">
+<button class="mygathers-tab active" id="myCreatedTab" onclick="switchMyGathersTab('created')">自分の募集</button>
+<button class="mygathers-tab" id="myCalendarTab" onclick="switchMyGathersTab('calendar')">カレンダー</button>
+</div>
+<div class="mygathers-panel" id="myCreatedPanel"></div>
+<div class="mygathers-panel" hidden="" id="myCalendarPanel">
+<div class="calendar-shell">
+<div class="calendar-head">
+<button aria-label="前の月" class="calendar-nav-btn" onclick="changeCalendarMonth(-1)" type="button">‹</button>
+<div>
+<div class="calendar-eyebrow">SCHEDULE</div>
+<div class="calendar-month-label" id="calendarMonthLabel"></div>
+</div>
+<button aria-label="次の月" class="calendar-nav-btn" onclick="changeCalendarMonth(1)" type="button">›</button>
+</div>
+<div class="calendar-legend">
+<span><i class="calendar-dot own"></i>自分の募集</span>
+<span><i class="calendar-dot joined"></i>参加予定</span>
+</div>
+<div class="calendar-weekdays">
+<span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+</div>
+<div class="calendar-grid" id="calendarGrid"></div>
+<div class="calendar-day-section">
+<div class="calendar-selected-label" id="calendarSelectedLabel"></div>
+<div class="calendar-day-events" id="calendarDayEvents"></div>
+</div>
+</div>
+</div>
+</section>
+<section class="page" id="profile">
+<div class="profile-hero">
+<div class="profile-cover profile-banner" id="profileBanner"><div class="profile-banner-empty">BANNER</div></div>
+<div class="profile-hero-actions">
+<button class="profile-hero-btn" onclick="openProfileEdit()">プロフィール編集</button>
+<button class="profile-hero-btn" onclick="openAccountSwitcher()">アカウント</button>
+</div>
+<div class="profile-avatar profile-avatar-overlap">
+<div class="profile-avatar-inner" id="profileAvatar">TK</div>
+</div>
+</div>
+<div class="profile-wrap profile-wrap-connected">
+<div class="profile-info">
+<div class="profile-name" id="profileName"></div>
+<div class="profile-handle" id="profileHandle"></div>
+<p class="bio" id="profileBio"></p>
+<div class="muted" id="profileArea"></div>
+<div class="counts">
+<button class="count-btn" onclick="showFollowList('followers')"><strong id="followersCount">0</strong>フォロワー</button>
+<button class="count-btn" onclick="showFollowList('following')"><strong id="followingCount">0</strong>フォロー中</button>
+<button class="count-btn" onclick="showMutuals()"><strong id="mutualCount">0</strong>友だち</button>
+</div>
+<div class="fun-total">
+<div><small>楽しかった！</small><strong id="myFunTotal">0</strong></div>
+<svg class="fun-spark" viewbox="0 0 120 36"><path d="M3 29 C18 30, 24 21, 37 23 S57 16, 70 18 S91 8,117 7" fill="none" stroke="#C47A3A" stroke-width="2.4"></path><circle cx="117" cy="7" fill="#C47A3A" r="3"></circle></svg>
+</div>
+</div>
+<div class="section-head"><div><div class="section-title">興味・関心</div><div class="section-note">やりたいことをプロフィールに表示</div></div><button class="text-btn" onclick="openWant()">追加</button></div>
+<div class="interest-grid" id="interestGrid"></div>
+<div class="profile-tabs">
+<button class="profile-tab active" data-tab="upcoming" onclick="switchProfileTab('upcoming')">参加予定</button>
+<button class="profile-tab" data-tab="created" onclick="switchProfileTab('created')">自分の募集</button>
+<button class="profile-tab" data-tab="history" onclick="switchProfileTab('history')">履歴</button>
+</div>
+<div class="tab-panel active" id="upcoming"></div>
+<div class="tab-panel" id="created"></div>
+<div class="tab-panel" id="history"></div>
+</div>
 </section>
 <nav class="nav nav-five">
-  <button class="nav-btn active" data-page="home" onclick="showPage('home')">
-    <span class="nav-symbol" aria-hidden="true">⌂</span>
-    <span class="nav-label">ホーム</span>
-  </button>
-  <button class="nav-btn" data-page="discover" onclick="showPage('discover')">
-    <span class="nav-symbol" aria-hidden="true">⌕</span>
-    <span class="nav-label">探す</span>
-  </button>
+<button class="nav-btn active" data-page="home" onclick="showPage('home')">
+<span aria-hidden="true" class="nav-symbol">⌂</span>
+<span class="nav-label">ホーム</span>
+</button>
+<button class="nav-btn" data-page="discover" onclick="showPage('discover')">
+<span aria-hidden="true" class="nav-symbol">⌕</span>
+<span class="nav-label">探す</span>
+</button>
 <button class="nav-btn" data-page="messages" onclick="showPage('messages')">
-    <span class="nav-symbol" aria-hidden="true">✉</span>
-    <span class="nav-label">メッセージ</span>
-  </button>
-  <button class="nav-btn" data-page="mygathers" onclick="showPage('mygathers')">
-    <span class="nav-symbol" aria-hidden="true">▣</span>
-    <span class="nav-label">マイ募集</span>
-  </button>
+<span aria-hidden="true" class="nav-symbol">✉</span>
+<span class="nav-label">メッセージ</span>
+</button>
+<button class="nav-btn" data-page="mygathers" onclick="showPage('mygathers')">
+<span aria-hidden="true" class="nav-symbol">▣</span>
+<span class="nav-label">マイ募集</span>
+</button>
 </nav>
 </main>
-
 <!-- create -->
-<div id="createModal" class="modal" onclick="backdropClose(event,'createModal')">
+<div class="modal" id="createModal" onclick="backdropClose(event,'createModal')">
 <div class="sheet">
 <div class="handle"></div>
 <div class="sheet-head">
-  <div><div class="sheet-title">プランをつくる</div><div class="sheet-sub">やりたいこと・日時・場所を決めて、そのまま募集できます。</div></div>
-  <button class="close-btn" onclick="closeModal('createModal')">×</button>
+<div><div class="sheet-title">プランをつくる</div><div class="sheet-sub">やりたいこと・日時・場所を決めて、そのまま募集できます。</div></div>
+<button class="close-btn" onclick="closeModal('createModal')">×</button>
 </div>
 <div class="step">
-  <div class="step-label">プラン作りを手伝ってもらう</div>
-  <button class="secondary-submit" type="button" onclick="closeModal('createModal');openPlanner()">条件からプランを作る</button>
+<div class="step-label">プラン作りを手伝ってもらう</div>
+<button class="secondary-submit" onclick="closeModal('createModal');openPlanner()" type="button">条件からプランを作る</button>
 </div>
 <form id="createForm">
-<div class="step"><div class="step-label">1. ジャンル</div><div id="categoryGrid" class="category-grid"></div></div>
-<div class="step"><div class="step-label">2. やりたいこと</div><div id="subs" class="subs"></div><div id="customBox" class="custom-box"><div class="field"><label class="label">オリジナルの募集名</label><input id="customTitle" class="input" placeholder="例：山手線一周歩く"></div></div></div>
+<div class="step"><div class="step-label">1. ジャンル</div><div class="category-grid" id="categoryGrid"></div></div>
+<div class="step"><div class="step-label">2. やりたいこと</div><div class="subs" id="subs"></div><div class="custom-box" id="customBox"><div class="field"><label class="label">オリジナルの募集名</label><input class="input" id="customTitle" placeholder="例：山手線一周歩く"/></div></div></div>
 <div class="step">
-  <div class="step-label">3. 日時と場所</div>
-  <div class="split"><div class="field"><label class="label">日付</label><input id="eventDate" class="input" type="date" required></div><div class="field"><label class="label">時間</label><input id="eventTime" class="input" type="time" required></div></div>
-  <div class="field" style="margin-top:9px"><label class="label">場所</label><input id="eventPlace" class="input" placeholder="例：渋谷駅周辺" required></div>
+<div class="step-label">3. 日時と場所</div>
+<div class="split"><div class="field"><label class="label">日付</label><input class="input" id="eventDate" required="" type="date"/></div><div class="field"><label class="label">時間</label><input class="input" id="eventTime" required="" type="time"/></div></div>
+<div class="field" style="margin-top:9px"><label class="label">場所</label><input class="input" id="eventPlace" placeholder="例：渋谷駅周辺" required=""/></div>
 </div>
 <div class="step">
-  <div class="step-label">4. 画像を追加</div>
-  <div id="eventUploadCard" class="upload-card">
-    <div class="upload-row">
-      <img id="eventImagePreview" class="preview-img" style="display:none" alt="募集画像プレビュー">
-      <button type="button" class="upload-btn" onclick="$('eventImageInput').click()">写真を追加</button>
-      <button type="button" class="upload-btn" onclick="clearEventImage()">画像を外す</button>
-    </div>
-    <input id="eventImageInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
-    <div id="eventImageFileInfo" class="upload-file-info">JPEG・PNG・WebP / 5MBまで</div>
-    <div id="eventImageUploadStatus" class="upload-status">画像をアップロードしています…</div>
-    <div class="muted" style="margin-top:8px">画像を選ばない場合はカテゴリに合わせた背景を使います。</div>
-  </div>
+<div class="step-label">4. 画像を追加</div>
+<div class="upload-card" id="eventUploadCard">
+<div class="upload-row">
+<img alt="募集画像プレビュー" class="preview-img" id="eventImagePreview" style="display:none"/>
+<button class="upload-btn" onclick="$('eventImageInput').click()" type="button">写真を追加</button>
+<button class="upload-btn" onclick="clearEventImage()" type="button">画像を外す</button>
+</div>
+<input accept="image/jpeg,image/png,image/webp" hidden="" id="eventImageInput" type="file"/>
+<div class="upload-file-info" id="eventImageFileInfo">JPEG・PNG・WebP / 5MBまで</div>
+<div class="upload-status" id="eventImageUploadStatus">画像をアップロードしています…</div>
+<div class="muted" style="margin-top:8px">画像を選ばない場合はカテゴリに合わせた背景を使います。</div>
+</div>
 </div>
 <div class="step">
-  <div class="step-label">5. 人数・予算</div>
-  <div class="split"><div class="field"><label class="label">募集人数</label><select id="capacity" class="select"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>8</option><option>10</option></select></div><div class="field"><label class="label">予算/人</label><input id="budget" class="input" placeholder="例：4000円"></div></div>
+<div class="step-label">5. 人数・予算</div>
+<div class="split"><div class="field"><label class="label">募集人数</label><select class="select" id="capacity"><option>2</option><option>3</option><option selected="">4</option><option>5</option><option>6</option><option>8</option><option>10</option></select></div><div class="field"><label class="label">予算/人</label><input class="input" id="budget" placeholder="例：4000円"/></div></div>
 </div>
 <div class="step">
-  <div class="step-label">6. 公開範囲</div>
-  <div class="vis-list">
-    <label class="vis"><input type="radio" name="vis" value="公開" checked><div><div class="vis-title">公開</div><div class="vis-sub">すべてのユーザーに表示</div></div></label>
-    <label class="vis"><input type="radio" name="vis" value="フォローのフォローまで"><div><div class="vis-title">友だちの友だちまで</div><div class="vis-sub">自分のフォロー先と、そのつながりまで</div></div></label>
-    <label class="vis"><input type="radio" name="vis" value="フォローまで"><div><div class="vis-title">フォローまで</div><div class="vis-sub">自分がフォローしている人まで</div></div></label>
-    <label class="vis"><input type="radio" name="vis" value="相互フォローまで"><div><div class="vis-title">友だちまで</div><div class="vis-sub">お互いにフォローしている人だけ</div></div></label>
-    <label class="vis"><input type="radio" name="vis" value="選択した人だけ"><div><div class="vis-title">選択した人だけ</div><div class="vis-sub">友だちから個別に選択</div></div></label>
-  </div>
-  <div id="visibilityCreateHint" class="visibility-note">未ログインの人も見ることができます</div>
-  <div id="picker" class="picker"><div id="memberList"></div><div id="selectedCount" class="muted" style="margin-top:7px"></div></div>
+<div class="step-label">6. 公開範囲</div>
+<div class="vis-list">
+<label class="vis"><input checked="" name="vis" type="radio" value="公開"/><div><div class="vis-title">公開</div><div class="vis-sub">すべてのユーザーに表示</div></div></label>
+<label class="vis"><input name="vis" type="radio" value="フォローのフォローまで"/><div><div class="vis-title">友だちの友だちまで</div><div class="vis-sub">自分のフォロー先と、そのつながりまで</div></div></label>
+<label class="vis"><input name="vis" type="radio" value="フォローまで"/><div><div class="vis-title">フォローまで</div><div class="vis-sub">自分がフォローしている人まで</div></div></label>
+<label class="vis"><input name="vis" type="radio" value="相互フォローまで"/><div><div class="vis-title">友だちまで</div><div class="vis-sub">お互いにフォローしている人だけ</div></div></label>
+<label class="vis"><input name="vis" type="radio" value="選択した人だけ"/><div><div class="vis-title">選択した人だけ</div><div class="vis-sub">友だちから個別に選択</div></div></label>
+</div>
+<div class="visibility-note" id="visibilityCreateHint">未ログインの人も見ることができます</div>
+<div class="picker" id="picker"><div id="memberList"></div><div class="muted" id="selectedCount" style="margin-top:7px"></div></div>
 </div>
 <div class="step">
-  <div class="step-label">7. タグ</div>
-  <div id="quickTags" class="quick-tags"></div>
-
-  <div class="custom-tag-maker">
-    <input
-      id="customTagInput"
-      class="input"
-      type="text"
-      maxlength="24"
-      placeholder="新しいタグを追加"
-    >
-    <button type="button" class="custom-tag-add" onclick="addCustomTag()">追加</button>
-  </div>
-
-  <div id="selectedTagPreview" class="selected-tag-preview"></div>
-  <div class="custom-tag-note">最大8個 / 1タグ24文字まで</div>
+<div class="step-label">7. タグ</div>
+<div class="quick-tags" id="quickTags"></div>
+<div class="custom-tag-maker">
+<input class="input" id="customTagInput" maxlength="24" placeholder="新しいタグを追加" type="text"/>
+<button class="custom-tag-add" onclick="addCustomTag()" type="button">追加</button>
 </div>
-<div class="step"><div class="step-label">8. ひとこと</div><textarea id="eventNote" class="textarea" placeholder="例：集合場所は参加後にコメントで共有します"></textarea></div>
+<div class="selected-tag-preview" id="selectedTagPreview"></div>
+<div class="custom-tag-note">最大8個 / 1タグ24文字まで</div>
+</div>
+<div class="step"><div class="step-label">8. ひとこと</div><textarea class="textarea" id="eventNote" placeholder="例：集合場所は参加後にコメントで共有します"></textarea></div>
 <button class="submit" type="submit">プランを作成する</button>
 </form>
 </div>
 </div>
-
 <!-- planner -->
-<div id="plannerModal" class="modal" onclick="backdropClose(event,'plannerModal')">
+<div class="modal" id="plannerModal" onclick="backdropClose(event,'plannerModal')">
 <div class="sheet">
 <div class="handle"></div>
 <div class="sheet-head"><div><div class="sheet-title">条件からプランを作る</div><div class="sheet-sub">幹事が考える会場・予算・流れを簡単に組み立てます。</div></div><button class="close-btn" onclick="closeModal('plannerModal')">×</button></div>
 <form id="plannerForm">
-<div class="step"><div class="field"><label class="label">やりたいこと</label><input id="planActivity" class="input" placeholder="例：BBQ、麻雀、カフェ巡り" required></div></div>
-<div class="step"><div class="split"><div class="field"><label class="label">人数</label><select id="planPeople" class="select"><option>4</option><option>6</option><option selected>8</option><option>10</option></select></div><div class="field"><label class="label">予算/人</label><select id="planBudget" class="select"><option value="2000">2,000円</option><option value="3000">3,000円</option><option value="4000" selected>4,000円</option><option value="5000">5,000円</option><option value="7000">7,000円</option></select></div></div></div>
-<div class="step"><div class="field"><label class="label">エリア</label><input id="planArea" class="input" placeholder="例：渋谷、新宿から30分以内" required></div><div class="field" style="margin-top:9px"><label class="label">優先したいこと</label><select id="planPriority" class="select"><option>アクセス</option><option>安さ</option><option>雰囲気</option><option>手軽さ</option><option>予約しやすさ</option></select></div></div>
+<div class="step"><div class="field"><label class="label">やりたいこと</label><input class="input" id="planActivity" placeholder="例：BBQ、麻雀、カフェ巡り" required=""/></div></div>
+<div class="step"><div class="split"><div class="field"><label class="label">人数</label><select class="select" id="planPeople"><option>4</option><option>6</option><option selected="">8</option><option>10</option></select></div><div class="field"><label class="label">予算/人</label><select class="select" id="planBudget"><option value="2000">2,000円</option><option value="3000">3,000円</option><option selected="" value="4000">4,000円</option><option value="5000">5,000円</option><option value="7000">7,000円</option></select></div></div></div>
+<div class="step"><div class="field"><label class="label">エリア</label><input class="input" id="planArea" placeholder="例：渋谷、新宿から30分以内" required=""/></div><div class="field" style="margin-top:9px"><label class="label">優先したいこと</label><select class="select" id="planPriority"><option>アクセス</option><option>安さ</option><option>雰囲気</option><option>手軽さ</option><option>予約しやすさ</option></select></div></div>
 <button class="submit" type="submit">3つのプランを作る</button>
 </form>
-<div id="planResults" class="plan-list"></div>
+<div class="plan-list" id="planResults"></div>
 <div class="muted" style="margin-top:10px;line-height:1.5">※ この試作版では候補をルールベースで生成しています。本番では実在店舗・会場検索とAI接続を想定しています。</div>
 </div>
 </div>
-
 <!-- event detail -->
-<div id="eventModal" class="modal" onclick="backdropClose(event,'eventModal')">
+<div class="modal" id="eventModal" onclick="backdropClose(event,'eventModal')">
 <div class="sheet">
 <div class="handle"></div>
-<div class="sheet-head"><div><div id="detailTitle" class="sheet-title"></div><div id="detailSub" class="sheet-sub"></div></div><button class="close-btn" onclick="closeModal('eventModal')">×</button></div>
-<div id="detailCover" class="event-detail-cover"></div>
-<div id="detailMeta" class="panel" style="padding:12px;margin-top:10px"></div>
+<div class="sheet-head"><div><div class="sheet-title" id="detailTitle"></div><div class="sheet-sub" id="detailSub"></div></div><button class="close-btn" onclick="closeModal('eventModal')">×</button></div>
+<div class="event-detail-cover" id="detailCover"></div>
+<div class="panel" id="detailMeta" style="padding:12px;margin-top:10px"></div>
 <div class="detail-tabs"><button class="detail-tab active" data-detailtab="comments" onclick="switchDetailTab('comments')">コメント</button><button class="detail-tab" data-detailtab="participants" onclick="switchDetailTab('participants')">参加者</button></div>
-<div id="comments" class="detail-panel active">
-  <div id="commentList" class="comment-list"></div>
-  <form id="commentForm" class="input-row comment-compose-row" style="margin-top:10px"><textarea id="commentInput" rows="3" maxlength="1000" placeholder="コメントを入力"></textarea><button class="send-btn" type="submit">送信</button></form>
+<div class="detail-panel active" id="comments">
+<div class="comment-list" id="commentList"></div>
+<form class="input-row comment-compose-row" id="commentForm" style="margin-top:10px"><textarea id="commentInput" maxlength="1000" placeholder="コメントを入力" rows="3"></textarea><button class="send-btn" type="submit">送信</button></form>
 </div>
-<div id="participants" class="detail-panel"><div id="participantList" class="list"></div></div>
+<div class="detail-panel" id="participants"><div class="list" id="participantList"></div></div>
 </div>
 </div>
-
 <!-- profile edit -->
-<div id="profileEditModal" class="modal" onclick="backdropClose(event,'profileEditModal')">
+<div class="modal" id="profileEditModal" onclick="backdropClose(event,'profileEditModal')">
 <div class="sheet">
 <div class="handle"></div>
 <div class="sheet-head"><div><div class="sheet-title">プロフィール編集</div></div><button class="close-btn" onclick="closeModal('profileEditModal')">×</button></div>
 <form id="profileEditForm">
-<div class="step"><div class="field"><label class="label">名前</label><input id="editName" class="input" required></div><div class="field" style="margin-top:8px"><label class="label">@ユーザー名</label><input id="editHandle" class="input" required></div></div>
-<div class="step"><div class="field"><label class="label">自己紹介</label><textarea id="editBio" class="textarea"></textarea></div><div class="field" style="margin-top:8px"><label class="label">活動エリア</label><input id="editArea" class="input"></div></div>
+<div class="step"><div class="field"><label class="label">名前</label><input class="input" id="editName" required=""/></div><div class="field" style="margin-top:8px"><label class="label">@ユーザー名</label><input class="input" id="editHandle" required=""/></div></div>
+<div class="step"><div class="field"><label class="label">自己紹介</label><textarea class="textarea" id="editBio"></textarea></div><div class="field" style="margin-top:8px"><label class="label">活動エリア</label><input class="input" id="editArea"/></div></div>
 <div class="step">
-  <div class="step-label">プロフィール画像</div>
-  <div class="profile-avatar-edit-preview">
-    <img id="profileImagePreview" style="display:none" alt="プロフィール画像プレビュー">
-    <div id="profileImagePlaceholder" class="profile-image-placeholder">PROFILE</div>
-  </div>
-  <div class="upload-row profile-media-actions">
-    <button type="button" class="upload-btn" onclick="$('profileImageInput').click()">写真を選ぶ・切り抜く</button>
-    <button type="button" class="upload-btn" onclick="clearProfileImage()">画像を外す</button>
-  </div>
-  <input id="profileImageInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+<div class="step-label">プロフィール画像</div>
+<div class="profile-avatar-edit-preview">
+<img alt="プロフィール画像プレビュー" id="profileImagePreview" style="display:none"/>
+<div class="profile-image-placeholder" id="profileImagePlaceholder">PROFILE</div>
 </div>
-
+<div class="upload-row profile-media-actions">
+<button class="upload-btn" onclick="$('profileImageInput').click()" type="button">写真を選ぶ・切り抜く</button>
+<button class="upload-btn" onclick="clearProfileImage()" type="button">画像を外す</button>
+</div>
+<input accept="image/jpeg,image/png,image/webp" hidden="" id="profileImageInput" type="file"/>
+</div>
 <div class="step">
-  <div class="step-label">プロフィールバナー</div>
-  <div class="profile-banner-edit">
-    <img id="profileBannerPreview" class="profile-banner-preview" style="display:none" alt="プロフィールバナー">
-    <div id="profileBannerPlaceholder" class="profile-banner-placeholder">BANNER</div>
-  </div>
-  <div class="upload-row profile-media-actions">
-    <button type="button" class="upload-btn" onclick="$('profileBannerInput').click()">バナーを選ぶ・切り抜く</button>
-    <button type="button" class="upload-btn" onclick="clearProfileBanner()">画像を外す</button>
-  </div>
-  <input id="profileBannerInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
-  <div class="muted" style="margin-top:6px">JPEG・PNG・WebP / 5MBまで</div>
+<div class="step-label">プロフィールバナー</div>
+<div class="profile-banner-edit">
+<img alt="プロフィールバナー" class="profile-banner-preview" id="profileBannerPreview" style="display:none"/>
+<div class="profile-banner-placeholder" id="profileBannerPlaceholder">BANNER</div>
+</div>
+<div class="upload-row profile-media-actions">
+<button class="upload-btn" onclick="$('profileBannerInput').click()" type="button">バナーを選ぶ・切り抜く</button>
+<button class="upload-btn" onclick="clearProfileBanner()" type="button">画像を外す</button>
+</div>
+<input accept="image/jpeg,image/png,image/webp" hidden="" id="profileBannerInput" type="file"/>
+<div class="muted" style="margin-top:6px">JPEG・PNG・WebP / 5MBまで</div>
 </div>
 <button class="submit" id="profileSaveButton">保存する</button>
-<div id="profileSaveStatus" class="profile-save-status" aria-live="polite"></div>
+<div aria-live="polite" class="profile-save-status" id="profileSaveStatus"></div>
 </form>
 </div>
 </div>
-
 <!-- profile media crop editor -->
-<div id="profileCropModal" class="modal profile-crop-modal" onclick="backdropClose(event,'profileCropModal')">
-  <div class="sheet profile-crop-sheet">
-    <div class="handle"></div>
-    <div class="sheet-head">
-      <div>
-        <div id="cropEditorTitle" class="sheet-title">画像の位置を調整</div>
-        <div class="sheet-sub">実際に表示される範囲を確認して調整できます。</div>
-      </div>
-      <button class="close-btn" type="button" onclick="cancelProfileCrop()">×</button>
-    </div>
-
-    <div class="crop-editor-stage-wrap">
-      <div id="cropViewport" class="crop-viewport crop-avatar">
-        <img id="cropEditorImage" alt="切り抜きプレビュー">
-        <div id="cropSelectionFrame" class="crop-selection-frame crop-selection-avatar"></div>
-      </div>
-    </div>
-
-    <div class="crop-gesture-tip">
-      <span>枠をドラッグして位置調整</span>
-      <span>2本指で枠を拡大・縮小</span>
-    </div>
-
-    <div class="crop-help"><strong>写真全体を見ながら、使いたい部分に枠を合わせます。</strong><br>丸・長方形の枠の中が実際に保存されます。</div>
-
-    <div class="crop-actions">
-      <button type="button" class="upload-btn" onclick="cancelProfileCrop()">選び直す</button>
-      <button type="button" class="submit crop-apply-btn" onclick="applyProfileCrop()">この位置で決定</button>
-    </div>
-  </div>
+<div class="modal profile-crop-modal" id="profileCropModal" onclick="backdropClose(event,'profileCropModal')">
+<div class="sheet profile-crop-sheet">
+<div class="handle"></div>
+<div class="sheet-head">
+<div>
+<div class="sheet-title" id="cropEditorTitle">画像の位置を調整</div>
+<div class="sheet-sub">実際に表示される範囲を確認して調整できます。</div>
 </div>
-
+<button class="close-btn" onclick="cancelProfileCrop()" type="button">×</button>
+</div>
+<div class="crop-editor-stage-wrap">
+<div class="crop-viewport crop-avatar" id="cropViewport">
+<img alt="切り抜きプレビュー" id="cropEditorImage"/>
+<div class="crop-selection-frame crop-selection-avatar" id="cropSelectionFrame"></div>
+</div>
+</div>
+<div class="crop-gesture-tip">
+<span>枠をドラッグして位置調整</span>
+<span>2本指で枠を拡大・縮小</span>
+</div>
+<div class="crop-help"><strong>写真全体を見ながら、使いたい部分に枠を合わせます。</strong><br/>丸・長方形の枠の中が実際に保存されます。</div>
+<div class="crop-actions">
+<button class="upload-btn" onclick="cancelProfileCrop()" type="button">選び直す</button>
+<button class="submit crop-apply-btn" onclick="applyProfileCrop()" type="button">この位置で決定</button>
+</div>
+</div>
+</div>
 <!-- want -->
-<div id="wantModal" class="modal" onclick="backdropClose(event,'wantModal')">
+<div class="modal" id="wantModal" onclick="backdropClose(event,'wantModal')">
 <div class="sheet"><div class="handle"></div><div class="sheet-head"><div><div class="sheet-title">やりたいことを追加</div></div><button class="close-btn" onclick="closeModal('wantModal')">×</button></div>
-<form id="wantForm"><div class="field"><input id="wantName" class="input" placeholder="例：古着巡り、映画、陶芸" required></div><button class="submit">追加する</button></form></div>
+<form id="wantForm"><div class="field"><input class="input" id="wantName" placeholder="例：古着巡り、映画、陶芸" required=""/></div><button class="submit">追加する</button></form></div>
 </div>
-
 <!-- mutual -->
-<div id="mutualModal" class="modal" onclick="backdropClose(event,'mutualModal')">
-<div class="sheet"><div class="handle"></div><div class="sheet-head"><div><div class="sheet-title">友だち</div></div><button class="close-btn" onclick="closeModal('mutualModal')">×</button></div><div id="mutualList" class="list"></div></div>
+<div class="modal" id="mutualModal" onclick="backdropClose(event,'mutualModal')">
+<div class="sheet"><div class="handle"></div><div class="sheet-head"><div><div class="sheet-title">友だち</div></div><button class="close-btn" onclick="closeModal('mutualModal')">×</button></div><div class="list" id="mutualList"></div></div>
 </div>
-
 <!-- fun -->
-<div id="funModal" class="modal" onclick="backdropClose(event,'funModal')">
-<div class="sheet"><div class="handle"></div><div class="sheet-head"><div><div class="sheet-title">楽しかった！を送る</div><div class="sheet-sub">同じ集まりに参加した人に1回ずつ送れます。</div></div><button class="close-btn" onclick="closeModal('funModal')">×</button></div><div id="funPeopleList" class="list"></div></div>
+<div class="modal" id="funModal" onclick="backdropClose(event,'funModal')">
+<div class="sheet"><div class="handle"></div><div class="sheet-head"><div><div class="sheet-title">楽しかった！を送る</div><div class="sheet-sub">同じ集まりに参加した人に1回ずつ送れます。</div></div><button class="close-btn" onclick="closeModal('funModal')">×</button></div><div class="list" id="funPeopleList"></div></div>
 </div>
-
-
 <!-- real account menu -->
-<div id="accountModal" class="modal" onclick="backdropClose(event,'accountModal')">
+<div class="modal" id="accountModal" onclick="backdropClose(event,'accountModal')">
 <div class="sheet">
 <div class="handle"></div>
 <div class="sheet-head">
-  <div>
-    <div class="sheet-title">アカウント</div>
-    <div class="sheet-sub">Supabaseでログイン中のアカウントです。</div>
-  </div>
-  <button class="close-btn" onclick="closeModal('accountModal')">×</button>
+<div>
+<div class="sheet-title">アカウント</div>
+<div class="sheet-sub">Supabaseでログイン中のアカウントです。</div>
 </div>
-<div id="accountList" class="list" style="margin-top:12px"></div>
-<button type="button" class="submit auth-logout-btn" onclick="logoutSupabase()">ログアウト</button>
+<button class="close-btn" onclick="closeModal('accountModal')">×</button>
+</div>
+<div class="list" id="accountList" style="margin-top:12px"></div>
+<button class="submit auth-logout-btn" onclick="logoutSupabase()" type="button">ログアウト</button>
 </div>
 </div>
-
 <!-- authentication gate -->
-<div id="authGate" class="auth-gate hidden">
-  <div class="auth-card">
-    <div class="auth-brand">
-      <div class="auth-tk">TK<span></span></div>
-      <div>
-        <div class="auth-brand-name">TK MY GATHERS</div>
-        <div class="auth-brand-copy">やりたいことから、集まる。</div>
-      </div>
-    </div>
-
-    <div class="auth-lead">
-      <strong>東京で、気の合う仲間と。</strong>
-      <span>ログインして募集を見つけたり、やりたいことを募集できます。</span>
-    </div>
-
-    <div class="auth-tabs">
-      <button type="button" id="loginTab" class="active" onclick="switchAuthMode('login')">ログイン</button>
-      <button type="button" id="signupTab" onclick="switchAuthMode('signup')">新規登録</button>
-    </div>
-
-    <form id="loginForm" class="auth-form">
-      <label>メールアドレス</label>
-      <input id="loginEmail" type="email" autocomplete="email" required placeholder="you@example.com">
-      <label>パスワード</label>
-      <input id="loginPassword" type="password" autocomplete="current-password" required minlength="6" placeholder="パスワード">
-      <button type="submit" class="auth-main-btn">ログイン</button>
-    </form>
-
-    <form id="signupForm" class="auth-form" hidden aria-hidden="true">
-      <label>表示名</label>
-      <input id="signupName" required maxlength="30" placeholder="例：しゅうぞう">
-      <label>メールアドレス</label>
-      <input id="signupEmail" type="email" autocomplete="email" required placeholder="you@example.com">
-      <label>パスワード</label>
-      <input id="signupPassword" type="password" autocomplete="new-password" required minlength="8" placeholder="8文字以上">
-      <button type="submit" class="auth-main-btn">アカウントを作成</button>
-      <p class="auth-note">登録後、確認メールのリンクを押すとログインできるようになります。</p>
-    </form>
-
-    <div id="authMessage" class="auth-message"></div>
-    <button type="button" class="auth-guest-back" onclick="closeGuestAuth()">ログインせず見る</button>
-  </div>
+<div class="auth-gate hidden" id="authGate">
+<div class="auth-card">
+<div class="auth-brand">
+<div class="auth-tk">TK<span></span></div>
+<div>
+<div class="auth-brand-name">TK MY GATHERS</div>
+<div class="auth-brand-copy">やりたいことから、集まる。</div>
 </div>
-
-
-<div id="newMessageModal" class="modal" onclick="backdropClose(event,'newMessageModal')">
-  <div class="modal-sheet">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title">新しいメッセージ</div>
-        <div class="muted">送りたい相手を選択</div>
-      </div>
-      <button class="close-btn" onclick="closeModal('newMessageModal')">×</button>
-    </div>
-    <div class="modal-body">
-      <input id="dmUserSearch" class="dm-picker-search" type="search" placeholder="名前・ユーザー名で検索">
-      <div id="dmUserList" class="dm-picker-list"></div>
-    </div>
-  </div>
 </div>
-
-
-<div id="otherProfileModal" class="modal" onclick="backdropClose(event,'otherProfileModal')">
-  <div class="sheet">
-    <div class="handle"></div>
-    <div class="sheet-head">
-      <div>
-        <div class="sheet-title">プロフィール</div>
-        <div class="sheet-sub">ユーザー情報</div>
-      </div>
-      <button class="close-btn" onclick="closeModal('otherProfileModal')">×</button>
-    </div>
-    <div id="otherProfileContent" class="other-profile-card"></div>
-  </div>
+<div class="auth-lead">
+<strong>東京で、気の合う仲間と。</strong>
+<span>ログインして募集を見つけたり、やりたいことを募集できます。</span>
 </div>
-
-<div id="followListModal" class="modal" onclick="backdropClose(event,'followListModal')">
-  <div class="sheet">
-    <div class="handle"></div>
-    <div class="sheet-head">
-      <div>
-        <div id="followListTitle" class="sheet-title">フォロー</div>
-        <div id="followListSub" class="sheet-sub"></div>
-      </div>
-      <button class="close-btn" onclick="closeModal('followListModal')">×</button>
-    </div>
-    <div id="followListBody" class="follow-list"></div>
-  </div>
+<div class="auth-tabs">
+<button class="active" id="loginTab" onclick="switchAuthMode('login')" type="button">ログイン</button>
+<button id="signupTab" onclick="switchAuthMode('signup')" type="button">新規登録</button>
 </div>
-
-
-<div id="notificationModal" class="modal" onclick="backdropClose(event,'notificationModal')">
-  <div class="sheet">
-    <div class="handle"></div>
-    <div class="sheet-head">
-      <div>
-        <div class="sheet-title">通知</div>
-        <div class="sheet-sub">あなたへのお知らせ</div>
-      </div>
-      <button class="close-btn" onclick="closeModal('notificationModal')">×</button>
-    </div>
-    <div class="notification-toolbar">
-      <button class="notification-read-all" onclick="markAllNotificationsRead()">すべて既読</button>
-    </div>
-    <div id="notificationList" class="notification-list"></div>
-  </div>
+<form class="auth-form" id="loginForm">
+<label>メールアドレス</label>
+<input autocomplete="email" id="loginEmail" placeholder="you@example.com" required="" type="email"/>
+<label>パスワード</label>
+<input autocomplete="current-password" id="loginPassword" minlength="6" placeholder="パスワード" required="" type="password"/>
+<button class="auth-main-btn" type="submit">ログイン</button>
+</form>
+<form aria-hidden="true" class="auth-form" hidden="" id="signupForm">
+<label>表示名</label>
+<input id="signupName" maxlength="30" placeholder="例：しゅうぞう" required=""/>
+<label>メールアドレス</label>
+<input autocomplete="email" id="signupEmail" placeholder="you@example.com" required="" type="email"/>
+<label>パスワード</label>
+<input autocomplete="new-password" id="signupPassword" minlength="8" placeholder="8文字以上" required="" type="password"/>
+<button class="auth-main-btn" type="submit">アカウントを作成</button>
+<p class="auth-note">登録後、確認メールのリンクを押すとログインできるようになります。</p>
+</form>
+<div class="auth-message" id="authMessage"></div>
+<button class="auth-guest-back" onclick="closeGuestAuth()" type="button">ログインせず見る</button>
 </div>
-
-
-<div id="quickActionModal" class="modal" onclick="backdropClose(event,'quickActionModal')">
-  <div class="sheet quick-action-sheet">
-    <div class="handle"></div>
-    <div class="sheet-head">
-      <div>
-        <div class="sheet-title">今、なにしたい？</div>
-        <div class="sheet-sub">気分から募集を始める</div>
-      </div>
-      <button class="close-btn" onclick="closeModal('quickActionModal')">×</button>
-    </div>
-
-    <div class="quick-action-grid">
-      <button onclick="startQuickCreate('食事・飲み','飲み会')">
-        <span class="quick-action-icon">DR</span>
-        <b>飲みたい</b>
-        <small>軽く一杯から</small>
-      </button>
-
-      <button onclick="startQuickCreate('おでかけ','街歩き')">
-        <span class="quick-action-icon">WK</span>
-        <b>外に出たい</b>
-        <small>散歩や街歩きから</small>
-      </button>
-
-      <button onclick="startQuickCreate('スポーツ','キャッチボール')">
-        <span class="quick-action-icon">SP</span>
-        <b>軽く運動</b>
-        <small>気分転換したい</small>
-      </button>
-
-      <button onclick="startQuickCreate('食事・飲み','カフェ')">
-        <span class="quick-action-icon">CF</span>
-        <b>カフェ</b>
-        <small>誰かとゆっくり</small>
-      </button>
-
-      <button onclick="startQuickCreate('おでかけ','BBQ')">
-        <span class="quick-action-icon">BQ</span>
-        <b>BBQ</b>
-        <small>人数を集めたい</small>
-      </button>
-
-      <button onclick="startQuickCreate('その他・オリジナル','')">
-        <span class="quick-action-icon">TK</span>
-        <b>オリジナル</b>
-        <small>自由な募集をつくる</small>
-      </button>
-    </div>
-
-    <button class="quick-action-custom" onclick="openFullCreateFromQuick()">
+</div>
+<div class="modal" id="newMessageModal" onclick="backdropClose(event,'newMessageModal')">
+<div class="modal-sheet">
+<div class="modal-head">
+<div>
+<div class="modal-title">新しいメッセージ</div>
+<div class="muted">送りたい相手を選択</div>
+</div>
+<button class="close-btn" onclick="closeModal('newMessageModal')">×</button>
+</div>
+<div class="modal-body">
+<input class="dm-picker-search" id="dmUserSearch" placeholder="名前・ユーザー名で検索" type="search"/>
+<div class="dm-picker-list" id="dmUserList"></div>
+</div>
+</div>
+</div>
+<div class="modal" id="otherProfileModal" onclick="backdropClose(event,'otherProfileModal')">
+<div class="sheet">
+<div class="handle"></div>
+<div class="sheet-head">
+<div>
+<div class="sheet-title">プロフィール</div>
+<div class="sheet-sub">ユーザー情報</div>
+</div>
+<button class="close-btn" onclick="closeModal('otherProfileModal')">×</button>
+</div>
+<div class="other-profile-card" id="otherProfileContent"></div>
+</div>
+</div>
+<div class="modal" id="followListModal" onclick="backdropClose(event,'followListModal')">
+<div class="sheet">
+<div class="handle"></div>
+<div class="sheet-head">
+<div>
+<div class="sheet-title" id="followListTitle">フォロー</div>
+<div class="sheet-sub" id="followListSub"></div>
+</div>
+<button class="close-btn" onclick="closeModal('followListModal')">×</button>
+</div>
+<div class="follow-list" id="followListBody"></div>
+</div>
+</div>
+<div class="modal" id="notificationModal" onclick="backdropClose(event,'notificationModal')">
+<div class="sheet">
+<div class="handle"></div>
+<div class="sheet-head">
+<div>
+<div class="sheet-title">通知</div>
+<div class="sheet-sub">あなたへのお知らせ</div>
+</div>
+<button class="close-btn" onclick="closeModal('notificationModal')">×</button>
+</div>
+<div class="notification-toolbar">
+<button class="notification-read-all" onclick="markAllNotificationsRead()">すべて既読</button>
+</div>
+<div class="notification-list" id="notificationList"></div>
+</div>
+</div>
+<div class="modal" id="quickActionModal" onclick="backdropClose(event,'quickActionModal')">
+<div class="sheet quick-action-sheet">
+<div class="handle"></div>
+<div class="sheet-head">
+<div>
+<div class="sheet-title">今、なにしたい？</div>
+<div class="sheet-sub">気分から募集を始める</div>
+</div>
+<button class="close-btn" onclick="closeModal('quickActionModal')">×</button>
+</div>
+<div class="quick-action-grid">
+<button onclick="startQuickCreate('食事・飲み','飲み会')">
+<span class="quick-action-icon">DR</span>
+<b>飲みたい</b>
+<small>軽く一杯から</small>
+</button>
+<button onclick="startQuickCreate('おでかけ','街歩き')">
+<span class="quick-action-icon">WK</span>
+<b>外に出たい</b>
+<small>散歩や街歩きから</small>
+</button>
+<button onclick="startQuickCreate('スポーツ','キャッチボール')">
+<span class="quick-action-icon">SP</span>
+<b>軽く運動</b>
+<small>気分転換したい</small>
+</button>
+<button onclick="startQuickCreate('食事・飲み','カフェ')">
+<span class="quick-action-icon">CF</span>
+<b>カフェ</b>
+<small>誰かとゆっくり</small>
+</button>
+<button onclick="startQuickCreate('おでかけ','BBQ')">
+<span class="quick-action-icon">BQ</span>
+<b>BBQ</b>
+<small>人数を集めたい</small>
+</button>
+<button onclick="startQuickCreate('その他・オリジナル','')">
+<span class="quick-action-icon">TK</span>
+<b>オリジナル</b>
+<small>自由な募集をつくる</small>
+</button>
+</div>
+<button class="quick-action-custom" onclick="openFullCreateFromQuick()">
       自分で募集内容を決める
     </button>
-  </div>
 </div>
-
-
-
-
-<div id="cardDetailModal" class="modal" onclick="backdropClose(event,'cardDetailModal')">
-  <div class="sheet v23-5-1-detail-sheet">
-    <div class="sheet-head v23-5-1-detail-head">
-      <div>
-        <div class="sheet-title">募集詳細</div>
-        <div class="sheet-sub">内容を確認する</div>
-      </div>
-      <button type="button" class="close-btn" onclick="closeModal('cardDetailModal')">×</button>
-    </div>
-    <div id="cardDetailContent"></div>
-  </div>
 </div>
-
-<div id="toast" class="toast"></div>
-
+<div class="modal" id="cardDetailModal" onclick="backdropClose(event,'cardDetailModal')">
+<div class="sheet v23-5-1-detail-sheet">
+<div class="sheet-head v23-5-1-detail-head">
+<div>
+<div class="sheet-title">募集詳細</div>
+<div class="sheet-sub">内容を確認する</div>
+</div>
+<button class="close-btn" onclick="closeModal('cardDetailModal')" type="button">×</button>
+</div>
+<div id="cardDetailContent"></div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v25_0_6_mahjong_deemphasis";
+const KEY="tk_my_gathers_v25_0_7_real_banner_images";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
