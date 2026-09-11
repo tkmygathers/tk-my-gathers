@@ -6428,6 +6428,250 @@ html,body{
   }
 }
 
+
+/* =========================================================
+   V24.4.13 — COMPACT EVENT CARD
+   Photo and right-side info share exactly the same height.
+   ========================================================= */
+
+.compact-event-card{
+  overflow:hidden !important;
+  border:1px solid var(--tk-line,#E4E8EE) !important;
+  border-radius:16px !important;
+  background:#fff !important;
+  box-shadow:none !important;
+}
+
+.compact-event-main{
+  display:grid !important;
+  grid-template-columns:42% 58% !important;
+  height:156px !important;
+  min-height:156px !important;
+  max-height:156px !important;
+  overflow:hidden !important;
+}
+
+.compact-event-image{
+  position:relative;
+  width:100%;
+  height:156px;
+  min-width:0;
+  padding:0;
+  border:0;
+  background:#EEF2F6;
+  overflow:hidden;
+}
+
+.compact-event-image img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+
+.compact-event-category,
+.compact-event-urgency{
+  position:absolute;
+  z-index:2;
+  top:8px;
+  min-height:23px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 7px;
+  border-radius:999px;
+  font-size:6.8px;
+  font-weight:850;
+  white-space:nowrap;
+}
+
+.compact-event-category{
+  left:8px;
+  max-width:calc(100% - 16px);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  background:rgba(255,255,255,.92);
+  color:#344054;
+}
+
+.compact-event-urgency{
+  left:8px;
+  top:auto;
+  bottom:8px;
+  background:#FFF7DB;
+  color:#7A5B0A;
+  border:1px solid #E6CF86;
+}
+
+.compact-event-info{
+  min-width:0;
+  height:156px;
+  padding:10px 11px 9px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+
+.compact-event-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  min-width:0;
+}
+
+.compact-event-host{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:0;
+  border:0;
+  background:transparent;
+  text-align:left;
+}
+
+.compact-event-host .mini-avatar{
+  width:25px;
+  height:25px;
+  flex:0 0 25px;
+}
+
+.compact-event-host-copy{
+  min-width:0;
+  display:grid;
+}
+
+.compact-event-host-copy b{
+  overflow:hidden;
+  color:#273039;
+  font-size:8px;
+  font-weight:850;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.compact-event-host-copy small{
+  margin-top:1px;
+  color:#98A2B3;
+  font-size:6.5px;
+}
+
+.compact-event-top .visibility-badge{
+  flex:0 1 auto;
+  min-width:0;
+  max-width:88px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.compact-event-title{
+  width:100%;
+  min-width:0;
+  margin-top:7px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#16181D;
+  text-align:left;
+  font-size:12px;
+  line-height:1.28;
+  font-weight:900;
+  letter-spacing:-.015em;
+
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+.compact-event-meta{
+  min-width:0;
+  display:grid;
+  gap:3px;
+  margin-top:7px;
+  color:#667085;
+  font-size:7.5px;
+  font-weight:700;
+}
+
+.compact-event-meta span{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.compact-event-bottom-info{
+  min-width:0;
+  margin-top:auto;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:4px;
+}
+
+.compact-event-bottom-info > span{
+  min-height:21px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 6px;
+  border-radius:999px;
+  background:#F5F7FA;
+  color:#667085;
+  font-size:6.8px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.compact-event-bottom-info .compact-event-one-more{
+  background:#FFF7DB;
+  color:#7A5B0A;
+}
+
+.compact-event-actions{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:7px !important;
+  padding:9px 10px 10px !important;
+  border-top:1px solid #EEF1F4 !important;
+  background:#fff !important;
+}
+
+.compact-event-actions .v22-action-button{
+  min-width:0 !important;
+  min-height:38px !important;
+  padding:7px 5px !important;
+  font-size:8px !important;
+  white-space:normal !important;
+  line-height:1.1 !important;
+}
+
+@media(max-width:360px){
+  .compact-event-main{
+    grid-template-columns:41% 59% !important;
+    height:146px !important;
+    min-height:146px !important;
+    max-height:146px !important;
+  }
+
+  .compact-event-image,
+  .compact-event-info{
+    height:146px !important;
+  }
+
+  .compact-event-info{
+    padding:8px 9px;
+  }
+
+  .compact-event-title{
+    font-size:11px;
+  }
+
+  .compact-event-top .visibility-badge{
+    max-width:75px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -7098,7 +7342,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_11_home_action_button_fix";
+const KEY="tk_my_gathers_v24_4_13_compact_event_cards";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -7753,6 +7997,30 @@ function setDbStatus(text){
   if(!el)return;
   el.innerHTML=text?`<span class="db-dot"></span><span>${esc(text)}</span>`:"";
 }
+
+async function fetchVisibleEventMemberCounts(eventIds){
+  const ids=(eventIds||[]).filter(Boolean);
+  if(!ids.length)return {};
+
+  try{
+    const {data,error}=await sb.rpc("get_visible_event_member_counts",{
+      p_event_ids:ids
+    });
+
+    if(error)throw error;
+
+    const counts={};
+    (data||[]).forEach(row=>{
+      counts[row.event_id]=Number(row.member_count||0);
+    });
+    return counts;
+
+  }catch(error){
+    console.warn("member count RPC unavailable:",error);
+    return {};
+  }
+}
+
 async function loadEventsFromSupabase(){
   setDbStatus("募集データを読み込んでいます…");
 
@@ -7833,6 +8101,7 @@ async function loadEventsFromSupabase(){
     let savedSet=new Set();
     let joinedSet=new Set();
     let membershipCounts={};
+    let authoritativeMemberCounts={};
 
     if(currentAuthUser && eventIds.length){
       const [
@@ -7864,6 +8133,12 @@ async function loadEventsFromSupabase(){
       });
     }
 
+    // RLSでevent_members全件が見えなくても、表示可能な募集について
+    // Supabase側の安全な集計RPCから正確な参加人数を取得する。
+    if(eventIds.length){
+      authoritativeMemberCounts=await fetchVisibleEventMemberCounts(eventIds);
+    }
+
     if(rows.length){
       const remote=rows.map(row=>{
         row.profiles=profileMap[row.owner_id]||null;
@@ -7877,10 +8152,15 @@ async function loadEventsFromSupabase(){
         ev.saved=savedSet.has(row.id);
         ev.joined=isMine || joinedSet.has(row.id);
 
-        const visibleCount=membershipCounts[row.id]||0;
+        const rpcCount=authoritativeMemberCounts[row.id];
+        const fallbackCount=membershipCounts[row.id]||0;
+        const visibleCount=Number.isFinite(rpcCount)?rpcCount:fallbackCount;
+
+        // 主催者を含むjoinedメンバー数をそのまま表示。
+        // 旧データで主催者membershipが無い場合だけ最低1人に補正。
         ev.people=Math.max(1,visibleCount);
 
-        if(ev.joined && !isMine){
+        if(ev.joined && !isMine && !Number.isFinite(rpcCount)){
           ev.people=Math.max(2,ev.people);
         }
 
@@ -8176,75 +8456,58 @@ function eventCard(e){
   const arg=eventIdArg(e.id);
   const remaining=Math.max(0,e.capacity-e.people);
   const oneMore=remaining===1 && !e.joined;
-  const quickLabel=remaining===1
-    ? `<span class="v22-urgency">あと1人</span>`
-    : e.joined
-      ? `<span class="v22-joined">参加中</span>`
-      : "";
 
-  return `<article class="card v22-event-card v22-2-card">
-    <div class="v22-event-cover" onclick="openCardDetail(${arg})">
-      <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
-      <div class="v22-cover-top">
-        <span class="v22-category">${esc(e.sub||e.category)}</span>
-        ${quickLabel}
-      </div>
-    </div>
+  return `<article class="card compact-event-card">
+    <div class="compact-event-main">
+      <button class="compact-event-image" onclick="openCardDetail(${arg})">
+        <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
+        <span class="compact-event-category">${esc(e.sub||e.category)}</span>
+        ${oneMore?`<span class="compact-event-urgency">あと1人</span>`:""}
+      </button>
 
-    <div class="v22-event-body">
-      <div class="v22-host-row">
-        <div class="v23-4-host-wrap">
-          <div class="v22-host-static" onclick="openOtherProfile('${escjs(e.owner)}')" role="button" tabindex="0">
+      <div class="compact-event-info">
+        <div class="compact-event-top">
+          <button class="compact-event-host" onclick="openOtherProfile('${escjs(e.owner)}')">
             <span class="mini-avatar">${avatarHtml(u)}</span>
-            <span class="v22-host-text">
+            <span class="compact-event-host-copy">
               <b>${esc(u.name)}</b>
               <small>主催</small>
             </span>
-          </div>
-          ${mine ? "" : `<button class="v23-4-contact" onclick="startChat('${escjs(e.owner)}')">主催者に連絡</button>`}
+          </button>
+          ${visibilityBadgeHtml(e.visibilityDb||e.visibility)}
         </div>
-        ${visibilityBadgeHtml(e.visibilityDb||e.visibility)}
-      </div>
 
-      <button class="v22-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
+        <button class="compact-event-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
 
-      ${oneMore?`
-        <div class="one-more-focus">
-          <div class="one-more-focus-main">
-            <span class="one-more-dot"></span>
-            <strong>あと1人で開催</strong>
-          </div>
-          <span class="one-more-focus-sub">参加できる人を募集中</span>
+        <div class="compact-event-meta">
+          <span>${dateLabel(e.date)} ${esc(e.time)}</span>
+          <span>${esc(e.place)}</span>
         </div>
-      `:""}
 
-      <div class="v22-primary-meta">
-        <span>${dateLabel(e.date)} ${esc(e.time)}</span>
-        <span>${esc(e.place)}</span>
+        <div class="compact-event-bottom-info">
+          <span class="${oneMore?"one-more-people":""}">${e.people}/${e.capacity}人</span>
+          ${e.budget?`<span>${esc(e.budget)}</span>`:""}
+          ${oneMore?`<span class="compact-event-one-more">あと1人で開催</span>`:""}
+        </div>
       </div>
+    </div>
 
-      <div class="v22-info-row">
-        <span class="${oneMore?"one-more-people":""}">${oneMore?`あと1人 · ${e.people}/${e.capacity}人`:`${e.people}/${e.capacity}人`}</span>
-        <span>${esc(e.budget)}</span>
-        ${(e.tags||[]).slice(0,1).map(t=>`<span>${esc(t)}</span>`).join("")}
-      </div>
+    <div class="compact-event-actions">
+      <button class="v22-action-button ${e.saved?"saved":""}" onclick="toggleSave(${arg})">
+        ${e.saved?"保存済み":"保存"}
+      </button>
 
-      <div class="v22-card-actions v23-5-1-actions">
-        <button class="v22-action-button ${e.saved?"saved":""}" onclick="toggleSave(${arg})">
-          ${e.saved?"保存済み":"保存"}
-        </button>
+      <button class="v22-action-button" onclick="openCardDetail(${arg})">
+        詳細
+      </button>
 
-        <button class="v22-action-button" onclick="openCardDetail(${arg})">
-          詳細
-        </button>
-
-        ${mine
-          ? `<button class="v22-action-button danger" onclick="removeEvent(${arg})">削除</button>`
-          : `<button class="v22-action-button primary ${e.joined?"joined":""} ${oneMore?"one-more-join":""}" onclick="toggleJoin(${arg})">${e.joined?"参加中":oneMore?"参加して埋める":"参加する"}</button>`}
-      </div>
+      ${mine
+        ? `<button class="v22-action-button danger" onclick="removeEvent(${arg})">削除</button>`
+        : `<button class="v22-action-button primary ${e.joined?"joined":""}" onclick="toggleJoin(${arg})">${e.joined?"参加中":"参加する"}</button>`}
     </div>
   </article>`
 }
+
 function renderHome(){
   let list=state.events.filter(e=>e.status==="upcoming");
 
@@ -8364,7 +8627,7 @@ function discoverCard(e){
         <button onclick="openCardDetail(${arg})">詳細</button>
         ${mine
           ? `<button class="discover-primary muted-primary" onclick="removeEvent(${arg})">削除</button>`
-          : `<button class="discover-primary ${e.joined?"joined":""} ${oneMore?"one-more-join":""}" onclick="toggleJoin(${arg})">${e.joined?"参加中":oneMore?"参加して埋める":"参加する"}</button>`}
+          : `<button class="discover-primary ${e.joined?"joined":""} ${oneMore?"one-more-join":""}" onclick="toggleJoin(${arg})">${e.joined?"参加中":"参加する"}</button>`}
       </div>
     </div>
   </article>`;
@@ -10592,7 +10855,13 @@ async function toggleSave(id){
         .eq("event_id",eventId)
         .eq("user_id",userId);
 
-      if(error)throw error;
+      if(error){
+        ev.joined=true;
+        ev.people=previousPeople;
+        renderHome();
+        renderDiscover();
+        throw error;
+      }
 
       const fresh=await refreshEventAfterMutation(eventId);
 
@@ -10695,6 +10964,14 @@ async function toggleJoin(id){
 
   try{
     if(ev.joined){
+      const previousPeople=Number(ev.people||1);
+      ev.joined=false;
+      ev.people=Math.max(1,previousPeople-1);
+      renderHome();
+      renderDiscover();
+      renderMyGathers();
+      renderProfile();
+
       const {error}=await sb
         .from("event_members")
         .delete()
@@ -10720,6 +10997,14 @@ async function toggleJoin(id){
         return;
       }
 
+      const previousPeople=Number(ev.people||1);
+      ev.joined=true;
+      ev.people=Math.min(Number(ev.capacity||previousPeople+1),previousPeople+1);
+      renderHome();
+      renderDiscover();
+      renderMyGathers();
+      renderProfile();
+
       const {error}=await sb
         .from("event_members")
         .upsert(
@@ -10735,7 +11020,13 @@ async function toggleJoin(id){
           }
         );
 
-      if(error)throw error;
+      if(error){
+        ev.joined=false;
+        ev.people=previousPeople;
+        renderHome();
+        renderDiscover();
+        throw error;
+      }
 
       const fresh=await refreshEventAfterMutation(eventId);
 
