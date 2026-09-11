@@ -8148,6 +8148,797 @@ html,body{
   line-height:1.5;
 }
 
+
+/* =========================================================
+   V25.0 — HOME = START A GATHER
+   ========================================================= */
+
+.home-v25{
+  padding:4px 0 24px;
+  background:var(--app-bg,#F7F8FA);
+}
+
+.v25-home-hero{
+  position:relative;
+  height:248px;
+  margin:0 13px;
+  overflow:hidden;
+  border-radius:20px;
+  background:#59616A;
+}
+
+.v25-home-hero-art,
+.v25-home-hero-art svg{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+.v25-home-hero-art svg{
+  object-fit:cover;
+}
+
+.v25-home-hero-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,rgba(20,26,33,.58) 0%,rgba(20,26,33,.22) 60%,rgba(20,26,33,.08) 100%);
+}
+
+.v25-home-hero-copy{
+  position:absolute;
+  z-index:2;
+  left:20px;
+  right:18px;
+  top:23px;
+  color:#fff;
+}
+
+.v25-home-hero-copy small{
+  display:block;
+  margin-bottom:18px;
+  font-size:7.5px;
+  font-weight:850;
+  letter-spacing:.16em;
+  opacity:.74;
+}
+
+.v25-home-hero-copy h1{
+  margin:0;
+  font-size:28px;
+  line-height:1.28;
+  letter-spacing:-.035em;
+  font-weight:900;
+}
+
+.v25-home-hero-copy p{
+  margin:14px 0 0;
+  color:rgba(255,255,255,.86);
+  font-size:9px;
+  line-height:1.65;
+  font-weight:650;
+}
+
+.v25-create-block{
+  margin:12px 13px 0;
+}
+
+.v25-create-main{
+  width:100%;
+  min-height:72px;
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr) 18px;
+  align-items:center;
+  gap:10px;
+  padding:13px 14px;
+  border:0;
+  border-radius:16px;
+  background:#2563EB;
+  color:#fff;
+  text-align:left;
+  box-shadow:none;
+}
+
+.v25-create-plus{
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:12px;
+  background:rgba(255,255,255,.15);
+  font-size:24px;
+  line-height:1;
+  font-weight:350;
+}
+
+.v25-create-copy{
+  min-width:0;
+  display:grid;
+  gap:4px;
+}
+
+.v25-create-copy strong{
+  font-size:15px;
+  font-weight:900;
+  letter-spacing:-.01em;
+}
+
+.v25-create-copy small{
+  color:rgba(255,255,255,.76);
+  font-size:8px;
+  font-weight:650;
+}
+
+.v25-create-arrow{
+  font-size:22px;
+  opacity:.82;
+}
+
+.v25-home-shortcuts{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:8px;
+}
+
+.v25-home-shortcuts button{
+  min-width:0;
+  min-height:66px;
+  display:grid;
+  grid-template-columns:35px minmax(0,1fr);
+  align-items:center;
+  gap:9px;
+  padding:10px 11px;
+  border:1px solid #E3E8EF;
+  border-radius:14px;
+  background:#fff;
+  text-align:left;
+}
+
+.v25-shortcut-number{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:#F0F5FF;
+  color:#2563EB;
+  font-size:13px;
+  font-weight:900;
+}
+
+.v25-shortcut-copy{
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+
+.v25-shortcut-copy b{
+  color:#25303B;
+  font-size:9px;
+  font-weight:900;
+}
+
+.v25-shortcut-copy small{
+  overflow:hidden;
+  color:#98A2B3;
+  font-size:6.9px;
+  line-height:1.3;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.v25-discover-bridge{
+  margin:14px 13px 0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:13px 14px;
+  border:1px solid #E3E8EF;
+  border-radius:14px;
+  background:#fff;
+}
+
+.v25-discover-bridge > div{
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+
+.v25-discover-bridge small,
+.v25-section-head small{
+  color:#98A2B3;
+  font-size:6.7px;
+  font-weight:850;
+  letter-spacing:.12em;
+}
+
+.v25-discover-bridge strong{
+  color:#26313B;
+  font-size:10px;
+  font-weight:900;
+}
+
+.v25-discover-bridge button,
+.v25-section-head button{
+  flex:0 0 auto;
+  border:0;
+  background:transparent;
+  color:#2563EB;
+  font-size:8px;
+  font-weight:850;
+}
+
+.v25-one-more-section{
+  margin-top:20px;
+}
+
+.v25-section-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  padding:0 13px 9px;
+}
+
+.v25-section-head > div{
+  display:grid;
+  gap:3px;
+}
+
+.v25-section-head strong{
+  color:#1F2937;
+  font-size:13px;
+  font-weight:900;
+}
+
+.v25-home-feed{
+  display:grid !important;
+  gap:10px !important;
+}
+
+.v25-home-empty{
+  margin:0 13px;
+  padding:18px 14px;
+  display:grid;
+  gap:6px;
+  border:1px solid #E3E8EF;
+  border-radius:14px;
+  background:#fff;
+  text-align:center;
+}
+
+.v25-home-empty strong{
+  color:#344054;
+  font-size:10px;
+  font-weight:900;
+}
+
+.v25-home-empty span{
+  color:#98A2B3;
+  font-size:8px;
+  line-height:1.5;
+}
+
+.v25-home-empty button{
+  justify-self:center;
+  margin-top:4px;
+  min-height:33px;
+  padding:0 12px;
+  border:1px solid #D6E2FA;
+  border-radius:999px;
+  background:#F7FAFF;
+  color:#2563EB;
+  font-size:7.5px;
+  font-weight:850;
+}
+
+@media(max-width:360px){
+  .v25-home-hero{
+    height:226px;
+    margin-left:10px;
+    margin-right:10px;
+  }
+
+  .v25-home-hero-copy h1{
+    font-size:25px;
+  }
+
+  .v25-create-block,
+  .v25-discover-bridge{
+    margin-left:10px;
+    margin-right:10px;
+  }
+
+  .v25-create-main{
+    min-height:68px;
+  }
+
+  .v25-home-shortcuts{
+    gap:6px;
+  }
+}
+
+
+/* =========================================================
+   V25.0.1 — HOME CLEANUP
+   Remove discover bridge + floating plus button.
+   Bottom nav becomes four equal items.
+   ========================================================= */
+
+.nav.nav-five{
+  grid-template-columns:repeat(4,1fr) !important;
+}
+
+.nav.nav-five .nav-spacer{
+  display:none !important;
+}
+
+.fab{
+  display:none !important;
+}
+
+/* Home create CTA remains the single creation entry point */
+.v25-create-main{
+  grid-template-columns:42px minmax(0,1fr) 18px !important;
+}
+
+
+/* =========================================================
+   V25.0.2 — COMPACT ROTATING HERO / FUTURE AD SLOT
+   ========================================================= */
+
+.v25-0-2-hero{
+  height:198px !important;
+  min-height:198px !important;
+  max-height:198px !important;
+}
+
+.v25-0-2-hero-track{
+  position:relative;
+  width:100%;
+  height:100%;
+}
+
+.v25-0-2-slide{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .35s ease;
+}
+
+.v25-0-2-slide.active{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.v25-0-2-slide .v25-home-hero-art,
+.v25-0-2-slide .v25-home-hero-art svg{
+  width:100%;
+  height:100%;
+}
+
+.v25-0-2-hero-copy{
+  top:19px !important;
+}
+
+.v25-0-2-hero-copy small{
+  margin-bottom:12px !important;
+}
+
+.v25-0-2-hero-copy h1{
+  font-size:23px !important;
+  line-height:1.25 !important;
+}
+
+.v25-0-2-hero-copy p{
+  margin-top:9px !important;
+  font-size:8.3px !important;
+}
+
+.v25-0-2-feature-bg{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(135deg,rgba(37,99,235,.96),rgba(24,61,138,.95)),
+    #2563EB;
+}
+
+.v25-0-2-feature-copy,
+.v25-0-2-ad-placeholder{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:22px;
+  box-sizing:border-box;
+}
+
+.v25-0-2-feature-copy{
+  color:#fff;
+}
+
+.v25-0-2-feature-copy small,
+.v25-0-2-ad-placeholder small{
+  margin-bottom:9px;
+  font-size:7px;
+  font-weight:850;
+  letter-spacing:.15em;
+  opacity:.72;
+}
+
+.v25-0-2-feature-copy strong,
+.v25-0-2-ad-placeholder strong{
+  font-size:20px;
+  line-height:1.3;
+  font-weight:900;
+}
+
+.v25-0-2-feature-copy span,
+.v25-0-2-ad-placeholder span{
+  margin-top:8px;
+  font-size:8px;
+  line-height:1.55;
+}
+
+.v25-0-2-feature-copy span{
+  color:rgba(255,255,255,.78);
+}
+
+.v25-0-2-ad-placeholder{
+  background:#F2F4F7;
+  color:#344054;
+}
+
+.v25-0-2-ad-placeholder span{
+  color:#667085;
+}
+
+.v25-0-2-hero-dots{
+  position:absolute;
+  z-index:5;
+  left:0;
+  right:0;
+  bottom:9px;
+  display:flex;
+  justify-content:center;
+  gap:6px;
+}
+
+.v25-0-2-hero-dots button{
+  width:6px;
+  height:6px;
+  padding:0;
+  border:0;
+  border-radius:999px;
+  background:rgba(255,255,255,.5);
+}
+
+.v25-0-2-hero-dots button.active{
+  width:18px;
+  background:#fff;
+}
+
+.v25-0-2-slide[data-kind="future-ad"] ~ .v25-0-2-hero-dots button{
+  background:#98A2B3;
+}
+
+@media(max-width:360px){
+  .v25-0-2-hero{
+    height:186px !important;
+    min-height:186px !important;
+    max-height:186px !important;
+  }
+
+  .v25-0-2-hero-copy h1{
+    font-size:21px !important;
+  }
+}
+
+
+/* =========================================================
+   V25.0.3 — SIGNATURE CREATE UI
+   ========================================================= */
+
+.v25-0-3-create-hub{
+  padding:14px;
+  border:1px solid #E3E8EF;
+  border-radius:18px;
+  background:#fff;
+}
+
+.v25-0-3-create-intro{
+  display:grid;
+  gap:4px;
+  margin-bottom:12px;
+}
+
+.v25-0-3-create-intro small{
+  color:#2563EB;
+  font-size:6.8px;
+  font-weight:900;
+  letter-spacing:.14em;
+}
+
+.v25-0-3-create-intro h2{
+  margin:0;
+  color:#182230;
+  font-size:20px;
+  line-height:1.25;
+  letter-spacing:-.025em;
+  font-weight:950;
+}
+
+.v25-0-3-create-intro p{
+  margin:0;
+  color:#7B8491;
+  font-size:8px;
+  line-height:1.5;
+  font-weight:650;
+}
+
+.v25-0-3-quick-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin-bottom:10px;
+}
+
+.v25-0-3-quick-grid button{
+  min-width:0;
+  min-height:66px;
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:6px;
+  padding:8px 4px;
+  border:1px solid #E4E9EF;
+  border-radius:13px;
+  background:#FAFBFC;
+  color:#344054;
+}
+
+.v25-0-3-quick-grid button span{
+  width:29px;
+  height:29px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:#EEF4FF;
+  color:#2563EB;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.02em;
+}
+
+.v25-0-3-quick-grid button b{
+  width:100%;
+  overflow:hidden;
+  color:#344054;
+  font-size:7.2px;
+  line-height:1.2;
+  font-weight:850;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.v25-0-3-create-main{
+  min-height:76px !important;
+  border-radius:15px !important;
+  box-shadow:0 8px 18px rgba(37,99,235,.12) !important;
+}
+
+.v25-0-3-create-main .v25-create-plus{
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  font-size:26px;
+}
+
+.v25-0-3-create-main .v25-create-copy strong{
+  font-size:16px;
+}
+
+.v25-0-3-create-main .v25-create-copy small{
+  font-size:8.2px;
+  letter-spacing:.01em;
+}
+
+.v25-0-3-create-hub .v25-home-shortcuts{
+  margin-top:9px;
+}
+
+@media(max-width:360px){
+  .v25-0-3-create-hub{
+    padding:12px;
+  }
+
+  .v25-0-3-create-intro h2{
+    font-size:18px;
+  }
+
+  .v25-0-3-quick-grid{
+    gap:5px;
+  }
+
+  .v25-0-3-quick-grid button{
+    min-height:61px;
+  }
+
+  .v25-0-3-quick-grid button b{
+    font-size:6.8px;
+  }
+}
+
+
+/* =========================================================
+   V25.0.4 — CREATE-FIRST CTA
+   One dominant action. Category examples are secondary only.
+   ========================================================= */
+
+.v25-0-4-create-hub{
+  padding:15px;
+  border:1px solid #E3E8EF;
+  border-radius:18px;
+  background:#fff;
+}
+
+.v25-0-4-create-intro{
+  display:grid;
+  gap:4px;
+  margin-bottom:13px;
+}
+
+.v25-0-4-create-intro small{
+  color:#2563EB;
+  font-size:6.8px;
+  font-weight:900;
+  letter-spacing:.14em;
+}
+
+.v25-0-4-create-intro h2{
+  margin:0;
+  color:#182230;
+  font-size:21px;
+  line-height:1.22;
+  letter-spacing:-.03em;
+  font-weight:950;
+}
+
+.v25-0-4-create-intro p{
+  margin:0;
+  color:#7B8491;
+  font-size:8.2px;
+  line-height:1.5;
+  font-weight:650;
+}
+
+.v25-0-4-create-main{
+  width:100%;
+  min-height:86px;
+  display:grid;
+  grid-template-columns:48px minmax(0,1fr) 18px;
+  align-items:center;
+  gap:11px;
+  padding:14px 15px;
+  border:0;
+  border-radius:17px;
+  background:#2563EB;
+  color:#fff;
+  text-align:left;
+  box-shadow:0 10px 22px rgba(37,99,235,.14);
+}
+
+.v25-0-4-create-icon{
+  width:46px;
+  height:46px;
+  display:grid;
+  place-items:center;
+  border-radius:14px;
+  background:rgba(255,255,255,.16);
+  font-size:29px;
+  line-height:1;
+  font-weight:350;
+}
+
+.v25-0-4-create-copy{
+  min-width:0;
+  display:grid;
+  gap:4px;
+}
+
+.v25-0-4-create-copy strong{
+  font-size:18px;
+  line-height:1.1;
+  font-weight:950;
+  letter-spacing:-.015em;
+}
+
+.v25-0-4-create-copy small{
+  color:rgba(255,255,255,.78);
+  font-size:8.4px;
+  font-weight:700;
+}
+
+.v25-0-4-create-arrow{
+  font-size:24px;
+  opacity:.85;
+}
+
+.v25-0-4-example-row{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  margin-top:9px;
+  padding-bottom:1px;
+  scrollbar-width:none;
+}
+
+.v25-0-4-example-row::-webkit-scrollbar{
+  display:none;
+}
+
+.v25-0-4-example-row span{
+  flex:0 0 auto;
+  min-height:25px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 8px;
+  border-radius:999px;
+  background:#F5F7FA;
+  color:#7A8491;
+  font-size:6.9px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.v25-0-4-create-hub .v25-home-shortcuts{
+  margin-top:10px;
+}
+
+@media(max-width:360px){
+  .v25-0-4-create-hub{
+    padding:12px;
+  }
+
+  .v25-0-4-create-intro h2{
+    font-size:19px;
+  }
+
+  .v25-0-4-create-main{
+    min-height:80px;
+    grid-template-columns:43px minmax(0,1fr) 16px;
+    padding:12px 13px;
+  }
+
+  .v25-0-4-create-icon{
+    width:41px;
+    height:41px;
+    font-size:26px;
+  }
+
+  .v25-0-4-create-copy strong{
+    font-size:16.5px;
+  }
+}
+
+
+/* =========================================================
+   V25.0.5 — HOME FOCUS CLEANUP
+   My Gathers owns "自分の募集 / 参加予定".
+   Home focuses on creation.
+   ========================================================= */
+
+.v25-0-4-create-hub{
+  padding-bottom:15px !important;
+}
+
+.v25-0-4-example-row{
+  margin-bottom:0 !important;
+}
+
 </style>
 </head>
 <body>
@@ -8178,87 +8969,111 @@ html,body{
 </header>
 
 <section id="home" class="page active">
-  <div class="mobile-home home-v22">
+  <div class="mobile-home home-v25">
 
-    <div class="home-hero">
-      <div class="hero-fallback-art" aria-label="東京の夕景">
-  <svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="東京の夕景">
-    <defs>
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#d9c6bb"/>
-        <stop offset="55%" stop-color="#b7a7a2"/>
-        <stop offset="100%" stop-color="#756f72"/>
-      </linearGradient>
-      <linearGradient id="city" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#4f5257"/>
-        <stop offset="100%" stop-color="#25292f"/>
-      </linearGradient>
-    </defs>
-    <rect width="900" height="520" fill="url(#sky)"/>
-    <circle cx="690" cy="116" r="46" fill="#f3e3c1" opacity=".88"/>
-    <rect y="350" width="900" height="170" fill="#353940"/>
-    <g fill="url(#city)">
-      <rect x="40" y="250" width="90" height="100" rx="3"/>
-      <rect x="150" y="205" width="80" height="145" rx="3"/>
-      <rect x="250" y="272" width="120" height="78" rx="3"/>
-      <rect x="388" y="188" width="92" height="162" rx="3"/>
-      <rect x="495" y="235" width="104" height="115" rx="3"/>
-      <rect x="620" y="170" width="94" height="180" rx="3"/>
-      <rect x="735" y="220" width="125" height="130" rx="3"/>
-    </g>
-    <g fill="#d9b777" opacity=".9">
-      <rect x="175" y="230" width="8" height="8"/><rect x="200" y="250" width="8" height="8"/>
-      <rect x="420" y="225" width="8" height="8"/><rect x="450" y="255" width="8" height="8"/>
-      <rect x="652" y="215" width="8" height="8"/><rect x="682" y="245" width="8" height="8"/>
-      <rect x="780" y="260" width="8" height="8"/><rect x="820" y="290" width="8" height="8"/>
-    </g>
-    <rect y="430" width="900" height="90" fill="#23262b"/>
-  </svg>
-</div>
-      <div class="home-hero-copy">
-        <small>TK MY GATHERS / TOKYO</small>
-        <div>東京で、</div>
-        <div>気の合う仲間と、</div>
-        <div>いい時間を。</div>
-        <span>Let's gather!</span>
+    <section class="v25-home-hero v25-0-2-hero">
+      <div id="v25HeroTrack" class="v25-0-2-hero-track">
+
+        <article class="v25-0-2-slide active" data-hero-slide="0" data-kind="brand">
+          <div class="v25-home-hero-art" aria-hidden="true">
+            <svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="v25sky2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#d7c8bf"/>
+                  <stop offset="58%" stop-color="#a99e9c"/>
+                  <stop offset="100%" stop-color="#4f535b"/>
+                </linearGradient>
+                <linearGradient id="v25city2" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#596067"/>
+                  <stop offset="100%" stop-color="#252a31"/>
+                </linearGradient>
+              </defs>
+              <rect width="900" height="360" fill="url(#v25sky2)"/>
+              <circle cx="696" cy="82" r="38" fill="#f2e2be" opacity=".88"/>
+              <rect y="250" width="900" height="110" fill="#30353c"/>
+              <g fill="url(#v25city2)">
+                <rect x="44" y="175" width="92" height="75" rx="3"/>
+                <rect x="158" y="145" width="78" height="105" rx="3"/>
+                <rect x="260" y="190" width="116" height="60" rx="3"/>
+                <rect x="395" y="135" width="94" height="115" rx="3"/>
+                <rect x="510" y="172" width="104" height="78" rx="3"/>
+                <rect x="636" y="120" width="90" height="130" rx="3"/>
+                <rect x="744" y="158" width="118" height="92" rx="3"/>
+              </g>
+            </svg>
+          </div>
+          <div class="v25-home-hero-overlay"></div>
+          <div class="v25-home-hero-copy v25-0-2-hero-copy">
+            <small>TK MY GATHERS / TOKYO</small>
+            <h1>やりたいことから、集まる。</h1>
+            <p>飲み会でも、麻雀でも、散歩でも。</p>
+          </div>
+        </article>
+
+        <article class="v25-0-2-slide" data-hero-slide="1" data-kind="feature">
+          <div class="v25-0-2-feature-bg"></div>
+          <div class="v25-0-2-feature-copy">
+            <small>FEATURE</small>
+            <strong>思いついたら、すぐ募集。</strong>
+            <span>ホームの「募集をつくる」から始められます。</span>
+          </div>
+        </article>
+
+        <article class="v25-0-2-slide" data-hero-slide="2" data-kind="future-ad">
+          <div class="v25-0-2-ad-placeholder">
+            <small>FUTURE SLOT</small>
+            <strong>特集・お知らせ・広告</strong>
+            <span>将来ここに外部広告やキャンペーンを差し替え可能</span>
+          </div>
+        </article>
+
       </div>
-      <div class="home-hero-dots">
-        <button class="active"></button><button></button><button></button><button></button><button></button>
+
+      <div class="v25-0-2-hero-dots" id="v25HeroDots">
+        <button type="button" class="active" onclick="setHomeHeroSlide(0)" aria-label="1枚目"></button>
+        <button type="button" onclick="setHomeHeroSlide(1)" aria-label="2枚目"></button>
+        <button type="button" onclick="setHomeHeroSlide(2)" aria-label="3枚目"></button>
       </div>
-    </div>
+    </section>
 
-    <div class="home-feed-tabs" id="homeChips">
-      <button class="home-feed-tab active" data-homefilter="all">おすすめ</button>
-      <button class="home-feed-tab" data-homefilter="weekend">今週末</button>
-      <button class="home-feed-tab" data-homefilter="weekday">平日夜</button>
-      <button class="home-feed-tab" data-homefilter="new">新着</button>
-    </div>
-<div class="home-section-row home-recruit-head">
-      <div><span class="home-mini-label">FOR YOU</span><div class="home-section-title">おすすめの募集</div></div>
-      <button onclick="showPage('discover')">すべて見る ›</button>
-    </div>
-
-    <div class="home-visibility-wrap">
-      <div class="home-visibility-label">公開範囲</div>
-      <div id="homeVisibilityFilters" class="home-visibility-filters"></div>
-    </div>
-
-    <div id="dbStatus" class="db-status"></div>
-    <div class="feed mobile-feed" id="feed"></div>
-
-    <div class="popular-block">
-      <div class="home-section-title">いま人気のタグ</div>
-      <div class="popular-tags">
-        <button onclick="searchTag('新規歓迎')"># 新規歓迎</button>
-        <button onclick="searchTag('1人参加OK')"># 1人参加OK</button>
-        <button onclick="searchTag('少人数')"># 少人数</button>
-        <button onclick="searchTag('初心者歓迎')"># 初心者歓迎</button>
-        <button onclick="searchTag('平日夜')"># 平日夜</button>
+    <section class="v25-create-block v25-0-4-create-hub">
+      <div class="v25-0-4-create-intro">
+        <small>START A GATHER</small>
+        <h2>今、なにしたい？</h2>
+        <p>やりたいことをそのまま募集にして、仲間を集めよう。</p>
       </div>
-    </div>
+
+      <button class="v25-0-4-create-main" type="button" onclick="openQuickAction()">
+        <span class="v25-0-4-create-icon">＋</span>
+        <span class="v25-0-4-create-copy">
+          <strong>募集をつくる</strong>
+          <small>やりたいことから、集まる。</small>
+        </span>
+        <span class="v25-0-4-create-arrow">›</span>
+      </button>
+
+      <div class="v25-0-4-example-row" aria-label="募集例">
+        <span>ごはん・飲み</span>
+        <span>スポーツ</span>
+        <span>おでかけ</span>
+        <span>オリジナル</span>
+      </div>
+    </section>
+<section class="v25-one-more-section">
+      <div class="v25-section-head">
+        <div>
+          <small>ONE MORE</small>
+          <strong>あと1人で開催</strong>
+        </div>
+        <button type="button" onclick="showPage('discover')">すべて見る</button>
+      </div>
+
+      <div id="dbStatus" class="db-status"></div>
+      <div class="feed mobile-feed v25-home-feed" id="feed"></div>
+    </section>
+
   </div>
 </section>
-
 
 
 
@@ -8418,8 +9233,6 @@ html,body{
     <div id="history" class="tab-panel"></div>
   </div>
 </section>
-
-<button class="fab" onclick="openQuickAction()">＋</button>
 <nav class="nav nav-five">
   <button class="nav-btn active" data-page="home" onclick="showPage('home')">
     <span class="nav-symbol" aria-hidden="true">⌂</span>
@@ -8429,8 +9242,7 @@ html,body{
     <span class="nav-symbol" aria-hidden="true">⌕</span>
     <span class="nav-label">探す</span>
   </button>
-  <div class="nav-spacer"></div>
-  <button class="nav-btn" data-page="messages" onclick="showPage('messages')">
+<button class="nav-btn" data-page="messages" onclick="showPage('messages')">
     <span class="nav-symbol" aria-hidden="true">✉</span>
     <span class="nav-label">メッセージ</span>
   </button>
@@ -8839,7 +9651,7 @@ html,body{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
-const KEY="tk_my_gathers_v24_4_24_rich_other_profile";
+const KEY="tk_my_gathers_v25_0_5_home_focus_cleanup";
 const SUPABASE_URL="https://reosbekfbmqciwmlcjxw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_okCU5zLFLD1SMpFjBw50gA_7T1veTUH";
 const sb=window.supabase.createClient(
@@ -9209,6 +10021,7 @@ function showPage(id){
   if((id==="messages"||id==="profile")&&!requireAuth("メッセージとマイページを使うにはログインしてください。"))return;
   document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
   document.querySelectorAll(".nav-btn[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+  if(id==="home"){renderHome();initHomeHeroRotation()}
   if(id==="discover"){renderDiscover()}
   if(id==="mygathers"){renderMyGathers()}
   if(id==="messages"){
@@ -10030,50 +10843,61 @@ function eventCard(e){
   </article>`
 }
 
-function renderHome(){
-  let list=state.events.filter(e=>e.status==="upcoming");
 
-  if(state.homeVisibilityFilter && state.homeVisibilityFilter!=="all"){
-    list=list.filter(e=>visibilityFilterGroup(e.visibilityDb||e.visibility)===state.homeVisibilityFilter);
-  }
+let v25HeroIndex=0;
+let v25HeroTimer=null;
 
-  if(state.tkSpecialFilter==="oneMore"){
-    list=list.filter(e=>(e.capacity-e.people)===1);
-  }else if(state.tkSpecialFilter==="today"){
-    const today=new Date().toISOString().slice(0,10);
-    list=list.filter(e=>e.date===today);
-  }else if(state.tkSpecialFilter==="weekend"){
-    list=list.filter(e=>{
-      const d=new Date(e.date+"T00:00:00").getDay();
-      return d===0||d===6;
-    });
-  }else if(state.tkSpecialFilter==="friends"){
-    list=list.filter(e=>e.owner!==meId() && e.visibility!=="公開");
-  }else if(state.tkSpecialFilter && state.tkSpecialFilter.startsWith("mood:")){
-    const mood=state.tkSpecialFilter.split(":")[1];
-    const moodMap={
-      drink:e=>e.category==="食事・飲み" || ["飲み会","夜ごはん"].includes(e.sub),
-      mahjong:e=>e.sub==="麻雀",
-      sport:e=>e.category==="スポーツ",
-      cafe:e=>e.sub==="カフェ" || (e.title||"").includes("カフェ"),
-      bbq:e=>e.sub==="BBQ",
-      anything:e=>true
-    };
-    if(moodMap[mood]) list=list.filter(moodMap[mood]);
-  }else{
-    if(state.homeFilter==="weekend")list=list.filter(e=>["6","0"].includes(String(new Date(e.date+"T00:00:00").getDay())));
-    if(state.homeFilter==="weekday")list=list.filter(e=>{
-      const d=new Date(e.date+"T00:00:00").getDay();
-      return d>=1&&d<=5&&Number(e.time.split(":")[0])>=18
-    });
-    if(state.homeFilter==="new")list=[...list].reverse();
-  }
+function setHomeHeroSlide(index){
+  const slides=[...document.querySelectorAll("[data-hero-slide]")];
+  if(!slides.length)return;
 
-  $("feed").innerHTML=list.length
-    ? list.map(eventCard).join("")
-    : `<div class="tk-empty"><strong>まだこの条件の募集はありません</strong><span>自分で募集を作ってみる？</span><button onclick="openCreate()">募集を作成</button></div>`;
+  v25HeroIndex=((index%slides.length)+slides.length)%slides.length;
+
+  slides.forEach((slide,i)=>{
+    slide.classList.toggle("active",i===v25HeroIndex);
+  });
+
+  document.querySelectorAll("#v25HeroDots button").forEach((dot,i)=>{
+    dot.classList.toggle("active",i===v25HeroIndex);
+  });
+
+  restartHomeHeroTimer();
 }
-$("homeChips").addEventListener("click",e=>{const c=e.target.closest(".home-feed-tab");if(!c)return;state.tkSpecialFilter=null;clearTkMoodSelection();state.homeFilter=c.dataset.homefilter;document.querySelectorAll("#homeChips .home-feed-tab").forEach(x=>x.classList.toggle("active",x===c));renderHome()})
+
+function restartHomeHeroTimer(){
+  clearInterval(v25HeroTimer);
+  v25HeroTimer=setInterval(()=>{
+    const slides=[...document.querySelectorAll("[data-hero-slide]")];
+    if(!slides.length)return;
+    setHomeHeroSlide((v25HeroIndex+1)%slides.length);
+  },8000);
+}
+
+function initHomeHeroRotation(){
+  const slides=document.querySelectorAll("[data-hero-slide]");
+  if(!slides.length)return;
+  setHomeHeroSlide(v25HeroIndex);
+}
+
+function renderHome(){
+  const uid=currentAuthUser?.id||meId();
+  const upcoming=(state.events||[]).filter(e=>e && e.status==="upcoming");
+const oneMore=upcoming
+    .filter(e=>e.owner!==uid && !e.joined && Math.max(0,e.capacity-e.people)===1)
+    .slice(0,2);
+
+  const feed=$("feed");
+  if(!feed)return;
+
+  feed.innerHTML=oneMore.length
+    ? oneMore.map(eventCard).join("")
+    : `<div class="v25-home-empty">
+        <strong>いま「あと1人」の募集はありません</strong>
+        <span>探すタブには、ほかの募集中イベントがあります。</span>
+        <button type="button" onclick="showPage('discover')">募集を探す</button>
+      </div>`;
+}
+const homeChipsEl=$("homeChips");if(homeChipsEl)homeChipsEl.addEventListener("click",e=>{const c=e.target.closest(".home-feed-tab");if(!c)return;state.tkSpecialFilter=null;clearTkMoodSelection();state.homeFilter=c.dataset.homefilter;document.querySelectorAll("#homeChips .home-feed-tab").forEach(x=>x.classList.toggle("active",x===c));renderHome()})
 
 const DISCOVER_CATEGORY_GROUPS=[
   {label:"すべて",value:"all"},
@@ -13366,6 +14190,8 @@ renderHomeCategories();
 updateAccountUI();
 setDefaultDate();
 initSupabaseAuth();
+
+setTimeout(()=>initHomeHeroRotation(),0);
 </script>
 </body>
 </html>
