@@ -10320,10 +10320,22 @@ body{
   }
 }
 
+
+/* ===== V25.4.3 PHOTO OVERLAY CLEANUP ===== */
+.fixed-layout-photo .fixed-photo-category{
+  display:none !important;
+}
+.fixed-layout-photo .fixed-photo-urgency{
+  top:auto !important;
+  right:10px !important;
+  bottom:10px !important;
+  left:auto !important;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.4.2 GATHERED cancel + preserve fun reactions -->
+<!-- v25.4.4 auto yen suffix for budget -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -10680,7 +10692,7 @@ body{
 </div>
 <div class="field">
 <label class="label">予算/人</label>
-<input class="input capacity-control" id="budget" placeholder="例：4000円"/>
+<input class="input capacity-control" id="budget" inputmode="numeric" placeholder="例：4000" autocomplete="off"/>
 </div>
 </div>
 <div class="capacity-mode-hint" id="capacityModeHint">4人までの募集として表示します。</div>
@@ -11021,7 +11033,12 @@ body{
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+document.addEventListener("DOMContentLoaded",()=>{
+  setupBudgetInput();
+});
+
+</script>
 <script>
 const $=id=>document.getElementById(id);
 const KEY="tk_my_gathers_v25_0_7_real_banner_images";
@@ -11091,6 +11108,51 @@ let state=(()=>{try{return JSON.parse(localStorage.getItem(KEY))||clone(defaults
 if(!state.discoverCategory)state.discoverCategory="all";
 if(!state.discoverSub)state.discoverSub="all";
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+function budgetDigits(value){
+  return String(value??"").replace(/[^\d]/g,"");
+}
+function formatBudgetLabel(value){
+  const raw=String(value??"").trim();
+  if(!raw || raw==="未設定")return "未設定";
+  if(raw==="無料" || raw==="0円" || raw==="0")return "無料";
+  const digits=budgetDigits(raw);
+  if(!digits)return raw;
+  return `${Number(digits).toLocaleString("ja-JP")}円`;
+}
+function normalizeBudgetForSave(value){
+  const raw=String(value??"").trim();
+  if(!raw)return "未設定";
+  if(raw==="無料")return "無料";
+  const digits=budgetDigits(raw);
+  if(!digits)return raw;
+  if(Number(digits)===0)return "無料";
+  return `${Number(digits).toLocaleString("ja-JP")}円`;
+}
+function setupBudgetInput(){
+  const el=$("budget");
+  if(!el || el.dataset.yenReady==="1")return;
+  el.dataset.yenReady="1";
+
+  el.addEventListener("focus",()=>{
+    const raw=String(el.value||"").trim();
+    if(raw==="無料"){
+      el.value="0";
+      return;
+    }
+    const digits=budgetDigits(raw);
+    if(digits)el.value=digits;
+  });
+
+  el.addEventListener("input",()=>{
+    el.value=el.value.replace(/[^\d]/g,"");
+  });
+
+  el.addEventListener("blur",()=>{
+    if(!el.value.trim())return;
+    el.value=normalizeBudgetForSave(el.value);
+  });
+}
+
 const escjs=s=>String(s??"").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
 function save(){
   syncActiveAccountToPeople();
@@ -12455,7 +12517,7 @@ function mapSupabaseEvent(row){
     place:row.place||"場所未定",
     people:1,
     capacity:Number(row.capacity||4),
-    budget:row.budget||"未設定",
+    budget:formatBudgetLabel(row.budget||"未設定"),
     visibility:visibilityLabel(row.visibility),
     visibilityDb:row.visibility,
     note:row.description||"気軽に参加できる募集です。",
@@ -12937,7 +12999,7 @@ function openCardDetail(id){
           <div><strong>場所</strong><span>${esc(e.place)}</span></div>
           <div><strong>人数</strong><span>${eventPeopleText(e)}</span></div>
           <div><strong>人数設定</strong><span class="people-mode-badge">${eventPeopleModeText(e)}</span></div>
-          <div><strong>予算</strong><span>${esc(e.budget)}</span></div>
+          <div><strong>予算</strong><span>${esc(formatBudgetLabel(e.budget))}</span></div>
         </div>
 
         <div class="v23-5-1-detail-visibility">
@@ -13050,7 +13112,6 @@ function eventCard(e){
     <div class="fixed-layout-left">
       <button class="fixed-layout-photo" onclick="openCardDetail(${arg})">
         <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
-        <span class="fixed-photo-category">${esc(e.sub||e.category)}</span>
         ${eventIsCompleted(e)?`<span class="fixed-photo-gather gathered">GATHERED</span>`:(eventIsGathered(e)?`<span class="fixed-photo-gather">GATHER</span>`:(oneMore?`<span class="fixed-photo-urgency">あと1人</span>`:""))}
       </button>
 
@@ -13096,7 +13157,7 @@ function eventCard(e){
 
         <div class="v24-4-19-stats">
           <span><small>人数</small><strong>${eventPeopleText(e)}</strong></span>
-          <span><small>予算</small><strong>${esc(e.budget||"未定")}</strong></span>
+          <span><small>予算</small><strong>${esc(formatBudgetLabel(e.budget||"未設定"))}</strong></span>
         </div>
 
         ${summary?`
@@ -13420,7 +13481,7 @@ function discoverCard(e){
 
       <div class="discover-card-info">
         <span class="${oneMore?"one-more-people":""}">${oneMore?`あと1人 · ${eventPeopleText(e)}`:eventPeopleText(e)}</span>
-        <span>${esc(e.budget)}</span>
+        <span>${esc(formatBudgetLabel(e.budget))}</span>
         ${publicEventTags(e).slice(0,1).map(t=>`<span>${esc(t)}</span>`).join("")}
       </div>
 
@@ -15654,7 +15715,7 @@ async function openEditEvent(id){
   $("eventTime").value=ev.time||"";
   $("eventPlace").value=ev.place||"";
   $("capacity").value=String(ev.capacity||4);
-  $("budget").value=ev.budget==="未設定"?"":(ev.budget||"");
+  $("budget").value=ev.budget==="未設定"?"":formatBudgetLabel(ev.budget||"");
   $("eventNote").value=ev.note||"";
 
   const mode=isFlexibleCapacityEvent(ev)?"flexible":"fixed";
@@ -16013,7 +16074,7 @@ $("createForm").addEventListener("submit",async e=>{
       start_time:$("eventTime").value,
       place:$("eventPlace").value.trim(),
       capacity:Number($("capacity").value),
-      budget:$("budget").value.trim()||"未設定",
+      budget:normalizeBudgetForSave($("budget").value),
       description:$("eventNote").value.trim()||"気軽に参加できる募集です。",
       image_url:imageUrl,
       tags,
@@ -16190,7 +16251,7 @@ $("createForm").addEventListener("submit",async e=>{
 function prefill(x){const f=Object.entries(categories).find(([c,l])=>l.includes(x));if(f){state.cat=f[0];state.sub=x}else{state.cat="その他・オリジナル";state.sub=""}openCreate();if(!f){$("customTitle").value=x;$("customBox").classList.add("show")}}
 function openPlanner(){openModal("plannerModal")}
 $("plannerForm").addEventListener("submit",e=>{e.preventDefault();const a=$("planActivity").value.trim(),p=Number($("planPeople").value),b=Number($("planBudget").value),area=$("planArea").value.trim(),prio=$("planPriority").value;if(!a||!area)return;const plans=[{name:"アクセス重視",price:Math.round(b*.95/100)*100,place:`${area}の駅近エリア`,prep:"予約・人数確定",note:`${prio}を優先して移動を少なくする想定。`},{name:"コスパ重視",price:Math.round(b*.8/100)*100,place:`${area}の周辺エリア`,prep:"候補比較・予約",note:`${p}人で予算を抑えやすい構成。`},{name:"手軽さ重視",price:Math.round(b*1.05/100)*100,place:`${area}の予約しやすい施設`,prep:"予約のみ",note:"準備物を減らして幹事の負担を軽くする想定。"}];window._plans={plans,a,p,b,area,prio};$("planResults").innerHTML=plans.map((x,i)=>`<div class="plan-card"><div class="plan-top"><div class="plan-title">${esc(x.name)}</div><div class="plan-price">約 ${x.price.toLocaleString()}円/人</div></div><div class="plan-points"><div>やること：${esc(a)}</div><div>候補エリア：${esc(x.place)}</div><div>人数：${p}人</div><div>幹事の準備：${esc(x.prep)}</div><div>${esc(x.note)}</div></div><button class="plan-use" type="button" onclick="usePlan(${i})">このプランで募集を作る</button></div>`).join("")})
-function usePlan(i){const d=window._plans;if(!d)return;const x=d.plans[i];const f=Object.entries(categories).find(([c,l])=>l.some(v=>d.a.includes(v)||v.includes(d.a)));if(f){state.cat=f[0];state.sub=f[1].find(v=>d.a.includes(v)||v.includes(d.a))||f[1][0]}else{state.cat="その他・オリジナル";state.sub=""}closeModal("plannerModal");openCreate();$("eventPlace").value=x.place;$("budget").value=`${x.price.toLocaleString()}円`;$("eventNote").value=x.note;if(state.cat==="その他・オリジナル"){$("customTitle").value=d.a;$("customBox").classList.add("show")}toast("募集フォームに反映しました")}
+function usePlan(i){const d=window._plans;if(!d)return;const x=d.plans[i];const f=Object.entries(categories).find(([c,l])=>l.some(v=>d.a.includes(v)||v.includes(d.a)));if(f){state.cat=f[0];state.sub=f[1].find(v=>d.a.includes(v)||v.includes(d.a))||f[1][0]}else{state.cat="その他・オリジナル";state.sub=""}closeModal("plannerModal");openCreate();$("eventPlace").value=x.place;$("budget").value=formatBudgetLabel(x.price);$("eventNote").value=x.note;if(state.cat==="その他・オリジナル"){$("customTitle").value=d.a;$("customBox").classList.add("show")}toast("募集フォームに反映しました")}
 
 function resolveEventRecord(id){
   const raw=String(id??"");
@@ -16618,7 +16679,7 @@ function openEvent(id){
   $("detailTitle").textContent=e.title;
   $("detailSub").textContent=`${u.name} · ${dateLabel(e.date)} ${e.time}`;
   $("detailCover").innerHTML=`<img src="${eventImageSrc(e)}" alt="" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">`;
-  $("detailMeta").innerHTML=`${eventIsGathered(e)?gatherStatusHtml(e):""}${gatherHostControlHtml(e)}${gatherFinalNoteHtml(e)}<div class="meta-line">場所　${esc(e.place)}</div><div class="meta-line">人数　${eventPeopleText(e)}</div><div class="meta-line">人数設定　${eventPeopleModeText(e)}</div><div class="meta-line">予算　${esc(e.budget)}</div><div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div><div class="visibility-note"><strong>公開範囲</strong><br>${esc(visibilityDescription(e.visibilityDb||e.visibility))}</div><div class="event-note">${esc(e.note)}</div><div class="event-tags">${publicEventTags(e).map(t=>`<span class="event-tag">${esc(t)}</span>`).join("")}</div>`;
+  $("detailMeta").innerHTML=`${eventIsGathered(e)?gatherStatusHtml(e):""}${gatherHostControlHtml(e)}${gatherFinalNoteHtml(e)}<div class="meta-line">場所　${esc(e.place)}</div><div class="meta-line">人数　${eventPeopleText(e)}</div><div class="meta-line">人数設定　${eventPeopleModeText(e)}</div><div class="meta-line">予算　${esc(formatBudgetLabel(e.budget))}</div><div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div><div class="visibility-note"><strong>公開範囲</strong><br>${esc(visibilityDescription(e.visibilityDb||e.visibility))}</div><div class="event-note">${esc(e.note)}</div><div class="event-tags">${publicEventTags(e).map(t=>`<span class="event-tag">${esc(t)}</span>`).join("")}</div>`;
   renderEventDetail();
   openModal("eventModal");
   if(e.source==="supabase")loadEventComments(e);
