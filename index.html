@@ -9719,10 +9719,27 @@ body{
   }
 }
 
+
+/* ===== V25.2.2 GATHER NOTIFICATIONS ===== */
+.notification-row.gather-notification{
+  background:linear-gradient(135deg,#f7faff,#eef5ff);
+}
+.notification-row.gather-notification .notification-title{
+  color:#245fcf;
+  font-weight:900;
+}
+.notification-row.gather-cancel-notification{
+  background:#fbfbfc;
+}
+.notification-row.gather-cancel-notification .notification-title{
+  color:#616b78;
+  font-weight:850;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.2.1 GATHER cancel support -->
+<!-- v25.2.2 GATHER participant notifications -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -10565,11 +10582,79 @@ function notificationCopy(n){
       text:"あなたの募集に新しい参加者がいます"
     };
   }
+  if(n.type==="gathered"){
+    return {
+      title:"GATHER！開催が決まりました",
+      text:"参加予定の募集が開催確定になりました"
+    };
+  }
+  if(n.type==="gather_cancelled"){
+    return {
+      title:"GATHERが取り消されました",
+      text:"開催確定前の状態に戻りました"
+    };
+  }
   return {
     title:"新しい通知",
     text:"お知らせがあります"
   };
 }
+
+function gatherNotificationSeenKey(){
+  const uid=currentAuthUser?.id||"guest";
+  return `tkmygathers_gather_notification_seen_${uid}`;
+}
+
+function getGatherNotificationSeen(){
+  try{
+    const raw=localStorage.getItem(gatherNotificationSeenKey());
+    const arr=JSON.parse(raw||"[]");
+    return new Set(Array.isArray(arr)?arr.map(String):[]);
+  }catch{
+    return new Set();
+  }
+}
+
+function markGatherNotificationSeen(notificationId){
+  const seen=getGatherNotificationSeen();
+  seen.add(String(notificationId));
+  localStorage.setItem(
+    gatherNotificationSeenKey(),
+    JSON.stringify([...seen].slice(-200))
+  );
+}
+
+async function maybeShowGatherNotificationPopup(){
+  if(!currentAuthUser)return;
+
+  const seen=getGatherNotificationSeen();
+  const n=(state.notifications||[]).find(row=>
+    row.type==="gathered" &&
+    !seen.has(String(row.id))
+  );
+
+  if(!n)return;
+
+  let ev=(state.events||[]).find(e=>
+    String(e.dbId||e.id)===String(n.event_id)
+  );
+
+  if(!ev && n.event_id){
+    await loadEventsFromSupabase();
+    ev=(state.events||[]).find(e=>
+      String(e.dbId||e.id)===String(n.event_id)
+    );
+  }
+
+  if(!ev)return;
+
+  markGatherNotificationSeen(n.id);
+
+  setTimeout(()=>{
+    showGatherCelebration(ev,{host:false});
+  },300);
+}
+
 async function loadNotifications(){
   if(!currentAuthUser){
     state.notifications=[];
@@ -10606,6 +10691,7 @@ async function loadNotifications(){
 
     updateNotificationBadge();
     renderNotifications();
+    maybeShowGatherNotificationPopup();
 
   }catch(error){
     console.error("load notifications:",error);
@@ -10630,7 +10716,7 @@ function renderNotifications(){
     ? rows.map(n=>{
         const actor=person(n.actor_id);
         const copy=notificationCopy(n);
-        return `<button class="notification-row ${n.read_at?"":"unread"}" onclick="openNotification('${escjs(n.id)}')">
+        return `<button class="notification-row ${n.read_at?"":"unread"} ${n.type==="gathered"?"gather-notification":""} ${n.type==="gather_cancelled"?"gather-cancel-notification":""}" onclick="openNotification('${escjs(n.id)}')">
           <div class="mini-avatar">${avatarHtml(actor)}</div>
           <div class="notification-main">
             <div class="notification-title">${esc(copy.title)}</div>
@@ -10712,7 +10798,7 @@ async function openNotification(id){
     return;
   }
 
-  if((n.type==="comment" || n.type==="event_join") && n.event_id){
+  if((n.type==="comment" || n.type==="event_join" || n.type==="gathered" || n.type==="gather_cancelled") && n.event_id){
     let ev=state.events.find(e=>e.dbId===n.event_id || e.id===n.event_id);
 
     if(!ev){
