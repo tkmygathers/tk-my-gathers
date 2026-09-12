@@ -9736,10 +9736,33 @@ body{
   font-weight:850;
 }
 
+
+/* ===== V25.2.3 MY GATHERS — CONFIRMED TAB ===== */
+.mygathers-tabs-three{
+  grid-template-columns:1fr 1fr 1fr!important;
+}
+#myGatheredPanel{
+  display:grid;
+  gap:12px;
+}
+#myGatheredPanel[hidden]{
+  display:none!important;
+}
+#myGatheredTab.active{
+  color:#245fcf;
+}
+@media(max-width:390px){
+  .mygathers-tabs-three .mygathers-tab{
+    font-size:9px;
+    padding-left:6px;
+    padding-right:6px;
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.2.2 GATHER participant notifications -->
+<!-- v25.2.3 my gathers confirmed GATHER tab -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -9963,12 +9986,14 @@ body{
 </div>
 </div>
 
-<div class="mygathers-tabs mygathers-tabs-two mygathers-card-tabs">
+<div class="mygathers-tabs mygathers-tabs-three mygathers-card-tabs">
 <button class="mygathers-tab active" id="myCreatedTab" type="button" onclick="switchMyGathersTab('created')">自分の募集</button>
+<button class="mygathers-tab" id="myGatheredTab" type="button" onclick="switchMyGathersTab('gathered')">GATHER</button>
 <button class="mygathers-tab" id="mySavedTab" type="button" onclick="switchMyGathersTab('saved')">保存した募集</button>
 </div>
 
 <div class="mygathers-panel" id="myCreatedPanel"></div>
+<div class="mygathers-panel" id="myGatheredPanel" hidden></div>
 <div class="mygathers-panel" id="mySavedPanel" hidden></div>
 </section>
 <section class="page" id="profile">
@@ -12959,17 +12984,21 @@ let calendarViewDate=new Date();
 let calendarSelectedDate=null;
 
 function switchMyGathersTab(tab){
-  const mode=tab==="saved"?"saved":"created";
+  const mode=tab==="saved"?"saved":tab==="gathered"?"gathered":"created";
   window._myGathersCardTab=mode;
 
   const createdTab=$("myCreatedTab");
+  const gatheredTab=$("myGatheredTab");
   const savedTab=$("mySavedTab");
   const createdPanel=$("myCreatedPanel");
+  const gatheredPanel=$("myGatheredPanel");
   const savedPanel=$("mySavedPanel");
 
   if(createdTab)createdTab.classList.toggle("active",mode==="created");
+  if(gatheredTab)gatheredTab.classList.toggle("active",mode==="gathered");
   if(savedTab)savedTab.classList.toggle("active",mode==="saved");
   if(createdPanel)createdPanel.hidden=mode!=="created";
+  if(gatheredPanel)gatheredPanel.hidden=mode!=="gathered";
   if(savedPanel)savedPanel.hidden=mode!=="saved";
 }
 
@@ -13154,11 +13183,13 @@ function myEventCard(e,mode){
 }
 function renderMyGathers(){
   const createdPanel=$("myCreatedPanel");
+  const gatheredPanel=$("myGatheredPanel");
   const savedPanel=$("mySavedPanel");
-  if(!createdPanel||!savedPanel)return;
+  if(!createdPanel||!gatheredPanel||!savedPanel)return;
 
   if(!currentAuthUser){
     createdPanel.innerHTML=`<div class="my-event-empty">ログインすると自分の募集を確認できます。</div>`;
+    gatheredPanel.innerHTML=`<div class="my-event-empty">ログインすると開催確定した募集を確認できます。</div>`;
     savedPanel.innerHTML=`<div class="my-event-empty">ログインすると保存した募集を確認できます。</div>`;
     switchMyGathersTab(window._myGathersCardTab||"created");
     renderMyCalendar();
@@ -13167,11 +13198,22 @@ function renderMyGathers(){
 
   const uid=currentAuthUser.id;
   const created=state.events.filter(e=>e.owner===uid);
+  const gathered=state.events
+    .filter(e=>eventIsGathered(e) && (e.owner===uid || e.joined))
+    .sort((a,b)=>{
+      const da=new Date(a.gatheredAt||a.date||0).getTime();
+      const db=new Date(b.gatheredAt||b.date||0).getTime();
+      return db-da;
+    });
   const saved=state.events.filter(e=>e.saved);
 
   createdPanel.innerHTML=created.length
     ? created.map(e=>myEventCard(e,"created")).join("")
     : `<div class="my-event-empty">自分で作った募集はまだありません。</div>`;
+
+  gatheredPanel.innerHTML=gathered.length
+    ? gathered.map(e=>myEventCard(e,e.owner===uid?"created":"gathered")).join("")
+    : `<div class="my-event-empty">開催確定した募集はまだありません。</div>`;
 
   savedPanel.innerHTML=saved.length
     ? saved.map(e=>myEventCard(e,"saved")).join("")
