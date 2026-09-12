@@ -10718,10 +10718,76 @@ body{
   line-height:1.5;
 }
 
+
+/* =========================================================
+   V25.6.6 — MOBILE HERO FIT
+   Match the taller smartphone banner ratio and keep photos
+   contained inside the rounded card.
+   ========================================================= */
+
+.v25-home-hero{
+  width:calc(100% - 26px) !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  aspect-ratio:5 / 3 !important;
+  margin-left:13px !important;
+  margin-right:13px !important;
+  overflow:hidden !important;
+  border-radius:18px !important;
+}
+
+.v25-0-2-hero-track,
+.v25-0-2-slide{
+  width:100% !important;
+  height:100% !important;
+  overflow:hidden !important;
+  border-radius:inherit !important;
+}
+
+.v25-0-7-banner-img{
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  display:block !important;
+  object-fit:cover !important;
+  object-position:center center !important;
+  border-radius:inherit !important;
+}
+
+.v25-0-2-slide[data-hero-slide="3"] .v25-0-7-slide-copy strong{
+  font-size:19px !important;
+  line-height:1.2 !important;
+  white-space:nowrap;
+  letter-spacing:-.03em;
+}
+
+@media(max-width:360px){
+  .v25-home-hero{
+    width:calc(100% - 26px) !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin-left:13px !important;
+    margin-right:13px !important;
+    aspect-ratio:5 / 3 !important;
+  }
+
+  .v25-0-2-slide[data-hero-slide="3"] .v25-0-7-slide-copy strong{
+    font-size:18px !important;
+  }
+}
+
+@media(max-width:330px){
+  .v25-0-2-slide[data-hero-slide="3"] .v25-0-7-slide-copy strong{
+    font-size:16.5px !important;
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.6.5 banner copy moved to top -->
+<!-- v25.6.6 mobile banner fit + after gather one-line -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -10784,7 +10850,7 @@ body{
 <div class="v25-0-7-photo-overlay"></div>
 <div class="v25-0-7-slide-copy">
 <small>AFTER GATHER</small>
-<strong>「楽しかった！」を、届けよう。</strong>
+<strong>「楽しかった！」を届けよう。</strong>
 <span>集まったあとに、一緒に過ごした人へ気持ちを残せます。</span>
 </div>
 </article>
