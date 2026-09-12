@@ -10064,10 +10064,101 @@ body{
   }
 }
 
+
+/* ===== V25.3.2 EVENT PARTICIPANTS + PROFILE ACCESS ===== */
+.event-participant-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:8px;
+  min-width:0;
+}
+.event-participant-label{
+  flex:0 0 auto;
+  color:#8a94a2;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.04em;
+}
+.event-participant-avatars{
+  display:flex;
+  align-items:center;
+  min-width:0;
+}
+.event-participant-avatar{
+  width:28px;
+  height:28px;
+  margin-left:-6px;
+  padding:0;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  border:2px solid #fff;
+  border-radius:50%;
+  background:#e8edf4;
+  color:#334155;
+  font:inherit;
+  font-size:8px;
+  font-weight:850;
+  cursor:pointer;
+  box-shadow:0 2px 7px rgba(31,45,65,.12);
+  -webkit-tap-highlight-color:transparent;
+}
+.event-participant-avatar:first-child{
+  margin-left:0;
+}
+.event-participant-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.event-participant-avatar:active{
+  transform:scale(.94);
+}
+.event-participant-more{
+  display:grid;
+  place-items:center;
+  min-width:28px;
+  height:28px;
+  margin-left:-5px;
+  padding:0 5px;
+  box-sizing:border-box;
+  border:2px solid #fff;
+  border-radius:999px;
+  background:#eef2f6;
+  color:#66717f;
+  font-size:8px;
+  font-weight:850;
+}
+.participant-profile-button{
+  flex:1 1 auto;
+  min-width:0;
+  border:0;
+  background:transparent;
+  padding:0;
+  text-align:left;
+  font:inherit;
+  cursor:pointer;
+}
+.participant-profile-button:active{
+  opacity:.72;
+}
+@media(max-width:420px){
+  .event-participant-avatar{
+    width:30px;
+    height:30px;
+  }
+  .event-participant-more{
+    min-width:30px;
+    height:30px;
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.3.1 other profile mobile navigation + scroll UX -->
+<!-- v25.3.2 event participant avatars + profile access -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -12036,6 +12127,7 @@ async function loadEventsFromSupabase(){
     let savedSet=new Set();
     let joinedSet=new Set();
     let membershipCounts={};
+    let participantsByEvent={};
     let authoritativeMemberCounts={};
 
     if(currentAuthUser && eventIds.length){
@@ -12062,10 +12154,26 @@ async function loadEventsFromSupabase(){
         if(m.status!=="joined")return;
         membershipCounts[m.event_id]=(membershipCounts[m.event_id]||0)+1;
 
+        if(!participantsByEvent[m.event_id])participantsByEvent[m.event_id]=[];
+        if(!participantsByEvent[m.event_id].includes(m.user_id)){
+          participantsByEvent[m.event_id].push(m.user_id);
+        }
+
         if(m.user_id===currentAuthUser.id){
           joinedSet.add(m.event_id);
         }
       });
+
+      const participantProfileIds=[...new Set(
+        (memberData||[])
+          .filter(m=>m.status==="joined")
+          .map(m=>m.user_id)
+          .filter(Boolean)
+      )];
+
+      if(participantProfileIds.length){
+        await ensurePeopleFromProfiles(participantProfileIds);
+      }
     }
 
     // RLSでevent_members全件が見えなくても、表示可能な募集について
@@ -12086,6 +12194,12 @@ async function loadEventsFromSupabase(){
         ev.mine=isMine;
         ev.saved=savedSet.has(row.id);
         ev.joined=isMine || joinedSet.has(row.id);
+
+        const visibleParticipants=[...(participantsByEvent[row.id]||[])];
+        if(row.owner_id && !visibleParticipants.includes(row.owner_id)){
+          visibleParticipants.unshift(row.owner_id);
+        }
+        ev.participants=[...new Set(visibleParticipants)];
 
         const rpcCount=authoritativeMemberCounts[row.id];
         const fallbackCount=membershipCounts[row.id]||0;
@@ -12396,6 +12510,41 @@ function openCardDetail(id){
     loadEventComments(e);
   }
 }
+
+function eventParticipantIds(e){
+  const ids=[...(Array.isArray(e?.participants)?e.participants:[])].filter(Boolean);
+  if(e?.owner && !ids.includes(e.owner))ids.unshift(e.owner);
+  return [...new Set(ids)];
+}
+
+function eventParticipantsHtml(e){
+  const ids=eventParticipantIds(e);
+  if(!ids.length)return "";
+
+  const shown=ids.slice(0,4);
+  const rest=Math.max(0,ids.length-shown.length);
+
+  return `<div class="event-participant-row">
+    <span class="event-participant-label">参加者</span>
+    <div class="event-participant-avatars">
+      ${shown.map(id=>{
+        const p=person(id);
+        const role=id===e.owner?"主催":"参加";
+        return `<button
+          type="button"
+          class="event-participant-avatar"
+          onclick="event.stopPropagation();openOtherProfile('${escjs(String(id))}')"
+          aria-label="${esc(p.name||"ユーザー")}のプロフィールを見る"
+          title="${esc(p.name||"ユーザー")} · ${role}"
+        >
+          ${avatarHtml(p)}
+        </button>`;
+      }).join("")}
+      ${rest?`<span class="event-participant-more">+${rest}</span>`:""}
+    </div>
+  </div>`;
+}
+
 function eventCard(e){
   const u=person(e.owner);
   const mine=e.owner===(currentAuthUser?.id||meId());
@@ -12456,6 +12605,8 @@ function eventCard(e){
           <span><small>人数</small><strong>${eventPeopleText(e)}</strong></span>
           <span><small>予算</small><strong>${esc(e.budget||"未定")}</strong></span>
         </div>
+
+        ${eventParticipantsHtml(e)}
 
         ${summary?`
           <p class="v24-4-17-summary">${esc(summary)}</p>
@@ -15944,10 +16095,19 @@ function renderEventDetail(){
     }).join("")||`<div class="comment-state">まだコメントはありません</div>`;
   }
 
-  $("participantList").innerHTML=(e.participants||[]).map(id=>{
+  $("participantList").innerHTML=eventParticipantIds(e).map(id=>{
     const p=person(id);
-    return `<div class="friend"><div class="friend-left"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(p.handle)}</div></div></div>${id!==meId()?`<button class="small-btn" onclick="startChat('${id}')">連絡</button>`:""}</div>`
-  }).join("");
+    return `<div class="friend">
+      <button type="button" class="friend-left participant-profile-button" onclick="openOtherProfile('${escjs(String(id))}')">
+        <div class="mini-avatar">${avatarHtml(p)}</div>
+        <div>
+          <div class="friend-name">${esc(p.name)}</div>
+          <div class="muted">${id===e.owner?"主催者 · ":""}${esc(p.handle||"")}</div>
+        </div>
+      </button>
+      ${id!==meId()?`<button class="small-btn" onclick="startChat('${escjs(String(id))}')">連絡</button>`:""}
+    </div>`
+  }).join("")||`<div class="comment-state">参加者情報はまだありません</div>`;
 
   updateCommentComposer(e);
 }
