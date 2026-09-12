@@ -10258,10 +10258,29 @@ body{
   padding:6px 2px;
 }
 
+
+/* ===== V25.4.0 GATHERED + FUN REACTIONS ===== */
+.gathered-complete-strip{display:flex;align-items:center;gap:8px;width:max-content;max-width:100%;margin:8px 0 10px;padding:7px 10px;border-radius:999px;background:#eef8f4;border:1px solid #cfe8dc;color:#207a61}
+.gathered-complete-strip span{font-size:9px;font-weight:950;letter-spacing:.12em}
+.gathered-complete-strip strong{font-size:10px}
+.gathered-badge-mini{display:inline-flex;align-items:center;min-height:20px;margin-left:5px;padding:0 7px;border-radius:999px;background:#eef8f4;border:1px solid #cfe8dc;color:#207a61;font-size:8px;font-weight:950;letter-spacing:.08em}
+.fixed-photo-gather.gathered{color:#176b53;background:#f2fbf7;border-color:#d6eee3}
+.gather-host-confirmed-actions{display:grid;gap:7px;min-width:122px}
+.gather-complete-button{min-height:48px;padding:8px 12px;border:0;border-radius:14px;background:#17202b;color:#fff;cursor:pointer}
+.gather-complete-button span{display:block;font-size:12px;font-weight:950;letter-spacing:.08em}
+.gather-complete-button small{display:block;margin-top:2px;font-size:8px;opacity:.78}
+.gathered-host-complete{margin:12px 0;padding:13px;border:1px solid #cfe8dc;border-radius:16px;background:#f2fbf7}
+.gathered-host-complete strong{display:block;color:#173b31;font-size:12px;margin-bottom:3px}
+.gathered-host-complete small{color:#668078;font-size:9px}
+.gathered-pop-mark{position:relative;z-index:2;display:inline-block;margin-bottom:12px;padding:10px 16px;border-radius:999px;background:#17202b;color:#fff;box-shadow:0 10px 26px rgba(23,32,43,.22);font-size:18px;font-weight:950;letter-spacing:.08em}
+.notification-row.gathered-notification{background:linear-gradient(135deg,#f4fbf8,#edf8f3)}
+.notification-row.gathered-notification .notification-title{color:#207a61;font-weight:900}
+@media(max-width:420px){.gather-host-confirmed-actions{width:100%}}
+
 </style>
 </head>
 <body>
-<!-- v25.3.5 removable profile interests -->
+<!-- v25.4.0 GATHERED completion + Supabase fun reactions -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -11148,6 +11167,12 @@ function notificationCopy(n){
       text:"開催確定前の状態に戻りました"
     };
   }
+  if(n.type==="completed"){
+    return {
+      title:"GATHERED！開催完了",
+      text:"一緒に過ごした人へ「楽しかった！」を送ろう"
+    };
+  }
   return {
     title:"新しい通知",
     text:"お知らせがあります"
@@ -11209,6 +11234,42 @@ async function maybeShowGatherNotificationPopup(){
   },300);
 }
 
+
+function gatheredCompletedSeenKey(){
+  const uid=currentAuthUser?.id||"guest";
+  return `tkmygathers_completed_notification_seen_${uid}`;
+}
+function getGatheredCompletedSeen(){
+  try{
+    const rows=JSON.parse(localStorage.getItem(gatheredCompletedSeenKey())||"[]");
+    return new Set(Array.isArray(rows)?rows.map(String):[]);
+  }catch{
+    return new Set();
+  }
+}
+function markGatheredCompletedSeen(id){
+  const seen=getGatheredCompletedSeen();
+  seen.add(String(id));
+  localStorage.setItem(gatheredCompletedSeenKey(),JSON.stringify([...seen].slice(-200)));
+}
+async function maybeShowCompletedNotificationPopup(){
+  if(!currentAuthUser)return;
+
+  const seen=getGatheredCompletedSeen();
+  const n=(state.notifications||[]).find(row=>row.type==="completed" && !seen.has(String(row.id)));
+  if(!n)return;
+
+  let ev=(state.events||[]).find(e=>String(e.dbId||e.id)===String(n.event_id));
+  if(!ev){
+    await loadEventsFromSupabase();
+    ev=(state.events||[]).find(e=>String(e.dbId||e.id)===String(n.event_id));
+  }
+  if(!ev)return;
+
+  markGatheredCompletedSeen(n.id);
+  setTimeout(()=>showGatheredCelebration(ev,{host:false}),350);
+}
+
 async function loadNotifications(){
   if(!currentAuthUser){
     state.notifications=[];
@@ -11246,6 +11307,7 @@ async function loadNotifications(){
     updateNotificationBadge();
     renderNotifications();
     maybeShowGatherNotificationPopup();
+    maybeShowCompletedNotificationPopup();
 
   }catch(error){
     console.error("load notifications:",error);
@@ -11270,7 +11332,7 @@ function renderNotifications(){
     ? rows.map(n=>{
         const actor=person(n.actor_id);
         const copy=notificationCopy(n);
-        return `<button class="notification-row ${n.read_at?"":"unread"} ${n.type==="gathered"?"gather-notification":""} ${n.type==="gather_cancelled"?"gather-cancel-notification":""}" onclick="openNotification('${escjs(n.id)}')">
+        return `<button class="notification-row ${n.read_at?"":"unread"} ${n.type==="gathered"?"gather-notification":""} ${n.type==="gather_cancelled"?"gather-cancel-notification":""} ${n.type==="completed"?"gathered-notification":""}" onclick="openNotification('${escjs(n.id)}')">
           <div class="mini-avatar">${avatarHtml(actor)}</div>
           <div class="notification-main">
             <div class="notification-title">${esc(copy.title)}</div>
@@ -11349,6 +11411,22 @@ async function openNotification(id){
 
   if(n.type==="follow" && n.actor_id){
     openOtherProfile(n.actor_id);
+    return;
+  }
+
+  if(n.type==="completed" && n.event_id){
+    let ev=state.events.find(e=>e.dbId===n.event_id || e.id===n.event_id);
+
+    if(!ev){
+      await loadEventsFromSupabase();
+      ev=state.events.find(e=>e.dbId===n.event_id || e.id===n.event_id);
+    }
+
+    if(ev){
+      openFun(ev.id);
+    }else{
+      toast("この集まりは現在表示できません");
+    }
     return;
   }
 
@@ -11650,10 +11728,8 @@ async function serverCanViewSupabaseEvent(row){
   // 自分の募集は常に表示
   if(uid && row.owner_id===uid)return true;
 
-  // GATHER済みはDB側の can_view_event で
-  // 「現在参加している人だけ」に判定してもらう。
-  // completed / cancelled などは他人には表示しない。
-  if(status!=="upcoming" && status!=="gathered")return false;
+  // GATHER済み / 開催完了はDB側の can_view_event で判定。
+  if(!["upcoming","gathered","completed"].includes(status))return false;
 
   // 未ログインでは募集中の公開募集だけ
   if(!uid)return status==="upcoming" && visibility==="public";
@@ -11735,6 +11811,10 @@ function updateCapacityModeUI(){
 }
 
 
+function eventIsCompleted(e){
+  return e?.status==="history" || e?.status==="completed";
+}
+
 function eventIsGathered(e){
   return e?.status==="gathered";
 }
@@ -11756,6 +11836,11 @@ function gatherHostMessage(e){
 }
 
 function gatherStatusHtml(e,{compact=false}={}){
+  if(eventIsCompleted(e)){
+    return compact
+      ? `<span class="gathered-badge-mini">GATHERED</span>`
+      : `<div class="gathered-complete-strip"><span>GATHERED!</span><strong>開催完了</strong></div>`;
+  }
   if(!eventIsGathered(e))return "";
   return compact
     ? `<span class="gather-badge-mini">GATHER</span>`
@@ -11766,16 +11851,30 @@ function gatherHostControlHtml(e){
   const mine=e.owner===(currentAuthUser?.id||meId());
   if(!mine)return "";
 
+  if(eventIsCompleted(e)){
+    return `<div class="gathered-host-complete">
+      <span class="gather-host-kicker">GATHERED</span>
+      <strong>この集まりは開催完了です</strong>
+      <small>参加者は「楽しかった！」を送れます。</small>
+    </div>`;
+  }
+
   if(eventIsGathered(e)){
     return `<div class="gather-host-confirmed">
       <div class="gather-host-confirmed-copy">
         <span class="gather-host-kicker">GATHER</span>
         <strong>開催確定済み</strong>
-        <small>参加者にも開催決定が表示されます。</small>
+        <small>会が終わったら、開催完了にして参加者へ知らせよう。</small>
       </div>
-      <button type="button" class="gather-cancel-button" onclick="confirmCancelGather('${escjs(String(e.id))}')">
-        GATHERを取り消す
-      </button>
+      <div class="gather-host-confirmed-actions">
+        <button type="button" class="gather-complete-button" onclick="confirmCompleteGather('${escjs(String(e.id))}')">
+          <span>GATHERED!</span>
+          <small>開催完了にする</small>
+        </button>
+        <button type="button" class="gather-cancel-button" onclick="confirmCancelGather('${escjs(String(e.id))}')">
+          GATHERを取り消す
+        </button>
+      </div>
     </div>`;
   }
 
@@ -11926,6 +12025,99 @@ async function gatherEvent(id){
   }
 }
 
+
+
+function confirmCompleteGather(id){
+  const ev=resolveEventByAnyId(id);
+  if(!ev)return;
+
+  if(ev.owner!==(currentAuthUser?.id||meId())){
+    toast("開催完了にできるのは主催者だけです");
+    return;
+  }
+  if(!eventIsGathered(ev)){
+    toast("GATHER済みの募集だけ開催完了にできます");
+    return;
+  }
+
+  const ok=window.confirm(
+    `「${ev.title||"この集まり"}」を GATHERED! にしますか？\n\n開催完了として参加者全員へ通知され、「楽しかった！」を送れるようになります。`
+  );
+  if(ok)completeGatherEvent(id);
+}
+
+async function completeGatherEvent(id){
+  if(!requireAuth("開催完了にするにはログインしてください。"))return;
+
+  const ev=resolveEventByAnyId(id);
+  if(!ev || ev.owner!==currentAuthUser.id)return;
+
+  const completedAt=new Date().toISOString();
+
+  try{
+    if(isRealSupabaseEvent(ev)){
+      const {error}=await sb
+        .from("events")
+        .update({status:"completed",completed_at:completedAt})
+        .eq("id",getSupabaseEventId(ev))
+        .eq("owner_id",currentAuthUser.id);
+
+      if(error)throw error;
+    }
+
+    ev.status="history";
+    ev.completedAt=completedAt;
+    save();
+
+    renderHome();
+    renderDiscover();
+    renderMyGathers();
+    renderProfile();
+    showGatheredCelebration(ev,{host:true});
+
+    if(isRealSupabaseEvent(ev)){
+      await loadEventsFromSupabase();
+      await loadNotifications();
+    }
+  }catch(error){
+    console.error("complete gather event:",error);
+    toast("開催完了を保存できませんでした");
+  }
+}
+
+function showGatheredCelebration(e,{host=false}={}){
+  if(!e)return;
+
+  let el=$("gatheredCelebration");
+  if(!el){
+    el=document.createElement("div");
+    el.id="gatheredCelebration";
+    el.className="gather-celebration gathered-celebration";
+    document.body.appendChild(el);
+  }
+
+  const pieces=Array.from({length:24},(_,i)=>
+    `<i style="--i:${i};--x:${(i*41)%100}%;--d:${(i%8)*.07}s"></i>`
+  ).join("");
+
+  el.innerHTML=`
+    <div class="gather-pop-card gathered-pop-card" role="dialog" aria-modal="true" aria-label="開催完了">
+      <div class="gather-confetti" aria-hidden="true">${pieces}</div>
+      <button type="button" class="gather-pop-close" onclick="closeGatheredCelebration()" aria-label="閉じる">×</button>
+      <div class="gathered-pop-mark">GATHERED!</div>
+      <div class="gather-pop-title">${host?"開催完了にしました！":"集まりが開催完了しました！"}</div>
+      <div class="gather-pop-event">${esc(e.title||"集まり")}</div>
+      <div class="gather-pop-meta">${dateLabel(e.date)} ${esc(e.time||"")} · ${esc(e.place||"")}</div>
+      <button type="button" class="gather-pop-action" onclick="closeGatheredCelebration();openFun('${escjs(String(e.id))}')">楽しかった！を送る</button>
+    </div>`;
+
+  requestAnimationFrame(()=>el.classList.add("show"));
+}
+
+function closeGatheredCelebration(){
+  const el=$("gatheredCelebration");
+  if(el)el.classList.remove("show");
+}
 
 function confirmCancelGather(id){
   const ev=resolveEventByAnyId(id);
@@ -12139,6 +12331,7 @@ function mapSupabaseEvent(row){
     status:row.status==="completed"?"history":row.status,
     gatheredAt:row.gathered_at||null,
     gatherNote:row.gather_note||"",
+    completedAt:row.completed_at||null,
     createdAt:row.created_at||null,
     updatedAt:row.updated_at||row.created_at||null,
     participants:[row.owner_id],
@@ -12203,6 +12396,7 @@ async function loadEventsFromSupabase(){
       status,
       gathered_at,
       gather_note,
+      completed_at,
       created_at,
       updated_at
     `;
@@ -12264,6 +12458,8 @@ async function loadEventsFromSupabase(){
     let joinedSet=new Set();
     let membershipCounts={};
     let participantsByEvent={};
+    let funSentByEvent={};
+    let funReceivedTotal=0;
     let authoritativeMemberCounts={};
 
     if(currentAuthUser && eventIds.length){
@@ -12310,6 +12506,31 @@ async function loadEventsFromSupabase(){
       if(participantProfileIds.length){
         await ensurePeopleFromProfiles(participantProfileIds);
       }
+
+      const {data:funData,error:funError}=await sb
+        .from("fun_reactions")
+        .select("id,event_id,sender_id,receiver_id,created_at")
+        .or(`sender_id.eq.${currentAuthUser.id},receiver_id.eq.${currentAuthUser.id}`);
+
+      if(funError){
+        console.warn("fun reactions load:",funError);
+      }else{
+        (funData||[]).forEach(r=>{
+          if(r.sender_id===currentAuthUser.id){
+            if(!funSentByEvent[r.event_id])funSentByEvent[r.event_id]=[];
+            if(!funSentByEvent[r.event_id].includes(r.receiver_id)){
+              funSentByEvent[r.event_id].push(r.receiver_id);
+            }
+          }
+          if(r.receiver_id===currentAuthUser.id){
+            funReceivedTotal++;
+          }
+        });
+      }
+
+      if(state.accounts[currentAuthUser.id]){
+        state.accounts[currentAuthUser.id].fun=funReceivedTotal;
+      }
     }
 
     // RLSでevent_members全件が見えなくても、表示可能な募集について
@@ -12336,6 +12557,7 @@ async function loadEventsFromSupabase(){
           visibleParticipants.unshift(row.owner_id);
         }
         ev.participants=[...new Set(visibleParticipants)];
+        ev.funSent=[...(funSentByEvent[row.id]||[])];
 
         const rpcCount=authoritativeMemberCounts[row.id];
         const fallbackCount=membershipCounts[row.id]||0;
@@ -12694,7 +12916,7 @@ function eventCard(e){
       <button class="fixed-layout-photo" onclick="openCardDetail(${arg})">
         <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
         <span class="fixed-photo-category">${esc(e.sub||e.category)}</span>
-        ${eventIsGathered(e)?`<span class="fixed-photo-gather">GATHER</span>`:(oneMore?`<span class="fixed-photo-urgency">あと1人</span>`:"")}
+        ${eventIsCompleted(e)?`<span class="fixed-photo-gather gathered">GATHERED</span>`:(eventIsGathered(e)?`<span class="fixed-photo-gather">GATHER</span>`:(oneMore?`<span class="fixed-photo-urgency">あと1人</span>`:""))}
       </button>
 
       <div class="v24-4-19-tag-footer">
@@ -13769,7 +13991,7 @@ function calendarEvents(){
   const uid=currentAuthUser.id;
 
   return state.events.filter(e=>{
-    if(!e.date || !["upcoming","gathered"].includes(e.status))return false;
+    if(!e.date || !["upcoming","gathered","history","completed"].includes(e.status))return false;
 
     const own=e.owner===uid;
     const joined=Boolean(e.joined) || (Array.isArray(e.participants) && e.participants.includes(uid));
@@ -16349,9 +16571,104 @@ $("commentForm").addEventListener("submit",async e=>{
     updateCommentComposer(ev);
   }
 })
-function openFun(id){if(!requireAuth("「楽しかった！」を送るにはログインしてください。"))return;state.currentFunEvent=id;renderFunPeople();openModal("funModal")}
-function renderFunPeople(){const e=state.events.find(x=>x.id===state.currentFunEvent);const sent=e.funSent||[];$("funPeopleList").innerHTML=e.participants.filter(id=>id!==meId()).map(id=>{const p=person(id),done=sent.includes(id);return `<div class="friend"><div class="friend-left"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">楽しかった！ ${p.fun}</div></div></div><button class="fun-btn ${done?"sent":""}" ${done?"disabled":""} onclick="sendFun('${id}')">${done?"送信済み":"楽しかった！"}</button></div>`}).join("")}
-function sendFun(id){const e=state.events.find(x=>x.id===state.currentFunEvent);if(!e||e.status!=="history"||!e.participants.includes(id)||id===meId())return;if(!e.funSent)e.funSent=[];if(e.funSent.includes(id))return;e.funSent.push(id);person(id).fun++;save();renderFunPeople();toast(`${person(id).name} に送りました`)}
+async function openFun(id){
+  if(!requireAuth("「楽しかった！」を送るにはログインしてください。"))return;
+
+  const e=resolveEventByAnyId(id);
+  if(!e)return;
+
+  if(!eventIsCompleted(e)){
+    toast("開催完了した集まりで送れます");
+    return;
+  }
+
+  state.currentFunEvent=e.id;
+  await refreshFunReactionsForEvent(e);
+  renderFunPeople();
+  openModal("funModal");
+}
+
+async function refreshFunReactionsForEvent(e){
+  if(!currentAuthUser || !isRealSupabaseEvent(e))return;
+
+  try{
+    const {data,error}=await sb
+      .from("fun_reactions")
+      .select("receiver_id")
+      .eq("event_id",getSupabaseEventId(e))
+      .eq("sender_id",currentAuthUser.id);
+
+    if(error)throw error;
+    e.funSent=(data||[]).map(r=>r.receiver_id);
+  }catch(error){
+    console.warn("refresh fun reactions:",error);
+  }
+}
+
+function renderFunPeople(){
+  const e=resolveEventByAnyId(state.currentFunEvent);
+  if(!e)return;
+
+  const sent=e.funSent||[];
+  const ids=eventParticipantIds(e).filter(id=>id!==meId());
+
+  $("funPeopleList").innerHTML=ids.length
+    ? ids.map(id=>{
+        const p=person(id);
+        const done=sent.includes(id);
+        return `<div class="friend">
+          <button class="friend-left participant-profile-button" type="button" onclick="closeModal('funModal');openOtherProfile('${escjs(String(id))}')">
+            <div class="mini-avatar">${avatarHtml(p)}</div>
+            <div>
+              <div class="friend-name">${esc(p.name)}</div>
+              <div class="muted">${id===e.owner?"主催者 · ":""}一緒に参加</div>
+            </div>
+          </button>
+          <button class="fun-btn ${done?"sent":""}" ${done?"disabled":""} onclick="sendFun('${escjs(String(id))}')">${done?"送信済み":"楽しかった！"}</button>
+        </div>`;
+      }).join("")
+    : `<div class="message-state">送れる参加者がいません。</div>`;
+}
+
+async function sendFun(receiverId){
+  const e=resolveEventByAnyId(state.currentFunEvent);
+  if(!e || !eventIsCompleted(e) || !currentAuthUser)return;
+
+  const participantIds=eventParticipantIds(e);
+  if(!participantIds.includes(receiverId) || receiverId===meId())return;
+
+  e.funSent=e.funSent||[];
+  if(e.funSent.includes(receiverId))return;
+
+  try{
+    if(isRealSupabaseEvent(e)){
+      const {error}=await sb
+        .from("fun_reactions")
+        .insert({
+          event_id:getSupabaseEventId(e),
+          sender_id:currentAuthUser.id,
+          receiver_id:receiverId
+        });
+
+      if(error){
+        if(error.code==="23505"){
+          e.funSent.push(receiverId);
+          renderFunPeople();
+          return;
+        }
+        throw error;
+      }
+    }
+
+    e.funSent.push(receiverId);
+    save();
+    renderFunPeople();
+    toast(`${person(receiverId).name} に「楽しかった！」を送りました`);
+  }catch(error){
+    console.error("send fun reaction:",error);
+    toast("「楽しかった！」を送れませんでした");
+  }
+}
 
 function openMyProfile(){
   if(!requireAuth("プロフィールを見るにはログインしてください。"))return;
