@@ -1,0 +1,11 @@
+{
+  "name": "TK MY GATHERS",
+  "short_name": "MY GATHERS",
+  "description": "やりたいことから、集まる。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F5F8FC",
+  "theme_color": "#F5F8FC",
+  "orientation": "portrait"
+}

@@ -2,6 +2,7 @@
 
 <html lang="ja">
 <head>
+  <link rel="manifest" href="manifest.json">
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <meta content="#F5F8FC" name="theme-color"/>
@@ -9059,6 +9060,30 @@ body{
     margin:0 !important;
   }
 }
+
+/* v26.0.3 — TK image logo */
+.brand-home-btn{
+  display:flex;
+  align-items:center;
+  gap:8px!important;
+}
+.brand-logo-img{
+  width:42px;
+  height:42px;
+  object-fit:contain;
+  display:block;
+  flex:0 0 auto;
+}
+.tk-mark{
+  display:none!important;
+}
+@media (max-width:520px){
+  .brand-logo-img{
+    width:38px;
+    height:38px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -9067,7 +9092,7 @@ body{
 <header class="topbar">
 <div class="toprow">
 <button aria-label="ホームに戻る" class="brand brand-home-btn" onclick="goHomeFromLogo()" type="button">
-<div class="tk-mark"><span class="t">T</span><span class="k">K</span><span class="slash"></span></div>
+<img src="tk_logo.png" alt="TK logo" class="brand-logo-img">
 <div class="brand-copy">
 <div class="brand-title">TK <em>MY</em> GATHERS</div>
 <div class="brand-sub">やりたいことから、集まる</div>
@@ -14204,6 +14229,19 @@ setDefaultDate();
 initSupabaseAuth();
 
 setTimeout(()=>initHomeHeroRotation(),0);
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(registration => {
+        console.log('Service Worker registered:', registration.scope);
+      })
+      .catch(error => {
+        console.error('Service Worker registration failed:', error);
+      });
+  });
+}
 </script>
 </body>
 </html>
