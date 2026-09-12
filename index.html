@@ -9320,10 +9320,76 @@ body{
   display:none!important;
 }
 
+
+/* ===== V25.1.3 CAPACITY MODE ===== */
+.capacity-mode-picker{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin:10px 0 12px;
+}
+.capacity-mode-option{
+  position:relative;
+  cursor:pointer;
+}
+.capacity-mode-option input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.capacity-mode-option span{
+  display:block;
+  min-height:68px;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fff;
+  transition:.16s ease;
+}
+.capacity-mode-option strong{
+  display:block;
+  font-size:11px;
+  color:#17202b;
+  margin-bottom:4px;
+}
+.capacity-mode-option small{
+  display:block;
+  font-size:9px;
+  line-height:1.45;
+  color:#7b8795;
+}
+.capacity-mode-option input:checked + span{
+  border-color:#2d68db;
+  box-shadow:0 0 0 2px rgba(45,104,219,.08);
+  background:#f7faff;
+}
+.capacity-mode-hint{
+  margin-top:6px;
+  font-size:9px;
+  line-height:1.45;
+  color:#7b8795;
+}
+.people-mode-badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:21px;
+  padding:0 8px;
+  border-radius:999px;
+  font-size:9px;
+  font-weight:800;
+  background:#f1f4f8;
+  color:#66717f;
+  white-space:nowrap;
+}
+@media(max-width:520px){
+  .capacity-mode-picker{grid-template-columns:1fr 1fr}
+  .capacity-mode-option span{padding:10px;min-height:66px}
+}
+
 </style>
 </head>
 <body>
-<!-- v25.1.2 my gathers: calendar first + created/saved tabs -->
+<!-- v25.1.3 capacity modes: fixed / flexible target -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -9649,7 +9715,38 @@ body{
 </div>
 <div class="step">
 <div class="step-label">5. 人数・予算</div>
-<div class="split"><div class="field"><label class="label">募集人数</label><select class="select" id="capacity"><option>2</option><option>3</option><option selected="">4</option><option>5</option><option>6</option><option>8</option><option>10</option></select></div><div class="field"><label class="label">予算/人</label><input class="input" id="budget" placeholder="例：4000円"/></div></div>
+
+<div class="capacity-mode-picker">
+<label class="capacity-mode-option">
+<input checked name="capacityMode" type="radio" value="fixed"/>
+<span>
+<strong>定員を決める</strong>
+<small>最大人数まで参加できます</small>
+</span>
+</label>
+
+<label class="capacity-mode-option">
+<input name="capacityMode" type="radio" value="flexible"/>
+<span>
+<strong>人数は目安</strong>
+<small>この人数を目安に、集まり具合で開催できます</small>
+</span>
+</label>
+</div>
+
+<div class="split">
+<div class="field">
+<label class="label" id="capacityLabel">募集人数</label>
+<select class="select" id="capacity">
+<option>2</option><option>3</option><option selected="">4</option><option>5</option><option>6</option><option>8</option><option>10</option>
+</select>
+<div class="capacity-mode-hint" id="capacityModeHint">4人までの募集として表示します。</div>
+</div>
+<div class="field">
+<label class="label">予算/人</label>
+<input class="input" id="budget" placeholder="例：4000円"/>
+</div>
+</div>
 </div>
 <div class="step">
 <div class="step-label">6. 公開範囲</div>
@@ -10583,6 +10680,49 @@ async function filterSupabaseRowsByVisibility(rows){
     .map(x=>x.row);
 }
 
+
+const FLEX_CAPACITY_TAG="__capacity_mode_flexible";
+
+function isFlexibleCapacityEvent(e){
+  return e?.capacityMode==="flexible" || (Array.isArray(e?.tags) && e.tags.includes(FLEX_CAPACITY_TAG));
+}
+
+function publicEventTags(e){
+  return (Array.isArray(e?.tags)?e.tags:[]).filter(t=>t!==FLEX_CAPACITY_TAG);
+}
+
+function eventPeopleText(e){
+  const people=Number(e?.people||0);
+  const capacity=Number(e?.capacity||0);
+  return isFlexibleCapacityEvent(e)
+    ? `参加${people}人 · 目安${capacity}人`
+    : `${people}/${capacity}人`;
+}
+
+function eventPeopleModeText(e){
+  return isFlexibleCapacityEvent(e) ? "人数は目安" : "定員あり";
+}
+
+function eventIsOneMore(e){
+  if(isFlexibleCapacityEvent(e))return false;
+  return Math.max(0,Number(e?.capacity||0)-Number(e?.people||0))===1 && !e?.joined;
+}
+
+function updateCapacityModeUI(){
+  const checked=document.querySelector('input[name="capacityMode"]:checked');
+  const mode=checked?.value||"fixed";
+  const label=$("capacityLabel");
+  const hint=$("capacityModeHint");
+  const cap=Number($("capacity")?.value||4);
+
+  if(label)label.textContent=mode==="flexible"?"目安人数":"募集人数";
+  if(hint){
+    hint.textContent=mode==="flexible"
+      ? `${cap}人くらいを目安に表示します。目安人数を超えても参加できます。`
+      : `${cap}人までの募集として表示します。`;
+  }
+}
+
 function mapSupabaseEvent(row){
   if(row.profiles)remoteProfileToPerson(row.profiles);
   return {
@@ -10610,6 +10750,7 @@ function mapSupabaseEvent(row){
     comments:[],
     funSent:[],
     tags:Array.isArray(row.tags)?row.tags:[],
+    capacityMode:(Array.isArray(row.tags)&&row.tags.includes(FLEX_CAPACITY_TAG))?"flexible":"fixed",
     members:[],
     source:"supabase",
     ownerType:"real"
@@ -10998,7 +11139,7 @@ function openCardDetail(id){
 
         <h3>${esc(e.title)}</h3>
 
-        ${Math.max(0,e.capacity-e.people)===1 && !e.joined ? `
+        ${eventIsOneMore(e) ? `
           <div class="detail-one-more-focus">
             <div>
               <span class="one-more-dot"></span>
@@ -11011,7 +11152,8 @@ function openCardDetail(id){
         <div class="v23-5-1-detail-meta">
           <div><strong>日時</strong><span>${dateLabel(e.date)} ${esc(e.time)}</span></div>
           <div><strong>場所</strong><span>${esc(e.place)}</span></div>
-          <div><strong>人数</strong><span>${e.people}/${e.capacity}人</span></div>
+          <div><strong>人数</strong><span>${eventPeopleText(e)}</span></div>
+          <div><strong>人数設定</strong><span class="people-mode-badge">${eventPeopleModeText(e)}</span></div>
           <div><strong>予算</strong><span>${esc(e.budget)}</span></div>
         </div>
 
@@ -11022,7 +11164,7 @@ function openCardDetail(id){
         <div class="v23-5-1-detail-note">${esc(e.note||"")}</div>
 
         <div class="v23-5-1-detail-tags">
-          ${(e.tags||[]).map(t=>`<span>${esc(t)}</span>`).join("")}
+          ${publicEventTags(e).map(t=>`<span>${esc(t)}</span>`).join("")}
         </div>
 
         <div class="v23-5-1-detail-actions">
@@ -11078,7 +11220,7 @@ function eventCard(e){
   const mine=e.owner===(currentAuthUser?.id||meId());
   const arg=eventIdArg(e.id);
   const remaining=Math.max(0,e.capacity-e.people);
-  const oneMore=remaining===1 && !e.joined;
+  const oneMore=eventIsOneMore(e);
   const summary=(e.note||e.description||"").trim();
 
   return `<article class="card fixed-layout-card v24-4-19-card">
@@ -11090,8 +11232,8 @@ function eventCard(e){
       </button>
 
       <div class="v24-4-19-tag-footer">
-        ${(e.tags||[]).length
-          ? (e.tags||[]).slice(0,2).map(t=>`<span>${esc(t)}</span>`).join("")
+        ${publicEventTags(e).length
+          ? publicEventTags(e).slice(0,2).map(t=>`<span>${esc(t)}</span>`).join("")
           : `<span class="v24-4-19-no-tag">タグなし</span>`}
       </div>
     </div>
@@ -11128,7 +11270,7 @@ function eventCard(e){
         </div>
 
         <div class="v24-4-19-stats">
-          <span><small>人数</small><strong>${e.people}/${e.capacity}人</strong></span>
+          <span><small>人数</small><strong>${eventPeopleText(e)}</strong></span>
           <span><small>予算</small><strong>${esc(e.budget||"未定")}</strong></span>
         </div>
 
@@ -11406,7 +11548,7 @@ function discoverKeywordMatches(e,query){
     e.place,
     e.area,
     e.note,
-    ...(e.tags||[])
+    ...publicEventTags(e)
   ].filter(Boolean).join(" "));
 
   return hay.includes(q);
@@ -11417,7 +11559,7 @@ function discoverCard(e){
   const arg=eventIdArg(e.id);
   const mine=e.owner===(currentAuthUser?.id||meId());
   const remaining=Math.max(0,e.capacity-e.people);
-  const oneMore=remaining===1 && !e.joined;
+  const oneMore=eventIsOneMore(e);
 
   return `<article class="discover-card ${oneMore?"discover-one-more":""}">
     <button class="discover-card-image" onclick="openCardDetail(${arg})">
@@ -11452,9 +11594,9 @@ function discoverCard(e){
       </div>
 
       <div class="discover-card-info">
-        <span class="${oneMore?"one-more-people":""}">${oneMore?`あと1人 · ${e.people}/${e.capacity}人`:`${e.people}/${e.capacity}人`}</span>
+        <span class="${oneMore?"one-more-people":""}">${oneMore?`あと1人 · ${eventPeopleText(e)}`:eventPeopleText(e)}</span>
         <span>${esc(e.budget)}</span>
-        ${(e.tags||[]).slice(0,1).map(t=>`<span>${esc(t)}</span>`).join("")}
+        ${publicEventTags(e).slice(0,1).map(t=>`<span>${esc(t)}</span>`).join("")}
       </div>
 
       <div class="discover-card-actions discover-card-actions-detail">
@@ -12309,7 +12451,7 @@ function myEventCard(e,mode){
     <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
     <div class="my-event-main">
       <div class="my-event-title">${esc(e.title)}</div>
-      <div class="my-event-meta">${dateLabel(e.date)} ${esc(e.time)}<br>${esc(e.place)} · ${e.people}/${e.capacity}人</div>
+      <div class="my-event-meta">${dateLabel(e.date)} ${esc(e.time)}<br>${esc(e.place)} · ${eventPeopleText(e)}</div>
       ${mode==="created"?`<div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div>`:""}
       <div class="my-event-actions">
         <button onclick="openEvent(${arg})">詳細を見る</button>
@@ -12616,7 +12758,7 @@ async function renderOtherProfile(id){
                         <span class="v24-4-24-hosted-copy">
                           <b>${esc(e.title)}</b>
                           <small>${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</small>
-                          <em>${e.people}/${e.capacity}人</em>
+                          <em>${eventPeopleText(e)}</em>
                         </span>
                       </button>
                     `;
@@ -12698,7 +12840,7 @@ if(banner){
     : `<div class="profile-banner-empty">BANNER</div>`;
 }
 $("profileName").textContent=m.name;$("profileHandle").textContent=m.handle;$("profileBio").textContent=m.bio;$("profileArea").textContent=m.area;$("followersCount").textContent=m.followers;$("followingCount").textContent=m.following;$("mutualCount").textContent=mutuals().length;$("myFunTotal").textContent=m.fun;$("profileAvatar").innerHTML=m.avatar?`<img src="${m.avatar}" alt="">`:esc(m.name.slice(0,2));$("interestGrid").innerHTML=m.interests.map(x=>`<button class="interest-chip light" onclick="prefill('${escjs(x)}')">${esc(x)}</button>`).join("");$("upcoming").innerHTML=profileList(state.events.filter(e=>e.joined&&e.status==="upcoming"),"まだ参加予定はありません",false);$("created").innerHTML=profileList(state.events.filter(e=>e.owner===(currentAuthUser?.id||meId())),"まだ自分の募集はありません",false);$("history").innerHTML=profileList(state.events.filter(e=>e.status==="history"&&e.participants.includes(meId())),"まだ履歴はありません",true)}
-function profileList(list,empty,historyMode){if(!list.length)return `<div class="panel" style="padding:18px;text-align:center;color:var(--muted)">${empty}</div>`;return `<div class="list">${list.map(e=>{const arg=eventIdArg(e.id);return `<div class="friend"><div class="friend-left" onclick="openEvent(${arg})" style="cursor:pointer"><div class="mini-avatar">${esc(e.sub.slice(0,2))}</div><div><div class="friend-name">${esc(e.title)}</div><div class="muted">${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</div></div></div>${historyMode?`<button class="fun-btn" onclick="openFun(${arg})">楽しかった！</button>`:`<div class="muted">${e.people}/${e.capacity}人</div>`}</div>`}).join("")}</div>`}
+function profileList(list,empty,historyMode){if(!list.length)return `<div class="panel" style="padding:18px;text-align:center;color:var(--muted)">${empty}</div>`;return `<div class="list">${list.map(e=>{const arg=eventIdArg(e.id);return `<div class="friend"><div class="friend-left" onclick="openEvent(${arg})" style="cursor:pointer"><div class="mini-avatar">${esc(e.sub.slice(0,2))}</div><div><div class="friend-name">${esc(e.title)}</div><div class="muted">${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</div></div></div>${historyMode?`<button class="fun-btn" onclick="openFun(${arg})">楽しかった！</button>`:`<div class="muted">${eventPeopleText(e)}</div>`}</div>`}).join("")}</div>`}
 function switchProfileTab(id){document.querySelectorAll(".profile-tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("active",p.id===id))}
 
 let selectedProfileBannerFile=null;
@@ -13768,6 +13910,7 @@ function resetCreateState(form){
   state.cat="ゲーム・遊び";
   state.sub="麻雀";
   form.reset();
+  updateCapacityModeUI();
   clearEventImage();
   setDefaultDate();
   renderCategories();
@@ -13779,6 +13922,12 @@ function resetCreateState(form){
 }
 
 function readFile(file,cb){if(!file)return;const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(file)}
+document.querySelectorAll('input[name="capacityMode"]').forEach(el=>{
+  el.addEventListener("change",updateCapacityModeUI);
+});
+if($("capacity"))$("capacity").addEventListener("change",updateCapacityModeUI);
+updateCapacityModeUI();
+
 $("createForm").addEventListener("submit",async e=>{
   e.preventDefault();
   if(!requireAuth("募集を作成するにはログインしてください。"))return;
@@ -13824,7 +13973,10 @@ $("createForm").addEventListener("submit",async e=>{
       budget:$("budget").value.trim()||"未設定",
       description:$("eventNote").value.trim()||"気軽に参加できる募集です。",
       image_url:uploadedImage?.publicUrl||null,
-      tags:[...(state.selectedTags||[])].map(normalizeEventTag).filter(Boolean).slice(0,8),
+      tags:[
+        ...[...(state.selectedTags||[])].map(normalizeEventTag).filter(Boolean).slice(0,8),
+        ...(document.querySelector('input[name="capacityMode"]:checked')?.value==="flexible"?[FLEX_CAPACITY_TAG]:[])
+      ],
       visibility:visDb,
       status:"upcoming"
     };
@@ -14129,7 +14281,7 @@ async function toggleJoin(id){
       ev.people=Math.max(1,ev.people-1);
       ev.participants=(ev.participants||[]).filter(x=>x!==meId());
       toast("参加を取り消しました");
-    }else if(ev.people<ev.capacity){
+    }else if(isFlexibleCapacityEvent(ev) || ev.people<ev.capacity){
       ev.joined=true;
       ev.people++;
       ev.participants=ev.participants||[];
@@ -14186,14 +14338,16 @@ async function toggleJoin(id){
       toast("参加を取り消しました");
 
     }else{
-      if(Number(ev.people||0)>=Number(ev.capacity||0)){
+      if(!isFlexibleCapacityEvent(ev) && Number(ev.people||0)>=Number(ev.capacity||0)){
         toast("満員です");
         return;
       }
 
       const previousPeople=Number(ev.people||1);
       ev.joined=true;
-      ev.people=Math.min(Number(ev.capacity||previousPeople+1),previousPeople+1);
+      ev.people=isFlexibleCapacityEvent(ev)
+        ? previousPeople+1
+        : Math.min(Number(ev.capacity||previousPeople+1),previousPeople+1);
       renderHome();
       renderDiscover();
       renderMyGathers();
@@ -14374,7 +14528,7 @@ function openEvent(id){
   $("detailTitle").textContent=e.title;
   $("detailSub").textContent=`${u.name} · ${dateLabel(e.date)} ${e.time}`;
   $("detailCover").innerHTML=`<img src="${eventImageSrc(e)}" alt="" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">`;
-  $("detailMeta").innerHTML=`<div class="meta-line">場所　${esc(e.place)}</div><div class="meta-line">人数　${e.people}/${e.capacity}人</div><div class="meta-line">予算　${esc(e.budget)}</div><div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div><div class="visibility-note"><strong>公開範囲</strong><br>${esc(visibilityDescription(e.visibilityDb||e.visibility))}</div><div class="event-note">${esc(e.note)}</div><div class="event-tags">${(e.tags||[]).map(t=>`<span class="event-tag">${esc(t)}</span>`).join("")}</div>`;
+  $("detailMeta").innerHTML=`<div class="meta-line">場所　${esc(e.place)}</div><div class="meta-line">人数　${eventPeopleText(e)}</div><div class="meta-line">人数設定　${eventPeopleModeText(e)}</div><div class="meta-line">予算　${esc(e.budget)}</div><div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div><div class="visibility-note"><strong>公開範囲</strong><br>${esc(visibilityDescription(e.visibilityDb||e.visibility))}</div><div class="event-note">${esc(e.note)}</div><div class="event-tags">${publicEventTags(e).map(t=>`<span class="event-tag">${esc(t)}</span>`).join("")}</div>`;
   renderEventDetail();
   openModal("eventModal");
   if(e.source==="supabase")loadEventComments(e);
