@@ -11277,77 +11277,100 @@ a,
 
 
 /* =========================================================
-   V25.8.1 — PROFILE FUN COUNT CLARITY
-   Copy only / visual clarification. Reaction logic unchanged.
+   V25.8.2 — FUN COUNT CLARITY / OTHER PROFILE
+   Reaction logic unchanged. Decorative graph removed.
    ========================================================= */
 
-.fun-total{
-  align-items:center !important;
-  gap:14px !important;
+.fun-total,
+.other-fun-total{
+  display:block !important;
+  margin-top:14px;
+  padding:14px 15px !important;
+  border:1px solid #D7E3F5 !important;
+  border-radius:16px !important;
+  background:#F3F7FD !important;
+  color:#0F172A !important;
+  box-shadow:none !important;
+}
+
+.fun-total-copy,
+.other-fun-total{
+  min-width:0;
 }
 
 .fun-total-copy{
-  min-width:0;
   display:grid;
-  gap:3px;
+  gap:4px;
 }
 
-.fun-total-copy > small{
+.fun-total-copy > small,
+.other-fun-total > small{
   display:block;
-  color:#DBEAFE !important;
+  color:#334155 !important;
   font-size:10px !important;
-  font-weight:760 !important;
-  letter-spacing:.01em !important;
+  line-height:1.35;
+  font-weight:850 !important;
+  letter-spacing:0 !important;
+  opacity:1 !important;
 }
 
-.fun-total-number{
+.fun-total-number,
+.other-fun-total-number{
   display:flex;
   align-items:baseline;
   gap:5px;
+  margin-top:4px;
 }
 
-.fun-total-number strong{
-  color:#fff !important;
+.fun-total-number strong,
+.other-fun-total-number strong{
+  color:#0F172A !important;
   font-size:30px !important;
   line-height:1 !important;
+  font-weight:850 !important;
   letter-spacing:-.04em !important;
 }
 
-.fun-total-number span{
-  color:rgba(255,255,255,.9);
+.fun-total-number span,
+.other-fun-total-number span{
+  color:#334155 !important;
   font-size:12px;
-  font-weight:750;
+  font-weight:800;
 }
 
-.fun-total-copy p{
-  margin:2px 0 0;
-  color:rgba(255,255,255,.68);
-  font-size:8.5px;
+.fun-total-copy p,
+.other-fun-total p{
+  margin:4px 0 0;
+  color:#64748B !important;
+  font-size:8.7px;
   line-height:1.45;
-  font-weight:600;
+  font-weight:650;
 }
 
+/* Old decorative line chart is intentionally not used. */
 .fun-spark{
-  flex:0 0 auto;
-  width:104px !important;
+  display:none !important;
+}
+
+.other-fun-total{
+  margin-top:10px;
 }
 
 @media(max-width:360px){
-  .fun-total-number strong{
+  .fun-total-number strong,
+  .other-fun-total-number strong{
     font-size:27px !important;
   }
-  .fun-total-copy p{
+
+  .fun-total-copy p,
+  .other-fun-total p{
     font-size:8px;
   }
-  .fun-spark{
-    width:88px !important;
-  }
 }
-
 </style>
 </head>
 <body>
-<!-- v25.8.1 profile fun count clarified; functionality unchanged -->
+<!-- v25.8.2 fun count clarity + other-profile received count -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -11672,7 +11695,6 @@ a,
     <div class="fun-total-number"><strong id="myFunTotal">0</strong><span>件</span></div>
     <p>一緒に集まった人から届いた合計</p>
   </div>
-  <svg class="fun-spark" viewbox="0 0 120 36" aria-hidden="true"><path d="M3 29 C18 30, 24 21, 37 23 S57 16, 70 18 S91 8,117 7" fill="none" stroke="#60A5FA" stroke-width="2.4"></path><circle cx="117" cy="7" fill="#60A5FA" r="3"></circle></svg>
 </div>
 </div>
 <div class="section-head"><div><div class="section-title">興味・関心</div><div class="section-note">やりたいことをプロフィールに表示</div></div><button class="text-btn" onclick="openWant()">追加</button></div>
@@ -15968,6 +15990,19 @@ async function fetchProfileCounts(id){
     following:followingResult.error?0:(followingResult.count||0)
   };
 }
+async function fetchReceivedFunCount(userId){
+  if(!currentAuthUser || !isRealUserId(userId))return 0;
+
+  try{
+    const {data,error}=await sb.rpc("get_received_fun_count",{p_user_id:userId});
+    if(error)throw error;
+    return Number(data||0);
+  }catch(error){
+    console.warn("received fun count:",error);
+    return 0;
+  }
+}
+
 async function renderOtherProfile(id){
   const box=$("otherProfileContent");
   if(!box)return;
@@ -15989,7 +16024,14 @@ async function renderOtherProfile(id){
     }
 
     let counts={followers:0,following:0};
-    if(isRealUserId(id))counts=await fetchProfileCounts(id);
+    let receivedFunCount=0;
+
+    if(isRealUserId(id)){
+      [counts,receivedFunCount]=await Promise.all([
+        fetchProfileCounts(id),
+        fetchReceivedFunCount(id)
+      ]);
+    }
 
     const following=isFollowing(id);
     const follower=isFollower(id);
@@ -16040,6 +16082,12 @@ async function renderOtherProfile(id){
               <strong>${hostedEvents.length}</strong>
               <span>募集中</span>
             </div>
+          </div>
+
+          <div class="other-fun-total">
+            <small>もらった「楽しかった！」</small>
+            <div class="other-fun-total-number"><strong>${receivedFunCount}</strong><span>件</span></div>
+            <p>一緒に集まった人から届いた合計</p>
           </div>
 
           <div class="follow-actions v24-4-24-actions">
