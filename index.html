@@ -11615,10 +11615,119 @@ a,
   color:#343C46 !important;
 }
 
+
+/* =========================================================
+   V25.9.3 — CALENDAR COLOR DISTINCTION + COMPACT COPY BUTTON
+   ========================================================= */
+
+/* Calendar: own event = blue, joined event = teal */
+.calendar-dot.own{
+  background:#3B82F6 !important;
+}
+
+.calendar-dot.joined{
+  background:#14B8A6 !important;
+}
+
+.calendar-event-card.own{
+  border-left-color:#3B82F6 !important;
+  background:#F3F7FF !important;
+}
+
+.calendar-event-card.joined{
+  border-left-color:#14B8A6 !important;
+  background:#F0FDFA !important;
+}
+
+.calendar-event-card.own .calendar-event-type{
+  background:#E7F0FF !important;
+  color:#2563EB !important;
+}
+
+.calendar-event-card.joined .calendar-event-type{
+  background:#DCF7F3 !important;
+  color:#0F766E !important;
+}
+
+/* GATHER / GATHERED keep their own semantic status styling */
+.calendar-event-card .calendar-event-type{
+  border:1px solid transparent;
+}
+
+/* My Gathers: keep copy compact and off the bottom action row */
+.my-event-title-row,
+.my-event-status-tools{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+}
+
+.my-event-title-row .my-event-title{
+  min-width:0;
+  flex:1 1 auto;
+}
+
+.my-event-status-tools{
+  margin-top:5px;
+}
+
+.my-event-status-left{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  flex-wrap:wrap;
+}
+
+.my-event-status-tools .event-expired-note{
+  margin-top:0 !important;
+}
+
+.my-event-copy-mini{
+  flex:0 0 auto;
+  min-height:25px;
+  padding:0 9px;
+  border:1px solid #BFC9D6;
+  border-radius:999px;
+  background:rgba(255,255,255,.78);
+  color:#344054;
+  font:inherit;
+  font-size:7.5px;
+  font-weight:850;
+  line-height:1;
+  cursor:pointer;
+  box-shadow:none;
+}
+
+.my-event-copy-mini:active{
+  transform:scale(.96);
+}
+
+.my-event-card.event-card-expired .my-event-copy-mini{
+  background:#F4F5F6;
+  border-color:#AEB5BE;
+  color:#3F4751;
+  opacity:1 !important;
+}
+
+.my-event-actions{
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+}
+
+@media(max-width:360px){
+  .my-event-copy-mini{
+    min-height:24px;
+    padding:0 8px;
+    font-size:7px;
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.9.2 discover expired status filter -->
+<!-- v25.9.3 calendar colors + compact copy placement -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -16117,7 +16226,11 @@ function calendarEventCard(e){
         <strong>${esc(e.title)}</strong>
         <small>${esc(e.place||"場所未定")}</small>
       </span>
-      <span class="calendar-event-type">${eventIsGathered(e)?"GATHER":(kind==="own"?"自分の募集":"参加予定")}</span>
+      <span class="calendar-event-type">
+        ${eventIsCompleted(e)
+          ?"GATHERED"
+          :(eventIsGathered(e)?"GATHER":(kind==="own"?"自分の募集":"参加予定"))}
+      </span>
     </button>
   `;
 }
@@ -16125,12 +16238,27 @@ function calendarEventCard(e){
 function myEventCard(e,mode){
   const arg=eventIdArg(e.id);
   const visual=eventVisualState(e);
+  const compactStatus=visual.expired
+    ? `<div class="event-expired-note"><span></span>開催日時を過ぎています</div>`
+    : gatherStatusHtml(e,{compact:true});
 
   return `<div class="my-event-card ${visual.className}">
     <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
     <div class="my-event-main">
-      <div class="my-event-title">${esc(e.title)} ${gatherStatusHtml(e,{compact:true})}</div>
-      ${visual.expired?`<div class="event-expired-note"><span></span>開催日時を過ぎています</div>`:""}
+      <div class="my-event-title-row">
+        <div class="my-event-title">${esc(e.title)}</div>
+        ${mode==="created" && !compactStatus
+          ? `<button type="button" class="my-event-copy-mini" onclick="openDuplicateEvent(${arg})">コピー</button>`
+          : ``}
+      </div>
+
+      ${mode==="created" && compactStatus
+        ? `<div class="my-event-status-tools">
+            <div class="my-event-status-left">${compactStatus}</div>
+            <button type="button" class="my-event-copy-mini" onclick="openDuplicateEvent(${arg})">コピー</button>
+          </div>`
+        : (compactStatus?`<div class="my-event-status-tools"><div class="my-event-status-left">${compactStatus}</div></div>`:"")}
+
       <div class="my-event-meta">${dateLabel(e.date)} ${esc(e.time)}<br>${esc(e.place)} · ${eventPeopleText(e)}</div>
       ${eventCardTimestamp(e)?`<div class="my-event-post-time">${esc(eventCardTimestamp(e))}</div>`:""}
       ${eventIsGathered(e)&&e.gatherNote?`<div class="my-gather-note-preview"><strong>最終メモ</strong><span>${esc(e.gatherNote)}</span></div>`:""}
@@ -16138,7 +16266,7 @@ function myEventCard(e,mode){
       <div class="my-event-actions">
         <button onclick="openEvent(${arg})">詳細を見る</button>
         ${mode==="created"
-          ? `<button onclick="openEditEvent(${arg})">編集</button><button onclick="openDuplicateEvent(${arg})">コピーして募集</button><button class="danger" onclick="removeEvent(${arg})">募集を削除</button>`
+          ? `<button onclick="openEditEvent(${arg})">編集</button><button class="danger" onclick="removeEvent(${arg})">募集を削除</button>`
           : mode==="saved"
             ? `<button onclick="toggleSave(${arg})">保存を外す</button>`
             : ``}
