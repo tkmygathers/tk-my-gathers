@@ -11275,10 +11275,79 @@ a,
 
 /* Keep all dimensions and positions exactly as existing. */
 
+
+/* =========================================================
+   V25.8.1 — PROFILE FUN COUNT CLARITY
+   Copy only / visual clarification. Reaction logic unchanged.
+   ========================================================= */
+
+.fun-total{
+  align-items:center !important;
+  gap:14px !important;
+}
+
+.fun-total-copy{
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+
+.fun-total-copy > small{
+  display:block;
+  color:#DBEAFE !important;
+  font-size:10px !important;
+  font-weight:760 !important;
+  letter-spacing:.01em !important;
+}
+
+.fun-total-number{
+  display:flex;
+  align-items:baseline;
+  gap:5px;
+}
+
+.fun-total-number strong{
+  color:#fff !important;
+  font-size:30px !important;
+  line-height:1 !important;
+  letter-spacing:-.04em !important;
+}
+
+.fun-total-number span{
+  color:rgba(255,255,255,.9);
+  font-size:12px;
+  font-weight:750;
+}
+
+.fun-total-copy p{
+  margin:2px 0 0;
+  color:rgba(255,255,255,.68);
+  font-size:8.5px;
+  line-height:1.45;
+  font-weight:600;
+}
+
+.fun-spark{
+  flex:0 0 auto;
+  width:104px !important;
+}
+
+@media(max-width:360px){
+  .fun-total-number strong{
+    font-size:27px !important;
+  }
+  .fun-total-copy p{
+    font-size:8px;
+  }
+  .fun-spark{
+    width:88px !important;
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.8.0 navy electric blue theme; functionality unchanged -->
+<!-- v25.8.1 profile fun count clarified; functionality unchanged -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -11598,8 +11667,12 @@ a,
 <button class="count-btn" onclick="showMutuals()"><strong id="mutualCount">0</strong>友だち</button>
 </div>
 <div class="fun-total">
-<div><small>楽しかった！</small><strong id="myFunTotal">0</strong></div>
-<svg class="fun-spark" viewbox="0 0 120 36"><path d="M3 29 C18 30, 24 21, 37 23 S57 16, 70 18 S91 8,117 7" fill="none" stroke="#C47A3A" stroke-width="2.4"></path><circle cx="117" cy="7" fill="#C47A3A" r="3"></circle></svg>
+  <div class="fun-total-copy">
+    <small>もらった「楽しかった！」</small>
+    <div class="fun-total-number"><strong id="myFunTotal">0</strong><span>件</span></div>
+    <p>一緒に集まった人から届いた合計</p>
+  </div>
+  <svg class="fun-spark" viewbox="0 0 120 36" aria-hidden="true"><path d="M3 29 C18 30, 24 21, 37 23 S57 16, 70 18 S91 8,117 7" fill="none" stroke="#60A5FA" stroke-width="2.4"></path><circle cx="117" cy="7" fill="#60A5FA" r="3"></circle></svg>
 </div>
 </div>
 <div class="section-head"><div><div class="section-title">興味・関心</div><div class="section-note">やりたいことをプロフィールに表示</div></div><button class="text-btn" onclick="openWant()">追加</button></div>
