@@ -11592,10 +11592,33 @@ a,
   white-space:nowrap;
 }
 
+
+/* =========================================================
+   V25.9.2 — DISCOVER EXPIRED STATUS
+   Default "募集中" now means future upcoming events only.
+   GATHER / GATHERED / 開催期限切れ are opt-in filters.
+   ========================================================= */
+
+.card.event-card-expired .fixed-layout-photo img{
+  filter:grayscale(1) saturate(.12) contrast(.90) !important;
+  opacity:.48 !important;
+}
+
+.card.event-card-expired{
+  background:#D9DEE4 !important;
+  border-color:#AEB6C0 !important;
+}
+
+.card.event-card-expired .event-expired-note{
+  background:#C5CBD2 !important;
+  border-color:#A8B0BA !important;
+  color:#343C46 !important;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.9.1 stronger card states + my-gathers copy -->
+<!-- v25.9.2 discover expired status filter -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -14500,7 +14523,7 @@ function eventStartHasPassed(e){
 function eventVisualState(e){
   const mine=!!currentAuthUser && e?.owner===currentAuthUser.id;
   const joined=!mine && !!e?.joined;
-  const expired=mine && e?.status==="upcoming" && eventStartHasPassed(e);
+  const expired=e?.status==="upcoming" && eventStartHasPassed(e);
 
   return {
     mine,
@@ -14709,7 +14732,8 @@ const DISCOVER_PEOPLE_OPTIONS=[
 const DISCOVER_STATUS_OPTIONS=[
   ["upcoming","募集中"],
   ["gathered","GATHER"],
-  ["completed","GATHERED"]
+  ["completed","GATHERED"],
+  ["expired","開催期限切れ"]
 ];
 
 function discoverCategoryDisplayName(value){
@@ -15168,10 +15192,20 @@ function discoverPeopleMatches(e){
   return true;
 }
 
+function discoverEffectiveStatus(e){
+  if(eventIsCompleted(e))return "completed";
+  if(eventIsGathered(e))return "gathered";
+
+  // An event that is still "upcoming" in the DB but whose scheduled
+  // start time has passed is treated as an explicit expired bucket.
+  if(e?.status==="upcoming" && eventStartHasPassed(e))return "expired";
+
+  return "upcoming";
+}
+
 function discoverStatusMatches(e){
   const selected=state.discoverStatusFilters||["upcoming"];
-  const status=eventIsCompleted(e)?"completed":(eventIsGathered(e)?"gathered":"upcoming");
-  return selected.includes(status);
+  return selected.includes(discoverEffectiveStatus(e));
 }
 
 function discoverAllFiltersMatch(e,query){
