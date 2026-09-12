@@ -10277,10 +10277,53 @@ body{
 .notification-row.gathered-notification .notification-title{color:#207a61;font-weight:900}
 @media(max-width:420px){.gather-host-confirmed-actions{width:100%}}
 
+
+/* ===== V25.4.2 GATHERED CANCEL ===== */
+.gathered-host-complete{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+}
+.gathered-host-complete-copy{
+  min-width:0;
+}
+.gathered-cancel-button{
+  min-height:40px;
+  padding:0 12px;
+  border:1px solid #d4dbe4;
+  border-radius:12px;
+  background:#fff;
+  color:#5f6a78;
+  font:inherit;
+  font-size:9px;
+  font-weight:800;
+  cursor:pointer;
+}
+.gathered-cancel-button:active{
+  transform:scale(.98);
+  background:#f5f7fa;
+}
+.notification-row.gathered-cancel-notification{
+  background:#fbfbfc;
+}
+.notification-row.gathered-cancel-notification .notification-title{
+  color:#616b78;
+  font-weight:850;
+}
+@media(max-width:420px){
+  .gathered-host-complete{
+    grid-template-columns:1fr;
+  }
+  .gathered-cancel-button{
+    width:100%;
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.4.1 host completed notification + duplicate-popup guard -->
+<!-- v25.4.2 GATHERED cancel + preserve fun reactions -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -11173,6 +11216,12 @@ function notificationCopy(n){
       text:"通知を開いて、一緒に過ごした人へ「楽しかった！」を送ろう"
     };
   }
+  if(n.type==="completed_cancelled"){
+    return {
+      title:"GATHEREDが取り消されました",
+      text:"開催完了が取り消され、GATHER状態に戻りました"
+    };
+  }
   return {
     title:"新しい通知",
     text:"お知らせがあります"
@@ -11342,7 +11391,7 @@ function renderNotifications(){
     ? rows.map(n=>{
         const actor=person(n.actor_id);
         const copy=notificationCopy(n);
-        return `<button class="notification-row ${n.read_at?"":"unread"} ${n.type==="gathered"?"gather-notification":""} ${n.type==="gather_cancelled"?"gather-cancel-notification":""} ${n.type==="completed"?"gathered-notification":""}" onclick="openNotification('${escjs(n.id)}')">
+        return `<button class="notification-row ${n.read_at?"":"unread"} ${n.type==="gathered"?"gather-notification":""} ${n.type==="gather_cancelled"?"gather-cancel-notification":""} ${n.type==="completed"?"gathered-notification":""} ${n.type==="completed_cancelled"?"gathered-cancel-notification":""}" onclick="openNotification('${escjs(n.id)}')">
           <div class="mini-avatar">${avatarHtml(actor)}</div>
           <div class="notification-main">
             <div class="notification-title">${esc(copy.title)}</div>
@@ -11440,7 +11489,7 @@ async function openNotification(id){
     return;
   }
 
-  if((n.type==="comment" || n.type==="event_join" || n.type==="gathered" || n.type==="gather_cancelled") && n.event_id){
+  if((n.type==="comment" || n.type==="event_join" || n.type==="gathered" || n.type==="gather_cancelled" || n.type==="completed_cancelled") && n.event_id){
     let ev=state.events.find(e=>e.dbId===n.event_id || e.id===n.event_id);
 
     if(!ev){
@@ -11863,9 +11912,14 @@ function gatherHostControlHtml(e){
 
   if(eventIsCompleted(e)){
     return `<div class="gathered-host-complete">
-      <span class="gather-host-kicker">GATHERED</span>
-      <strong>この集まりは開催完了です</strong>
-      <small>参加者は「楽しかった！」を送れます。</small>
+      <div class="gathered-host-complete-copy">
+        <span class="gather-host-kicker">GATHERED</span>
+        <strong>この集まりは開催完了です</strong>
+        <small>参加者は「楽しかった！」を送れます。</small>
+      </div>
+      <button type="button" class="gathered-cancel-button" onclick="confirmCancelCompletedGather('${escjs(String(e.id))}')">
+        GATHEREDを取り消す
+      </button>
     </div>`;
   }
 
@@ -12036,6 +12090,70 @@ async function gatherEvent(id){
 }
 
 
+
+
+function confirmCancelCompletedGather(id){
+  const ev=resolveEventByAnyId(id);
+  if(!ev)return;
+
+  if(ev.owner!==(currentAuthUser?.id||meId())){
+    toast("GATHEREDを取り消せるのは主催者だけです");
+    return;
+  }
+
+  if(!eventIsCompleted(ev)){
+    toast("この集まりは開催完了になっていません");
+    return;
+  }
+
+  const ok=window.confirm(
+    `「${ev.title||"この集まり"}」の GATHERED を取り消しますか？\n\n開催確定の GATHER 状態へ戻ります。\nすでに送られた「楽しかった！」はそのまま残り、同じ相手へ再送はできません。`
+  );
+
+  if(!ok)return;
+  cancelCompletedGather(id);
+}
+
+async function cancelCompletedGather(id){
+  if(!requireAuth("GATHEREDを取り消すにはログインしてください。"))return;
+
+  const ev=resolveEventByAnyId(id);
+  if(!ev || ev.owner!==currentAuthUser.id)return;
+
+  try{
+    if(isRealSupabaseEvent(ev)){
+      const {error}=await sb
+        .from("events")
+        .update({
+          status:"gathered",
+          completed_at:null
+        })
+        .eq("id",getSupabaseEventId(ev))
+        .eq("owner_id",currentAuthUser.id);
+
+      if(error)throw error;
+    }
+
+    ev.status="gathered";
+    ev.completedAt=null;
+    save();
+
+    renderHome();
+    renderDiscover();
+    renderMyGathers();
+    renderProfile();
+
+    toast("GATHEREDを取り消しました");
+
+    if(isRealSupabaseEvent(ev)){
+      await loadEventsFromSupabase();
+      await loadNotifications();
+    }
+  }catch(error){
+    console.error("cancel completed gather:",error);
+    toast("GATHEREDを取り消せませんでした");
+  }
+}
 
 function confirmCompleteGather(id){
   const ev=resolveEventByAnyId(id);
