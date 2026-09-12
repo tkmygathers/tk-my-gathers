@@ -11993,10 +11993,81 @@ a,
   }
 }
 
+
+/* =========================================================
+   V25.12.0 — SMART IN-APP NOTIFICATIONS
+   ========================================================= */
+
+.notification-row.reminder-notification{
+  background:#FBFCFE;
+}
+
+.notification-row.reminder-notification.day-before{
+  background:linear-gradient(135deg,#F7FAFF,#EEF4FF);
+}
+
+.notification-row.reminder-notification.today{
+  background:linear-gradient(135deg,#F3F8FF,#EAF2FF);
+}
+
+.notification-row.reminder-notification.soon{
+  background:linear-gradient(135deg,#FFF8E8,#FFF3D4);
+}
+
+.notification-row.reminder-notification.fun{
+  background:linear-gradient(135deg,#F3FBF7,#EAF8F1);
+}
+
+.notification-row.reminder-notification.day-before .notification-title,
+.notification-row.reminder-notification.today .notification-title{
+  color:#245FCF;
+  font-weight:900;
+}
+
+.notification-row.reminder-notification.soon .notification-title{
+  color:#8A6517;
+  font-weight:900;
+}
+
+.notification-row.reminder-notification.fun .notification-title{
+  color:#18794E;
+  font-weight:900;
+}
+
+.notification-system-mark{
+  width:34px;
+  height:34px;
+  flex:0 0 34px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#E9EEF5;
+  color:#475569;
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.02em;
+}
+
+.notification-system-mark.reminder_day_before,
+.notification-system-mark.reminder_today{
+  background:#E5EEFF;
+  color:#2563EB;
+}
+
+.notification-system-mark.reminder_soon{
+  background:#F9E8BD;
+  color:#8A6517;
+}
+
+.notification-system-mark.reminder_fun{
+  background:#DDF4E8;
+  color:#18794E;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.11.0 create/edit confirmation screen -->
+<!-- v25.12.0 smart in-app notifications -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -13071,6 +13142,30 @@ function notificationCopy(n){
       text:"開催完了が取り消され、GATHER状態に戻りました"
     };
   }
+  if(n.type==="reminder_day_before"){
+    return {
+      title:"明日開催です",
+      text:n.event_title ? `「${n.event_title}」の予定を確認しておこう` : "明日の予定を確認しておこう"
+    };
+  }
+  if(n.type==="reminder_today"){
+    return {
+      title:"今日は開催日です",
+      text:n.event_title ? `「${n.event_title}」は今日の予定です` : "今日の予定を確認しよう"
+    };
+  }
+  if(n.type==="reminder_soon"){
+    return {
+      title:"まもなく開催です",
+      text:n.event_title ? `「${n.event_title}」の開始時間が近づいています` : "開始時間が近づいています"
+    };
+  }
+  if(n.type==="reminder_fun"){
+    return {
+      title:"「楽しかった！」を送ろう",
+      text:n.event_title ? `「${n.event_title}」で一緒だった人に送れます` : "一緒に過ごした人へ送れます"
+    };
+  }
   return {
     title:"新しい通知",
     text:"お知らせがあります"
@@ -13178,6 +13273,145 @@ async function maybeShowCompletedNotificationPopup(){
   setTimeout(()=>showGatheredCelebration(ev,{host:false}),350);
 }
 
+function notificationLocalReadKey(){
+  const uid=currentAuthUser?.id||"guest";
+  return `tkmygathers_local_notification_read_${uid}`;
+}
+
+function getLocalNotificationReadSet(){
+  try{
+    const rows=JSON.parse(localStorage.getItem(notificationLocalReadKey())||"[]");
+    return new Set(Array.isArray(rows)?rows.map(String):[]);
+  }catch{
+    return new Set();
+  }
+}
+
+function markLocalNotificationRead(id){
+  const seen=getLocalNotificationReadSet();
+  seen.add(String(id));
+  localStorage.setItem(notificationLocalReadKey(),JSON.stringify([...seen].slice(-500)));
+}
+
+function eventReminderStart(e){
+  if(!e?.date)return null;
+  const time=(e.time||"23:59").slice(0,5);
+  const d=new Date(`${e.date}T${time}:00`);
+  return Number.isNaN(d.getTime())?null:d;
+}
+
+function reminderNotificationId(type,e){
+  return `local_${type}_${String(e.dbId||e.id)}`;
+}
+
+function buildLocalReminderNotifications(){
+  if(!currentAuthUser)return [];
+
+  const uid=currentAuthUser.id;
+  const read=getLocalNotificationReadSet();
+  const now=new Date();
+  const rows=[];
+
+  (state.events||[]).forEach(e=>{
+    if(!e)return;
+
+    const own=e.owner===uid;
+    const joined=!!e.joined || (Array.isArray(e.participants)&&e.participants.includes(uid));
+    if(!own && !joined)return;
+
+    const eventId=e.dbId||e.id;
+    const start=eventReminderStart(e);
+
+    if(eventIsCompleted(e)){
+      const id=reminderNotificationId("reminder_fun",e);
+      const created=e.completedAt || e.updatedAt || e.date;
+      rows.push({
+        id,
+        user_id:uid,
+        actor_id:null,
+        type:"reminder_fun",
+        event_id:eventId,
+        event_title:e.title||"",
+        read_at:read.has(id) ? new Date(0).toISOString() : null,
+        created_at:created ? new Date(created).toISOString() : now.toISOString(),
+        local_only:true
+      });
+      return;
+    }
+
+    if(!start || e.status!=="upcoming" && e.status!=="gathered")return;
+
+    const diffMs=start.getTime()-now.getTime();
+    const diffHours=diffMs/3600000;
+
+    // Within 2 hours, including up to 15 minutes after the scheduled start,
+    // use only the strongest "soon" reminder to avoid duplicates.
+    if(diffHours<=2 && diffHours>=-0.25){
+      const id=reminderNotificationId("reminder_soon",e);
+      rows.push({
+        id,user_id:uid,actor_id:null,type:"reminder_soon",
+        event_id:eventId,event_title:e.title||"",
+        read_at:read.has(id)?new Date(0).toISOString():null,
+        created_at:now.toISOString(),local_only:true
+      });
+      return;
+    }
+
+    const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    const eventDay=new Date(start.getFullYear(),start.getMonth(),start.getDate());
+    const dayDiff=Math.round((eventDay-today)/86400000);
+
+    if(dayDiff===0){
+      const id=reminderNotificationId("reminder_today",e);
+      rows.push({
+        id,user_id:uid,actor_id:null,type:"reminder_today",
+        event_id:eventId,event_title:e.title||"",
+        read_at:read.has(id)?new Date(0).toISOString():null,
+        created_at:new Date(today.getTime()+1).toISOString(),local_only:true
+      });
+      return;
+    }
+
+    if(dayDiff===1){
+      const id=reminderNotificationId("reminder_day_before",e);
+      rows.push({
+        id,user_id:uid,actor_id:null,type:"reminder_day_before",
+        event_id:eventId,event_title:e.title||"",
+        read_at:read.has(id)?new Date(0).toISOString():null,
+        created_at:now.toISOString(),local_only:true
+      });
+    }
+  });
+
+  return rows;
+}
+
+function notificationVisualClass(n){
+  if(n.type==="gathered")return "gather-notification";
+  if(n.type==="gather_cancelled")return "gather-cancel-notification";
+  if(n.type==="completed")return "gathered-notification";
+  if(n.type==="completed_cancelled")return "gathered-cancel-notification";
+  if(n.type==="reminder_day_before")return "reminder-notification day-before";
+  if(n.type==="reminder_today")return "reminder-notification today";
+  if(n.type==="reminder_soon")return "reminder-notification soon";
+  if(n.type==="reminder_fun")return "reminder-notification fun";
+  return "";
+}
+
+function notificationLeadingHtml(n){
+  if(n.local_only){
+    const label=n.type==="reminder_day_before"
+      ?"明"
+      :(n.type==="reminder_today"
+        ?"今"
+        :(n.type==="reminder_soon"?"近":"楽"));
+    return `<div class="notification-system-mark ${esc(n.type)}">${label}</div>`;
+  }
+
+  const actor=person(n.actor_id);
+  return `<div class="mini-avatar">${avatarHtml(actor)}</div>`;
+}
+
 async function loadNotifications(){
   if(!currentAuthUser){
     state.notifications=[];
@@ -13196,10 +13430,14 @@ async function loadNotifications(){
 
     if(error)throw error;
 
-    state.notifications=data||[];
+    const remoteNotifications=data||[];
+    const reminderNotifications=buildLocalReminderNotifications();
+
+    state.notifications=[...remoteNotifications,...reminderNotifications]
+      .sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
 
     const actorIds=[...new Set(
-      state.notifications.map(n=>n.actor_id).filter(Boolean)
+      remoteNotifications.map(n=>n.actor_id).filter(Boolean)
     )];
 
     if(actorIds.length){
@@ -13241,10 +13479,9 @@ function renderNotifications(){
 
   list.innerHTML=rows.length
     ? rows.map(n=>{
-        const actor=person(n.actor_id);
         const copy=notificationCopy(n);
-        return `<button class="notification-row ${n.read_at?"":"unread"} ${n.type==="gathered"?"gather-notification":""} ${n.type==="gather_cancelled"?"gather-cancel-notification":""} ${n.type==="completed"?"gathered-notification":""} ${n.type==="completed_cancelled"?"gathered-cancel-notification":""}" onclick="openNotification('${escjs(n.id)}')">
-          <div class="mini-avatar">${avatarHtml(actor)}</div>
+        return `<button class="notification-row ${n.read_at?"":"unread"} ${notificationVisualClass(n)}" onclick="openNotification('${escjs(n.id)}')">
+          ${notificationLeadingHtml(n)}
           <div class="notification-main">
             <div class="notification-title">${esc(copy.title)}</div>
             <div class="notification-text">${esc(copy.text)}</div>
@@ -13265,6 +13502,15 @@ async function markNotificationRead(id){
 
   const item=(state.notifications||[]).find(n=>n.id===id);
   if(!item||item.read_at)return;
+
+  if(item.local_only){
+    const readAt=new Date().toISOString();
+    markLocalNotificationRead(id);
+    item.read_at=readAt;
+    updateNotificationBadge();
+    renderNotifications();
+    return;
+  }
 
   try{
     const readAt=new Date().toISOString();
@@ -13295,13 +13541,23 @@ async function markAllNotificationsRead(){
 
   try{
     const readAt=new Date().toISOString();
-    const {error}=await sb
-      .from("notifications")
-      .update({read_at:readAt})
-      .eq("user_id",currentAuthUser.id)
-      .is("read_at",null);
 
-    if(error)throw error;
+    unread.filter(n=>n.local_only).forEach(n=>{
+      markLocalNotificationRead(n.id);
+      n.read_at=readAt;
+    });
+
+    const hasRemoteUnread=unread.some(n=>!n.local_only);
+
+    if(hasRemoteUnread){
+      const {error}=await sb
+        .from("notifications")
+        .update({read_at:readAt})
+        .eq("user_id",currentAuthUser.id)
+        .is("read_at",null);
+
+      if(error)throw error;
+    }
 
     unread.forEach(n=>n.read_at=readAt);
     updateNotificationBadge();
@@ -13325,12 +13581,12 @@ async function openNotification(id){
     return;
   }
 
-  if(n.type==="completed" && n.event_id){
-    let ev=state.events.find(e=>e.dbId===n.event_id || e.id===n.event_id);
+  if((n.type==="completed" || n.type==="reminder_fun") && n.event_id){
+    let ev=state.events.find(e=>String(e.dbId||e.id)===String(n.event_id));
 
     if(!ev){
       await loadEventsFromSupabase();
-      ev=state.events.find(e=>e.dbId===n.event_id || e.id===n.event_id);
+      ev=state.events.find(e=>String(e.dbId||e.id)===String(n.event_id));
     }
 
     if(ev){
@@ -13341,7 +13597,7 @@ async function openNotification(id){
     return;
   }
 
-  if((n.type==="comment" || n.type==="event_join" || n.type==="gathered" || n.type==="gather_cancelled" || n.type==="completed_cancelled") && n.event_id){
+  if((n.type==="comment" || n.type==="event_join" || n.type==="gathered" || n.type==="gather_cancelled" || n.type==="completed_cancelled" || n.type==="reminder_day_before" || n.type==="reminder_today" || n.type==="reminder_soon") && n.event_id){
     let ev=state.events.find(e=>e.dbId===n.event_id || e.id===n.event_id);
 
     if(!ev){
