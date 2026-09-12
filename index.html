@@ -9772,10 +9772,150 @@ body{
   margin-left:6px;
 }
 
+
+/* ===== V25.2.5 GATHER FINAL NOTE ===== */
+.gather-final-note-card{
+  margin:12px 0 14px;
+  padding:14px;
+  border-radius:17px;
+  border:1px solid #cfdcf2;
+  background:#f7faff;
+}
+.gather-final-note-card.participant{
+  background:linear-gradient(135deg,#f7faff,#eef5ff);
+}
+.gather-final-note-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.gather-final-note-head > div{
+  min-width:0;
+}
+.gather-final-note-head span:first-child{
+  display:block;
+  margin-bottom:3px;
+  color:#2d68db;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.14em;
+}
+.gather-final-note-head strong{
+  display:block;
+  color:#17202b;
+  font-size:12px;
+}
+.gather-final-note-status{
+  flex:0 0 auto;
+  display:inline-flex!important;
+  align-items:center;
+  min-height:23px;
+  padding:0 8px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid #d7e2f5;
+  color:#5e6d82!important;
+  font-size:8px!important;
+  font-weight:850!important;
+  letter-spacing:0!important;
+}
+.gather-final-note-help{
+  margin:8px 0 10px;
+  color:#748091;
+  font-size:9px;
+  line-height:1.55;
+}
+.gather-final-note-input{
+  width:100%;
+  min-height:92px;
+  box-sizing:border-box;
+  resize:vertical;
+  padding:11px 12px;
+  border:1px solid #d8e0ea;
+  border-radius:13px;
+  background:#fff;
+  color:#202a36;
+  font:inherit;
+  font-size:11px;
+  line-height:1.6;
+  outline:none;
+}
+.gather-final-note-input:focus{
+  border-color:#2d68db;
+  box-shadow:0 0 0 3px rgba(45,104,219,.08);
+}
+.gather-final-note-actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-top:10px;
+}
+.gather-final-note-save,
+.gather-final-note-clear{
+  min-height:38px;
+  padding:0 12px;
+  border-radius:11px;
+  font:inherit;
+  font-size:9px;
+  font-weight:850;
+  cursor:pointer;
+}
+.gather-final-note-save{
+  border:0;
+  background:#2d68db;
+  color:#fff;
+}
+.gather-final-note-clear{
+  border:1px solid #d9dfe7;
+  background:#fff;
+  color:#747f8d;
+}
+.gather-final-note-body{
+  margin-top:11px;
+  padding:12px 13px;
+  border-radius:13px;
+  background:#fff;
+  color:#283441;
+  font-size:11px;
+  line-height:1.7;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.gather-final-note-empty{
+  margin-top:11px;
+  color:#7d8896;
+  font-size:10px;
+}
+.my-gather-note-preview{
+  margin-top:8px;
+  padding:9px 10px;
+  border-radius:11px;
+  background:#eef5ff;
+  border:1px solid #d8e5fa;
+}
+.my-gather-note-preview strong{
+  display:block;
+  margin-bottom:3px;
+  color:#2d68db;
+  font-size:8px;
+  letter-spacing:.08em;
+}
+.my-gather-note-preview span{
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  color:#566272;
+  font-size:9px;
+  line-height:1.45;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.2.4 gathered-event visibility fix -->
+<!-- v25.2.5 GATHER final host note -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -11445,6 +11585,123 @@ async function cancelGatherEvent(id){
   }
 }
 
+
+function gatherFinalNoteHtml(e){
+  if(!eventIsGathered(e))return "";
+
+  const mine=e.owner===(currentAuthUser?.id||meId());
+  const note=(e.gatherNote||"").trim();
+
+  if(mine){
+    return `<section class="gather-final-note-card host">
+      <div class="gather-final-note-head">
+        <div>
+          <span>FINAL NOTE</span>
+          <strong>主催者からの最終メモ</strong>
+        </div>
+        <span class="gather-final-note-status">${note?"公開中":"未入力"}</span>
+      </div>
+      <p class="gather-final-note-help">集合場所の詳細や当日の注意などを、参加者に共有できます。</p>
+      <textarea class="gather-final-note-input" id="gatherFinalNoteInput" maxlength="1200" rows="4" placeholder="例：13:50に新宿駅南口へ集合してください。遅れる場合はコメントで連絡をお願いします。">${esc(note)}</textarea>
+      <div class="gather-final-note-actions">
+        ${note?`<button type="button" class="gather-final-note-clear" onclick="clearGatherFinalNote('${escjs(String(e.id))}')">メモを削除</button>`:"<span></span>"}
+        <button type="button" class="gather-final-note-save" onclick="saveGatherFinalNote('${escjs(String(e.id))}')">${note?"更新する":"参加者に共有する"}</button>
+      </div>
+    </section>`;
+  }
+
+  return `<section class="gather-final-note-card participant">
+    <div class="gather-final-note-head">
+      <div>
+        <span>FROM HOST</span>
+        <strong>主催者からの最終メモ</strong>
+      </div>
+      <span class="gather-final-note-status">${note?"更新あり":"準備中"}</span>
+    </div>
+    ${note
+      ? `<div class="gather-final-note-body">${esc(note)}</div>`
+      : `<div class="gather-final-note-empty">主催者からの最終メモはまだありません。</div>`}
+  </section>`;
+}
+
+async function saveGatherFinalNote(id){
+  if(!requireAuth("最終メモを保存するにはログインしてください。"))return;
+
+  const ev=resolveEventByAnyId(id);
+  if(!ev)return;
+
+  if(ev.owner!==currentAuthUser.id){
+    toast("最終メモを編集できるのは主催者だけです");
+    return;
+  }
+  if(!eventIsGathered(ev)){
+    toast("GATHER後に最終メモを編集できます");
+    return;
+  }
+
+  const input=$("gatherFinalNoteInput");
+  const text=(input?.value||"").trim();
+
+  if(!text){
+    toast("メモを入力してください");
+    return;
+  }
+
+  try{
+    if(isRealSupabaseEvent(ev)){
+      const eventId=getSupabaseEventId(ev);
+      const {error}=await sb
+        .from("events")
+        .update({gather_note:text})
+        .eq("id",eventId)
+        .eq("owner_id",currentAuthUser.id);
+
+      if(error)throw error;
+    }
+
+    ev.gatherNote=text;
+    save();
+    renderMyGathers();
+    openCardDetail(ev.id);
+    toast("最終メモを参加者に共有しました");
+  }catch(error){
+    console.error("save gather final note:",error);
+    toast("最終メモを保存できませんでした");
+  }
+}
+
+async function clearGatherFinalNote(id){
+  if(!requireAuth("最終メモを編集するにはログインしてください。"))return;
+
+  const ev=resolveEventByAnyId(id);
+  if(!ev || ev.owner!==currentAuthUser.id)return;
+
+  const ok=window.confirm("主催者からの最終メモを削除しますか？");
+  if(!ok)return;
+
+  try{
+    if(isRealSupabaseEvent(ev)){
+      const eventId=getSupabaseEventId(ev);
+      const {error}=await sb
+        .from("events")
+        .update({gather_note:null})
+        .eq("id",eventId)
+        .eq("owner_id",currentAuthUser.id);
+
+      if(error)throw error;
+    }
+
+    ev.gatherNote="";
+    save();
+    renderMyGathers();
+    openCardDetail(ev.id);
+    toast("最終メモを削除しました");
+  }catch(error){
+    console.error("clear gather final note:",error);
+    toast("最終メモを削除できませんでした");
+  }
+}
+
 function mapSupabaseEvent(row){
   if(row.profiles)remoteProfileToPerson(row.profiles);
   return {
@@ -11469,6 +11726,7 @@ function mapSupabaseEvent(row){
     mine:!!currentAuthUser && row.owner_id===currentAuthUser.id,
     status:row.status==="completed"?"history":row.status,
     gatheredAt:row.gathered_at||null,
+    gatherNote:row.gather_note||"",
     participants:[row.owner_id],
     comments:[],
     funSent:[],
@@ -11530,6 +11788,7 @@ async function loadEventsFromSupabase(){
       visibility,
       status,
       gathered_at,
+      gather_note,
       created_at
     `;
 
@@ -11866,6 +12125,7 @@ function openCardDetail(id){
 
         ${eventIsGathered(e)?gatherStatusHtml(e):""}
         ${gatherHostControlHtml(e)}
+        ${gatherFinalNoteHtml(e)}
 
         ${!eventIsGathered(e) && eventIsOneMore(e) ? `
           <div class="detail-one-more-focus">
@@ -13186,6 +13446,7 @@ function myEventCard(e,mode){
     <div class="my-event-main">
       <div class="my-event-title">${esc(e.title)} ${gatherStatusHtml(e,{compact:true})}</div>
       <div class="my-event-meta">${dateLabel(e.date)} ${esc(e.time)}<br>${esc(e.place)} · ${eventPeopleText(e)}</div>
+      ${eventIsGathered(e)&&e.gatherNote?`<div class="my-gather-note-preview"><strong>最終メモ</strong><span>${esc(e.gatherNote)}</span></div>`:""}
       ${mode==="created"?`<div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div>${gatherHostControlHtml(e)}`:""}
       <div class="my-event-actions">
         <button onclick="openEvent(${arg})">詳細を見る</button>
@@ -15275,7 +15536,7 @@ function openEvent(id){
   $("detailTitle").textContent=e.title;
   $("detailSub").textContent=`${u.name} · ${dateLabel(e.date)} ${e.time}`;
   $("detailCover").innerHTML=`<img src="${eventImageSrc(e)}" alt="" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">`;
-  $("detailMeta").innerHTML=`${eventIsGathered(e)?gatherStatusHtml(e):""}${gatherHostControlHtml(e)}<div class="meta-line">場所　${esc(e.place)}</div><div class="meta-line">人数　${eventPeopleText(e)}</div><div class="meta-line">人数設定　${eventPeopleModeText(e)}</div><div class="meta-line">予算　${esc(e.budget)}</div><div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div><div class="visibility-note"><strong>公開範囲</strong><br>${esc(visibilityDescription(e.visibilityDb||e.visibility))}</div><div class="event-note">${esc(e.note)}</div><div class="event-tags">${publicEventTags(e).map(t=>`<span class="event-tag">${esc(t)}</span>`).join("")}</div>`;
+  $("detailMeta").innerHTML=`${eventIsGathered(e)?gatherStatusHtml(e):""}${gatherHostControlHtml(e)}${gatherFinalNoteHtml(e)}<div class="meta-line">場所　${esc(e.place)}</div><div class="meta-line">人数　${eventPeopleText(e)}</div><div class="meta-line">人数設定　${eventPeopleModeText(e)}</div><div class="meta-line">予算　${esc(e.budget)}</div><div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div><div class="visibility-note"><strong>公開範囲</strong><br>${esc(visibilityDescription(e.visibilityDb||e.visibility))}</div><div class="event-note">${esc(e.note)}</div><div class="event-tags">${publicEventTags(e).map(t=>`<span class="event-tag">${esc(t)}</span>`).join("")}</div>`;
   renderEventDetail();
   openModal("eventModal");
   if(e.source==="supabase")loadEventComments(e);
