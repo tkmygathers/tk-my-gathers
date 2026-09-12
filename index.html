@@ -9934,10 +9934,140 @@ body{
   transition:.15s ease;
 }
 
+
+/* ===== V25.3.1 OTHER PROFILE MOBILE UX ===== */
+#otherProfileModal{
+  overscroll-behavior:contain;
+}
+#otherProfileModal .other-profile-sheet{
+  width:min(100%,430px);
+  padding:0!important;
+  overflow:hidden!important;
+  display:flex;
+  flex-direction:column;
+  max-height:94dvh!important;
+  background:#fff!important;
+}
+.other-profile-topbar{
+  position:relative;
+  z-index:20;
+  flex:0 0 auto;
+  display:grid;
+  grid-template-columns:48px minmax(0,1fr) 48px;
+  align-items:center;
+  min-height:58px;
+  padding:calc(4px + env(safe-area-inset-top)) 10px 6px;
+  border-bottom:1px solid rgba(27,36,47,.08);
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  box-sizing:border-box;
+}
+.other-profile-topbar::after{
+  content:"";
+  width:48px;
+  height:1px;
+}
+.other-profile-back{
+  width:44px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  border:0;
+  border-radius:50%;
+  background:transparent;
+  color:#17202b;
+  font:inherit;
+  font-size:24px;
+  line-height:1;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.other-profile-back:active{
+  background:#eef2f6;
+  transform:scale(.96);
+}
+.other-profile-topbar-copy{
+  min-width:0;
+  text-align:center;
+}
+.other-profile-topbar-copy .sheet-title{
+  font-size:13px;
+  font-weight:850;
+  line-height:1.2;
+}
+.other-profile-topbar-copy .sheet-sub{
+  margin-top:2px;
+  font-size:8px;
+  color:#8b95a2;
+}
+#otherProfileModal .other-profile-scroll{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+  touch-action:pan-y;
+  scrollbar-width:none;
+}
+#otherProfileModal .other-profile-scroll::-webkit-scrollbar{
+  display:none;
+}
+#otherProfileModal .v24-4-24-profile-shell{
+  margin:0!important;
+  min-height:100%;
+}
+#otherProfileModal .v24-4-24-profile-main{
+  padding-bottom:calc(28px + env(safe-area-inset-bottom))!important;
+}
+
+/* Give interactive profile controls a comfortable tap target. */
+#otherProfileModal button,
+#otherProfileModal .v24-4-24-count{
+  -webkit-tap-highlight-color:transparent;
+}
+#otherProfileModal .v24-4-24-actions button,
+#otherProfileModal .v24-4-24-count{
+  min-height:42px;
+}
+
+/* Mobile: behave like a native full-screen profile page. */
+@media(max-width:520px){
+  #otherProfileModal{
+    align-items:flex-end!important;
+  }
+  #otherProfileModal .other-profile-sheet{
+    width:100%!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    border-radius:0!important;
+  }
+  .other-profile-topbar{
+    min-height:60px;
+  }
+  #otherProfileModal .v24-4-24-banner{
+    height:156px;
+  }
+}
+
+/* Desktop/tablet: keep the modal-card presentation. */
+@media(min-width:521px){
+  #otherProfileModal{
+    align-items:center!important;
+  }
+  #otherProfileModal .other-profile-sheet{
+    max-height:86vh!important;
+    border-radius:24px!important;
+    box-shadow:0 22px 70px rgba(20,31,46,.22);
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.3.0 host event editing + posted/updated timestamps -->
+<!-- v25.3.1 other profile mobile navigation + scroll UX -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -10504,16 +10634,17 @@ body{
 </div>
 </div>
 <div class="modal" id="otherProfileModal" onclick="backdropClose(event,'otherProfileModal')">
-<div class="sheet">
-<div class="handle"></div>
-<div class="sheet-head">
-<div>
+<div class="sheet other-profile-sheet">
+<div class="other-profile-topbar">
+<button class="other-profile-back" type="button" onclick="closeModal('otherProfileModal')" aria-label="戻る">
+<span aria-hidden="true">←</span>
+</button>
+<div class="other-profile-topbar-copy">
 <div class="sheet-title">プロフィール</div>
 <div class="sheet-sub">ユーザー情報</div>
 </div>
-<button class="close-btn" onclick="closeModal('otherProfileModal')">×</button>
 </div>
-<div class="other-profile-card" id="otherProfileContent"></div>
+<div class="other-profile-card other-profile-scroll" id="otherProfileContent"></div>
 </div>
 </div>
 <div class="modal" id="followListModal" onclick="backdropClose(event,'followListModal')">
