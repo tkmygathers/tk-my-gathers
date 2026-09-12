@@ -10218,10 +10218,50 @@ body{
   }
 }
 
+
+/* ===== V25.3.5 REMOVABLE INTERESTS ===== */
+.profile-interest-item{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+}
+.profile-interest-main{
+  padding-right:30px!important;
+}
+.profile-interest-remove{
+  position:absolute;
+  right:5px;
+  top:50%;
+  transform:translateY(-50%);
+  width:22px;
+  height:22px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:rgba(83,96,112,.10);
+  color:#6f7a88;
+  font:inherit;
+  font-size:14px;
+  line-height:1;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.profile-interest-remove:active{
+  transform:translateY(-50%) scale(.92);
+  background:rgba(83,96,112,.18);
+}
+.profile-interest-empty{
+  color:#8a94a2;
+  font-size:9px;
+  padding:6px 2px;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.3.4 profile gender + age range -->
+<!-- v25.3.5 removable profile interests -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -14298,7 +14338,12 @@ if(basicMeta){
   basicMeta.innerHTML=parts.length?parts.map(x=>`<span>${esc(x)}</span>`).join(`<i>・</i>`):"";
   basicMeta.style.display=parts.length?"flex":"none";
 }
-$("profileArea").textContent=m.area;$("followersCount").textContent=m.followers;$("followingCount").textContent=m.following;$("mutualCount").textContent=mutuals().length;$("myFunTotal").textContent=m.fun;$("profileAvatar").innerHTML=m.avatar?`<img src="${m.avatar}" alt="">`:esc(m.name.slice(0,2));$("interestGrid").innerHTML=m.interests.map(x=>`<button class="interest-chip light" onclick="prefill('${escjs(x)}')">${esc(x)}</button>`).join("");$("upcoming").innerHTML=profileList(state.events.filter(e=>e.joined&&["upcoming","gathered"].includes(e.status)),"まだ参加予定はありません",false);$("created").innerHTML=profileList(state.events.filter(e=>e.owner===(currentAuthUser?.id||meId())),"まだ自分の募集はありません",false);$("history").innerHTML=profileList(state.events.filter(e=>e.status==="history"&&e.participants.includes(meId())),"まだ履歴はありません",true)}
+$("profileArea").textContent=m.area;$("followersCount").textContent=m.followers;$("followingCount").textContent=m.following;$("mutualCount").textContent=mutuals().length;$("myFunTotal").textContent=m.fun;$("profileAvatar").innerHTML=m.avatar?`<img src="${m.avatar}" alt="">`:esc(m.name.slice(0,2));$("interestGrid").innerHTML=m.interests.length
+  ? m.interests.map(x=>`<div class="profile-interest-item">
+      <button class="interest-chip light profile-interest-main" onclick="prefill('${escjs(x)}')">${esc(x)}</button>
+      <button class="profile-interest-remove" type="button" aria-label="${esc(x)}を削除" onclick="removeInterest('${escjs(x)}')">×</button>
+    </div>`).join("")
+  : `<div class="profile-interest-empty">興味・関心はまだありません。</div>`;$("upcoming").innerHTML=profileList(state.events.filter(e=>e.joined&&["upcoming","gathered"].includes(e.status)),"まだ参加予定はありません",false);$("created").innerHTML=profileList(state.events.filter(e=>e.owner===(currentAuthUser?.id||meId())),"まだ自分の募集はありません",false);$("history").innerHTML=profileList(state.events.filter(e=>e.status==="history"&&e.participants.includes(meId())),"まだ履歴はありません",true)}
 function profileList(list,empty,historyMode){if(!list.length)return `<div class="panel" style="padding:18px;text-align:center;color:var(--muted)">${empty}</div>`;return `<div class="list">${list.map(e=>{const arg=eventIdArg(e.id);return `<div class="friend"><div class="friend-left" onclick="openEvent(${arg})" style="cursor:pointer"><div class="mini-avatar">${esc(e.sub.slice(0,2))}</div><div><div class="friend-name">${esc(e.title)}</div><div class="muted">${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</div></div></div>${historyMode?`<button class="fun-btn" onclick="openFun(${arg})">楽しかった！</button>`:`<div class="muted">${eventPeopleText(e)}</div>`}</div>`}).join("")}</div>`}
 function switchProfileTab(id){document.querySelectorAll(".profile-tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("active",p.id===id))}
 
@@ -15080,6 +15125,33 @@ function clearProfileBanner(){
   preview.removeAttribute("src");
   preview.style.display="none";
   if(placeholder)placeholder.style.display="flex";
+}
+
+
+async function removeInterest(name){
+  if(!requireAuth("興味・関心を編集するにはログインしてください。"))return;
+
+  const current=me();
+  const next=(current.interests||[]).filter(x=>x!==name);
+
+  try{
+    if(currentAuthUser){
+      const {error}=await sb
+        .from("profiles")
+        .update({interests:next})
+        .eq("id",currentAuthUser.id);
+
+      if(error)throw error;
+    }
+
+    current.interests=next;
+    save();
+    renderProfile();
+    toast("興味・関心を削除しました");
+  }catch(error){
+    console.error("remove interest:",error);
+    toast("削除できませんでした");
+  }
 }
 
 function openWant(){openModal("wantModal")}
