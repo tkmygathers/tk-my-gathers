@@ -9759,10 +9759,23 @@ body{
   }
 }
 
+
+/* ===== V25.2.4 GATHER VISIBILITY FIX ===== */
+#myGatheredPanel .my-event{
+  border-color:#c8dafa;
+  background:linear-gradient(180deg,#ffffff,#f8fbff);
+}
+#myGatheredPanel .my-event-title{
+  color:#17202b;
+}
+#myGatheredPanel .gather-badge-mini{
+  margin-left:6px;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.2.3 my gathers confirmed GATHER tab -->
+<!-- v25.2.4 gathered-event visibility fix -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -11085,11 +11098,13 @@ async function serverCanViewSupabaseEvent(row){
   // 自分の募集は常に表示
   if(uid && row.owner_id===uid)return true;
 
-  // 他人の終了済み募集は一覧に出さない
-  if(status!=="upcoming")return false;
+  // GATHER済みはDB側の can_view_event で
+  // 「現在参加している人だけ」に判定してもらう。
+  // completed / cancelled などは他人には表示しない。
+  if(status!=="upcoming" && status!=="gathered")return false;
 
-  // 未ログインでは公開募集だけ
-  if(!uid)return visibility==="public";
+  // 未ログインでは募集中の公開募集だけ
+  if(!uid)return status==="upcoming" && visibility==="public";
 
   try{
     const {data,error}=await sb.rpc("can_view_event",{
@@ -13016,7 +13031,7 @@ function calendarEvents(){
   const uid=currentAuthUser.id;
 
   return state.events.filter(e=>{
-    if(!e.date || e.status!=="upcoming")return false;
+    if(!e.date || !["upcoming","gathered"].includes(e.status))return false;
 
     const own=e.owner===uid;
     const joined=Boolean(e.joined) || (Array.isArray(e.participants) && e.participants.includes(uid));
@@ -13405,7 +13420,7 @@ async function renderOtherProfile(id){
     const mutual=isMutualFollow(id);
 
     const hostedEvents=(state.events||[])
-      .filter(e=>e && e.owner===id && e.status==="upcoming")
+      .filter(e=>e && e.owner===id && ["upcoming","gathered"].includes(e.status))
       .slice(0,3);
 
     const interestList=Array.isArray(p.interests)?p.interests.filter(Boolean).slice(0,10):[];
@@ -13571,7 +13586,7 @@ if(banner){
     ? `<img src="${esc(m.banner)}" alt="プロフィールバナー">`
     : `<div class="profile-banner-empty">BANNER</div>`;
 }
-$("profileName").textContent=m.name;$("profileHandle").textContent=m.handle;$("profileBio").textContent=m.bio;$("profileArea").textContent=m.area;$("followersCount").textContent=m.followers;$("followingCount").textContent=m.following;$("mutualCount").textContent=mutuals().length;$("myFunTotal").textContent=m.fun;$("profileAvatar").innerHTML=m.avatar?`<img src="${m.avatar}" alt="">`:esc(m.name.slice(0,2));$("interestGrid").innerHTML=m.interests.map(x=>`<button class="interest-chip light" onclick="prefill('${escjs(x)}')">${esc(x)}</button>`).join("");$("upcoming").innerHTML=profileList(state.events.filter(e=>e.joined&&e.status==="upcoming"),"まだ参加予定はありません",false);$("created").innerHTML=profileList(state.events.filter(e=>e.owner===(currentAuthUser?.id||meId())),"まだ自分の募集はありません",false);$("history").innerHTML=profileList(state.events.filter(e=>e.status==="history"&&e.participants.includes(meId())),"まだ履歴はありません",true)}
+$("profileName").textContent=m.name;$("profileHandle").textContent=m.handle;$("profileBio").textContent=m.bio;$("profileArea").textContent=m.area;$("followersCount").textContent=m.followers;$("followingCount").textContent=m.following;$("mutualCount").textContent=mutuals().length;$("myFunTotal").textContent=m.fun;$("profileAvatar").innerHTML=m.avatar?`<img src="${m.avatar}" alt="">`:esc(m.name.slice(0,2));$("interestGrid").innerHTML=m.interests.map(x=>`<button class="interest-chip light" onclick="prefill('${escjs(x)}')">${esc(x)}</button>`).join("");$("upcoming").innerHTML=profileList(state.events.filter(e=>e.joined&&["upcoming","gathered"].includes(e.status)),"まだ参加予定はありません",false);$("created").innerHTML=profileList(state.events.filter(e=>e.owner===(currentAuthUser?.id||meId())),"まだ自分の募集はありません",false);$("history").innerHTML=profileList(state.events.filter(e=>e.status==="history"&&e.participants.includes(meId())),"まだ履歴はありません",true)}
 function profileList(list,empty,historyMode){if(!list.length)return `<div class="panel" style="padding:18px;text-align:center;color:var(--muted)">${empty}</div>`;return `<div class="list">${list.map(e=>{const arg=eventIdArg(e.id);return `<div class="friend"><div class="friend-left" onclick="openEvent(${arg})" style="cursor:pointer"><div class="mini-avatar">${esc(e.sub.slice(0,2))}</div><div><div class="friend-name">${esc(e.title)}</div><div class="muted">${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</div></div></div>${historyMode?`<button class="fun-btn" onclick="openFun(${arg})">楽しかった！</button>`:`<div class="muted">${eventPeopleText(e)}</div>`}</div>`}).join("")}</div>`}
 function switchProfileTab(id){document.querySelectorAll(".profile-tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("active",p.id===id))}
 
