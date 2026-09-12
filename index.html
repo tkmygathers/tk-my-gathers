@@ -11385,10 +11385,162 @@ a,
     font-size:29px !important;
   }
 }
+
+/* =========================================================
+   V25.9.0 — CARD STATES + PUBLIC AUDIENCE CONDITIONS
+   ========================================================= */
+
+.card.event-card-mine{
+  background:#F3F7FF !important;
+  border-color:#CFE0FB !important;
+}
+
+.card.event-card-joined{
+  background:#F2FAFC !important;
+  border-color:#CDE8EE !important;
+}
+
+.card.event-card-expired{
+  background:#F1F3F5 !important;
+  border-color:#D5DAE0 !important;
+  box-shadow:none !important;
+}
+
+.card.event-card-expired .fixed-layout-photo img{
+  filter:grayscale(.75) saturate(.45);
+  opacity:.72;
+}
+
+.card.event-card-expired .fixed-layout-right,
+.card.event-card-expired .v24-4-19-tag-footer{
+  opacity:.72;
+}
+
+.event-expired-note{
+  width:max-content;
+  max-width:100%;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:6px;
+  padding:5px 8px;
+  border:1px solid #D3D8DE;
+  border-radius:999px;
+  background:#E7EAEE;
+  color:#59616C;
+  font-size:7.7px;
+  font-weight:850;
+  line-height:1;
+}
+
+.event-expired-note span{
+  width:6px;
+  height:6px;
+  flex:0 0 auto;
+  border-radius:50%;
+  background:#7A838E;
+}
+
+.audience-condition-box{
+  display:none;
+  margin-top:10px;
+  padding:12px;
+  border:1px solid #DCE5F1;
+  border-radius:15px;
+  background:#F8FAFD;
+}
+
+.audience-condition-box.show{
+  display:block;
+}
+
+.audience-condition-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.audience-condition-head strong{
+  display:block;
+  color:#172033;
+  font-size:10.5px;
+  font-weight:850;
+}
+
+.audience-condition-head small{
+  display:block;
+  margin-top:3px;
+  color:#758195;
+  font-size:7.5px;
+  line-height:1.45;
+  font-weight:650;
+}
+
+.audience-condition-group{
+  margin-top:11px;
+}
+
+.audience-condition-label{
+  display:block;
+  margin-bottom:6px;
+  color:#475569;
+  font-size:8px;
+  font-weight:850;
+}
+
+.audience-condition-options{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+.audience-condition-options label{
+  position:relative;
+}
+
+.audience-condition-options input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.audience-condition-options span{
+  min-height:30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 10px;
+  border:1px solid #DCE3EC;
+  border-radius:999px;
+  background:#fff;
+  color:#536174;
+  font-size:8px;
+  font-weight:760;
+  cursor:pointer;
+  user-select:none;
+}
+
+.audience-condition-options input:checked + span{
+  border-color:#AFCBF8;
+  background:#EAF2FF;
+  color:#2563EB;
+}
+
+.audience-condition-note{
+  margin-top:10px;
+  padding-top:9px;
+  border-top:1px solid #E3E9F1;
+  color:#7B8798;
+  font-size:7.4px;
+  line-height:1.5;
+  font-weight:650;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.8.4 true two-line fun count card -->
+<!-- v25.9.0 card states + public audience conditions -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -11824,6 +11976,41 @@ a,
 </div>
 <div class="visibility-note" id="visibilityCreateHint">未ログインの人も見ることができます</div>
 <div class="picker" id="picker"><div id="memberList"></div><div class="muted" id="selectedCount" style="margin-top:7px"></div></div>
+
+<div class="audience-condition-box" id="publicAudienceConditions">
+  <div class="audience-condition-head">
+    <div>
+      <strong>表示する相手を絞る</strong>
+      <small>公開募集のときだけ使えます。未選択なら条件なしです。</small>
+    </div>
+  </div>
+
+  <div class="audience-condition-group">
+    <span class="audience-condition-label">性別</span>
+    <div class="audience-condition-options">
+      <label><input type="checkbox" name="allowedGender" value="男性"><span>男性</span></label>
+      <label><input type="checkbox" name="allowedGender" value="女性"><span>女性</span></label>
+      <label><input type="checkbox" name="allowedGender" value="その他"><span>その他</span></label>
+      <label><input type="checkbox" name="allowedGender" value="回答しない"><span>回答しない</span></label>
+    </div>
+  </div>
+
+  <div class="audience-condition-group">
+    <span class="audience-condition-label">年代</span>
+    <div class="audience-condition-options">
+      <label><input type="checkbox" name="allowedAge" value="20代前半"><span>20代前半</span></label>
+      <label><input type="checkbox" name="allowedAge" value="20代後半"><span>20代後半</span></label>
+      <label><input type="checkbox" name="allowedAge" value="30代前半"><span>30代前半</span></label>
+      <label><input type="checkbox" name="allowedAge" value="30代後半"><span>30代後半</span></label>
+      <label><input type="checkbox" name="allowedAge" value="40代"><span>40代</span></label>
+      <label><input type="checkbox" name="allowedAge" value="50代以上"><span>50代以上</span></label>
+    </div>
+  </div>
+
+  <div class="audience-condition-note">
+    条件を設定すると、条件に合わないユーザーには募集自体が表示されません。
+  </div>
+</div>
 </div>
 <div class="step">
 <div class="step-label">7. タグ</div>
@@ -12933,6 +13120,30 @@ function updateVisibilityCreateHint(){
   const hint=$("visibilityCreateHint");
   if(hint)hint.textContent=visibilityDescription(db);
   $("picker").classList.toggle("show",db==="selected");
+
+  const audienceBox=$("publicAudienceConditions");
+  if(audienceBox){
+    audienceBox.classList.toggle("show",db==="public");
+  }
+}
+
+function selectedAudienceValues(name){
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)]
+    .map(el=>el.value)
+    .filter(Boolean);
+}
+
+function setAudienceConditionValues(genders=[],ages=[]){
+  const genderSet=new Set(Array.isArray(genders)?genders:[]);
+  const ageSet=new Set(Array.isArray(ages)?ages:[]);
+
+  document.querySelectorAll('input[name="allowedGender"]').forEach(el=>{
+    el.checked=genderSet.has(el.value);
+  });
+
+  document.querySelectorAll('input[name="allowedAge"]').forEach(el=>{
+    el.checked=ageSet.has(el.value);
+  });
 }
 function clientCanViewLocalEvent(e){
   const v=visibilityDbValue(e?.visibility);
@@ -13645,6 +13856,8 @@ function mapSupabaseEvent(row){
     budget:formatBudgetLabel(row.budget||"未設定"),
     visibility:visibilityLabel(row.visibility),
     visibilityDb:row.visibility,
+    allowedGenders:Array.isArray(row.allowed_genders)?row.allowed_genders:[],
+    allowedAgeRanges:Array.isArray(row.allowed_age_ranges)?row.allowed_age_ranges:[],
     note:row.description||"気軽に参加できる募集です。",
     image:row.image_url||null,
     joined:!!currentAuthUser && row.owner_id===currentAuthUser.id,
@@ -13715,6 +13928,8 @@ async function loadEventsFromSupabase(){
       image_url,
       tags,
       visibility,
+      allowed_genders,
+      allowed_age_ranges,
       status,
       gathered_at,
       gather_note,
@@ -14217,6 +14432,31 @@ function eventParticipantsHtml(e){
   </div>`;
 }
 
+function eventStartHasPassed(e){
+  if(!e?.date)return false;
+
+  const time=(e.time||"23:59").slice(0,5);
+  const start=new Date(`${e.date}T${time}:00`);
+
+  if(Number.isNaN(start.getTime()))return false;
+  return Date.now()>start.getTime();
+}
+
+function eventVisualState(e){
+  const mine=!!currentAuthUser && e?.owner===currentAuthUser.id;
+  const joined=!mine && !!e?.joined;
+  const expired=mine && e?.status==="upcoming" && eventStartHasPassed(e);
+
+  return {
+    mine,
+    joined,
+    expired,
+    className:expired
+      ?"event-card-expired"
+      :(mine?"event-card-mine":(joined?"event-card-joined":""))
+  };
+}
+
 function eventCard(e){
   const u=person(e.owner);
   const mine=e.owner===(currentAuthUser?.id||meId());
@@ -14224,8 +14464,9 @@ function eventCard(e){
   const remaining=Math.max(0,e.capacity-e.people);
   const oneMore=eventIsOneMore(e);
   const summary=(e.note||e.description||"").trim();
+  const visual=eventVisualState(e);
 
-  return `<article class="card fixed-layout-card v24-4-19-card">
+  return `<article class="card fixed-layout-card v24-4-19-card ${visual.className}">
     <div class="fixed-layout-left">
       <button class="fixed-layout-photo" onclick="openCardDetail(${arg})">
         <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
@@ -14257,6 +14498,13 @@ function eventCard(e){
         </div>
 
         <button class="fixed-card-title v24-4-17-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
+
+        ${visual.expired?`
+          <div class="event-expired-note">
+            <span></span>
+            開催日時を過ぎています
+          </div>
+        `:""}
 
         ${eventIsGathered(e)?gatherStatusHtml(e):""}
 
@@ -17149,6 +17397,7 @@ function openCreate(){
   renderSubs();
   renderMemberPicker();
   renderQuickTags();
+  setAudienceConditionValues([],[]);
   updateVisibilityCreateHint();
   $("eventImagePreview").style.display=selectedEventImageFile?"block":"none";
   openModal("createModal");
@@ -17207,6 +17456,11 @@ async function openEditEvent(id){
   document.querySelectorAll('input[name="vis"]').forEach(r=>{
     r.checked=r.value===visValue;
   });
+
+  setAudienceConditionValues(
+    ev.allowedGenders||[],
+    ev.allowedAgeRanges||[]
+  );
 
   state.selectedTags=[...publicEventTags(ev)];
   state.selectedMembers=[];
@@ -17486,6 +17740,7 @@ function resetCreateState(form){
   renderSubs();
   renderQuickTags();
   renderMemberPicker();
+  setAudienceConditionValues([],[]);
   $("picker").classList.remove("show");
   updateVisibilityCreateHint();
 }
@@ -17546,6 +17801,14 @@ $("createForm").addEventListener("submit",async e=>{
     const imageUrl=uploadedImage?.publicUrl
       || (editing ? (editingRemoveImage?null:editingExistingImageUrl) : null);
 
+    const allowedGenders=visDb==="public"
+      ? selectedAudienceValues("allowedGender")
+      : [];
+
+    const allowedAgeRanges=visDb==="public"
+      ? selectedAudienceValues("allowedAge")
+      : [];
+
     const eventPayload={
       title:sub,
       category:state.cat,
@@ -17559,6 +17822,8 @@ $("createForm").addEventListener("submit",async e=>{
       image_url:imageUrl,
       tags,
       visibility:visDb,
+      allowed_genders:allowedGenders,
+      allowed_age_ranges:allowedAgeRanges,
       updated_at:new Date().toISOString()
     };
 
@@ -17671,6 +17936,8 @@ $("createForm").addEventListener("submit",async e=>{
           image_url,
           tags,
           visibility,
+          allowed_genders,
+          allowed_age_ranges,
           status,
           gathered_at,
           gather_note,
