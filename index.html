@@ -10280,7 +10280,7 @@ body{
 </style>
 </head>
 <body>
-<!-- v25.4.0 GATHERED completion + Supabase fun reactions -->
+<!-- v25.4.1 host completed notification + duplicate-popup guard -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -11170,7 +11170,7 @@ function notificationCopy(n){
   if(n.type==="completed"){
     return {
       title:"GATHERED！開催完了",
-      text:"一緒に過ごした人へ「楽しかった！」を送ろう"
+      text:"通知を開いて、一緒に過ごした人へ「楽しかった！」を送ろう"
     };
   }
   return {
@@ -11258,6 +11258,16 @@ async function maybeShowCompletedNotificationPopup(){
   const seen=getGatheredCompletedSeen();
   const n=(state.notifications||[]).find(row=>row.type==="completed" && !seen.has(String(row.id)));
   if(!n)return;
+
+  // 主催者が今まさに GATHERED! を押した直後は、
+  // その場の演出をすでに表示しているので通知由来の演出は重ねない。
+  if(
+    window._suppressCompletedPopupEventId &&
+    String(n.event_id)===String(window._suppressCompletedPopupEventId)
+  ){
+    markGatheredCompletedSeen(n.id);
+    return;
+  }
 
   let ev=(state.events||[]).find(e=>String(e.dbId||e.id)===String(n.event_id));
   if(!ev){
@@ -12076,8 +12086,15 @@ async function completeGatherEvent(id){
     showGatheredCelebration(ev,{host:true});
 
     if(isRealSupabaseEvent(ev)){
-      await loadEventsFromSupabase();
-      await loadNotifications();
+      const completedEventId=getSupabaseEventId(ev);
+      window._suppressCompletedPopupEventId=completedEventId;
+
+      try{
+        await loadEventsFromSupabase();
+        await loadNotifications();
+      }finally{
+        window._suppressCompletedPopupEventId=null;
+      }
     }
   }catch(error){
     console.error("complete gather event:",error);
