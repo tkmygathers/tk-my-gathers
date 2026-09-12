@@ -11724,10 +11724,279 @@ a,
   }
 }
 
+
+/* =========================================================
+   V25.10.0 — EVENT CARD INFORMATION SYSTEM
+   One consistent status area; no duplicate state badges.
+   ========================================================= */
+
+.event-card-status-row{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-top:8px;
+  min-height:21px;
+}
+
+.event-state-badge,
+.event-relation-badge{
+  min-height:21px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 8px;
+  border:1px solid transparent;
+  border-radius:999px;
+  font-size:7.2px;
+  line-height:1;
+  font-weight:880;
+  white-space:nowrap;
+  letter-spacing:.01em;
+}
+
+/* Event lifecycle: one primary badge at most */
+.event-state-badge.one-more{
+  background:#FFF7E6;
+  border-color:#F0D9A5;
+  color:#7A5A13;
+}
+
+.event-state-badge.gathered{
+  background:#EAF2FF;
+  border-color:#BFD3F7;
+  color:#2563EB;
+  letter-spacing:.08em;
+}
+
+.event-state-badge.completed{
+  background:#EAF7F1;
+  border-color:#B9DFCB;
+  color:#18794E;
+  letter-spacing:.07em;
+}
+
+.event-state-badge.expired{
+  background:#C8CED6;
+  border-color:#A9B1BB;
+  color:#333B45;
+}
+
+/* Relationship to the event is visually secondary */
+.event-relation-badge.mine{
+  background:#EDF4FF;
+  border-color:#C8DDFB;
+  color:#3869B8;
+}
+
+.event-relation-badge.joined{
+  background:#EAF9F7;
+  border-color:#BCE6DF;
+  color:#0F766E;
+}
+
+/* Old large status presentations are no longer used on list cards. */
+.fixed-layout-card .gather-confirmed-strip,
+.fixed-layout-card .gathered-complete-strip,
+.fixed-layout-card .v24-4-17-one-more{
+  display:none !important;
+}
+
+/* Keep expired cards clearly muted, while the status chip remains readable. */
+.card.event-card-expired .event-card-status-row,
+.card.event-card-expired .event-state-badge,
+.card.event-card-expired .event-relation-badge{
+  opacity:1 !important;
+}
+
+@media(max-width:360px){
+  .event-card-status-row{
+    gap:4px;
+    margin-top:7px;
+  }
+
+  .event-state-badge,
+  .event-relation-badge{
+    min-height:20px;
+    padding:0 7px;
+    font-size:6.7px;
+  }
+}
+
+
+/* =========================================================
+   V25.11.0 — CREATE / EDIT CONFIRMATION SCREEN
+   ========================================================= */
+
+#createConfirmModal{
+  z-index:10030;
+}
+
+.create-confirm-sheet{
+  width:min(100%,440px);
+  max-height:90dvh;
+  overflow-y:auto;
+  padding-bottom:calc(18px + env(safe-area-inset-bottom));
+}
+
+.create-confirm-preview{
+  margin-top:4px;
+}
+
+.create-confirm-image{
+  width:100%;
+  aspect-ratio:16 / 8.5;
+  overflow:hidden;
+  border:1px solid #E2E8F0;
+  border-radius:16px;
+  background:#EEF2F6;
+}
+
+.create-confirm-image img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+
+.create-confirm-image.empty{
+  display:grid;
+  place-items:center;
+  color:#94A3B8;
+  font-size:9px;
+  font-weight:800;
+}
+
+.create-confirm-main{
+  padding:14px 2px 0;
+}
+
+.create-confirm-kicker{
+  color:#3B82F6;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.05em;
+}
+
+.create-confirm-event-title{
+  margin-top:5px;
+  color:#0F172A;
+  font-size:18px;
+  line-height:1.35;
+  font-weight:900;
+}
+
+.create-confirm-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:14px;
+}
+
+.create-confirm-item{
+  min-width:0;
+  padding:10px 11px;
+  border:1px solid #E2E8F0;
+  border-radius:13px;
+  background:#F8FAFC;
+}
+
+.create-confirm-item.wide{
+  grid-column:1 / -1;
+}
+
+.create-confirm-item span,
+.create-confirm-section > span{
+  display:block;
+  margin-bottom:4px;
+  color:#94A3B8;
+  font-size:7px;
+  font-weight:850;
+  letter-spacing:.04em;
+}
+
+.create-confirm-item strong{
+  display:block;
+  overflow-wrap:anywhere;
+  color:#334155;
+  font-size:9.5px;
+  line-height:1.45;
+  font-weight:850;
+}
+
+.create-confirm-section{
+  margin-top:10px;
+  padding:11px;
+  border:1px solid #E2E8F0;
+  border-radius:13px;
+  background:#fff;
+}
+
+.create-confirm-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+}
+
+.create-confirm-tags b{
+  padding:5px 7px;
+  border-radius:999px;
+  background:#EEF4FF;
+  color:#356AC3;
+  font-size:7.5px;
+  font-weight:800;
+}
+
+.create-confirm-tags em{
+  color:#94A3B8;
+  font-size:8px;
+  font-style:normal;
+}
+
+.create-confirm-section p{
+  margin:0;
+  color:#475569;
+  font-size:9px;
+  line-height:1.6;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+
+.create-confirm-actions{
+  position:sticky;
+  bottom:0;
+  display:grid;
+  grid-template-columns:.85fr 1.15fr;
+  gap:8px;
+  margin-top:15px;
+  padding-top:10px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 25%);
+}
+
+.create-confirm-actions .secondary-submit,
+.create-confirm-actions .submit{
+  min-height:46px;
+  margin:0;
+}
+
+@media(max-width:360px){
+  .create-confirm-event-title{
+    font-size:16px;
+  }
+
+  .create-confirm-grid{
+    grid-template-columns:1fr;
+  }
+
+  .create-confirm-item.wide{
+    grid-column:auto;
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.9.3 calendar colors + compact copy placement -->
+<!-- v25.11.0 create/edit confirmation screen -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -12213,6 +12482,28 @@ a,
 <button class="submit" id="createSubmitButton" type="submit">プランを作成する</button>
 </form>
 </div>
+</div>
+
+<!-- create confirmation -->
+<div class="modal" id="createConfirmModal" onclick="backdropClose(event,'createConfirmModal')">
+  <div class="sheet create-confirm-sheet">
+    <div class="handle"></div>
+
+    <div class="sheet-head">
+      <div>
+        <div class="sheet-title" id="createConfirmTitle">募集内容を確認</div>
+        <div class="sheet-sub" id="createConfirmSub">公開前に内容を確認してください。</div>
+      </div>
+      <button class="close-btn" type="button" onclick="closeCreateConfirm()">×</button>
+    </div>
+
+    <div class="create-confirm-preview" id="createConfirmPreview"></div>
+
+    <div class="create-confirm-actions">
+      <button class="secondary-submit" type="button" onclick="closeCreateConfirm()">戻って編集</button>
+      <button class="submit" id="createConfirmSubmitButton" type="button" onclick="confirmCreateSubmission()">この内容で募集する</button>
+    </div>
+  </div>
 </div>
 <!-- planner -->
 <div class="modal" id="plannerModal" onclick="backdropClose(event,'plannerModal')">
@@ -14644,6 +14935,33 @@ function eventVisualState(e){
   };
 }
 
+function eventCardStatusHtml(e){
+  const mine=!!currentAuthUser && e?.owner===currentAuthUser.id;
+  const joined=!mine && !!e?.joined;
+  const expired=e?.status==="upcoming" && eventStartHasPassed(e);
+  const oneMore=eventIsOneMore(e);
+
+  let primary="";
+
+  if(expired){
+    primary=`<span class="event-state-badge expired">開催期限切れ</span>`;
+  }else if(eventIsCompleted(e)){
+    primary=`<span class="event-state-badge completed">GATHERED</span>`;
+  }else if(eventIsGathered(e)){
+    primary=`<span class="event-state-badge gathered">GATHER</span>`;
+  }else if(oneMore){
+    primary=`<span class="event-state-badge one-more">あと1人</span>`;
+  }
+
+  const relation=mine
+    ? `<span class="event-relation-badge mine">自分の募集</span>`
+    : (joined?`<span class="event-relation-badge joined">参加中</span>`:"");
+
+  if(!primary && !relation)return "";
+
+  return `<div class="event-card-status-row">${primary}${relation}</div>`;
+}
+
 function eventCard(e){
   const u=person(e.owner);
   const mine=e.owner===(currentAuthUser?.id||meId());
@@ -14657,7 +14975,7 @@ function eventCard(e){
     <div class="fixed-layout-left">
       <button class="fixed-layout-photo" onclick="openCardDetail(${arg})">
         <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
-        ${eventIsCompleted(e)?`<span class="fixed-photo-gather gathered">GATHERED</span>`:(eventIsGathered(e)?`<span class="fixed-photo-gather">GATHER</span>`:(oneMore?`<span class="fixed-photo-urgency">あと1人</span>`:""))}
+        
       </button>
 
       <div class="v24-4-19-tag-footer">
@@ -14686,21 +15004,7 @@ function eventCard(e){
 
         <button class="fixed-card-title v24-4-17-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
 
-        ${visual.expired?`
-          <div class="event-expired-note">
-            <span></span>
-            開催日時を過ぎています
-          </div>
-        `:""}
-
-        ${eventIsGathered(e)?gatherStatusHtml(e):""}
-
-        ${!eventIsGathered(e)&&oneMore?`
-          <div class="v24-4-17-one-more">
-            <span class="one-more-dot"></span>
-            <strong>あと1人で開催</strong>
-          </div>
-        `:""}
+        ${eventCardStatusHtml(e)}
 
         <div class="fixed-card-meta v24-4-17-meta">
           <span>${dateLabel(e.date)} ${esc(e.time)}</span>
@@ -17612,6 +17916,8 @@ function openCreate(){
   editingExistingImageUrl=null;
   editingRemoveImage=false;
   copyingEventSourceId=null;
+  createSubmitConfirmed=false;
+  closeModal("createConfirmModal");
   setCreateModalMode("create");
   setDefaultDate();
   renderCategories();
@@ -17947,6 +18253,7 @@ let editingEventId=null;
 let editingExistingImageUrl=null;
 let editingRemoveImage=false;
 let copyingEventSourceId=null;
+let createSubmitConfirmed=false;
 
 $("eventImageInput").addEventListener("change",e=>{
   const file=e.target.files?.[0];
@@ -18083,6 +18390,160 @@ document.querySelectorAll('input[name="capacityMode"]').forEach(el=>{
 if($("capacity"))$("capacity").addEventListener("change",updateCapacityModeUI);
 updateCapacityModeUI();
 
+function createConfirmationData(){
+  let sub=state.sub;
+  const custom=($("customTitle")?.value||"").trim();
+
+  if(state.cat==="その他・オリジナル" || $("customBox")?.classList.contains("show")){
+    sub=custom;
+  }
+
+  const visLabel=document.querySelector('input[name="vis"]:checked')?.value||"公開";
+  const visDb=visibilityDbValue(visLabel);
+  const flexible=document.querySelector('input[name="capacityMode"]:checked')?.value==="flexible";
+
+  return {
+    title:sub||"募集",
+    category:state.cat||"",
+    date:$("eventDate")?.value||"",
+    time:$("eventTime")?.value||"",
+    place:($("eventPlace")?.value||"").trim(),
+    capacity:Number($("capacity")?.value||4),
+    flexible,
+    budget:normalizeBudgetForSave($("budget")?.value||""),
+    note:($("eventNote")?.value||"").trim(),
+    visibility:visLabel,
+    visibilityDb:visDb,
+    genders:visDb==="public" ? selectedAudienceValues("allowedGender") : [],
+    ages:visDb==="public" ? selectedAudienceValues("allowedAge") : [],
+    tags:[...(state.selectedTags||[])],
+    selectedCount:visDb==="selected" ? (state.selectedMembers||[]).length : 0,
+    image:selectedEventImagePreviewUrl
+      || (!editingRemoveImage ? editingExistingImageUrl : null)
+      || null,
+    editing:!!editingEventId,
+    copying:!!copyingEventSourceId
+  };
+}
+
+function createConfirmValue(value,fallback="未設定"){
+  const text=String(value??"").trim();
+  return text ? esc(text) : fallback;
+}
+
+function renderCreateConfirmation(){
+  const data=createConfirmationData();
+  const preview=$("createConfirmPreview");
+  if(!preview)return;
+
+  const audienceParts=[];
+  if(data.genders.length)audienceParts.push(`性別：${data.genders.join("・")}`);
+  if(data.ages.length)audienceParts.push(`年代：${data.ages.join("・")}`);
+
+  const audienceText=data.visibilityDb==="public"
+    ? (audienceParts.length ? audienceParts.join(" / ") : "条件なし")
+    : (data.visibilityDb==="selected"
+      ? `${data.selectedCount}人を選択`
+      : "公開範囲の条件を使用");
+
+  const imageHtml=data.image
+    ? `<div class="create-confirm-image"><img src="${esc(data.image)}" alt="募集画像"></div>`
+    : `<div class="create-confirm-image empty"><span>画像なし</span></div>`;
+
+  preview.innerHTML=`
+    ${imageHtml}
+
+    <div class="create-confirm-main">
+      <div class="create-confirm-kicker">${esc(data.category||"募集")}</div>
+      <div class="create-confirm-event-title">${createConfirmValue(data.title,"募集名未設定")}</div>
+
+      <div class="create-confirm-grid">
+        <div class="create-confirm-item wide">
+          <span>日時</span>
+          <strong>${createConfirmValue(data.date)} ${createConfirmValue(data.time,"時間未設定")}</strong>
+        </div>
+
+        <div class="create-confirm-item wide">
+          <span>場所</span>
+          <strong>${createConfirmValue(data.place,"場所未設定")}</strong>
+        </div>
+
+        <div class="create-confirm-item">
+          <span>人数</span>
+          <strong>${data.flexible?`${data.capacity}人目安`:`定員 ${data.capacity}人`}</strong>
+        </div>
+
+        <div class="create-confirm-item">
+          <span>予算</span>
+          <strong>${esc(formatBudgetLabel(data.budget||"未設定"))}</strong>
+        </div>
+
+        <div class="create-confirm-item wide">
+          <span>公開範囲</span>
+          <strong>${esc(data.visibility)}</strong>
+        </div>
+
+        <div class="create-confirm-item wide">
+          <span>表示条件</span>
+          <strong>${esc(audienceText)}</strong>
+        </div>
+      </div>
+
+      <div class="create-confirm-section">
+        <span>タグ</span>
+        <div class="create-confirm-tags">
+          ${data.tags.length
+            ? data.tags.map(tag=>`<b># ${esc(tag)}</b>`).join("")
+            : `<em>タグなし</em>`}
+        </div>
+      </div>
+
+      <div class="create-confirm-section">
+        <span>ひとこと</span>
+        <p>${data.note?esc(data.note):"なし"}</p>
+      </div>
+    </div>
+  `;
+
+  if($("createConfirmTitle")){
+    $("createConfirmTitle").textContent=data.editing
+      ?"変更内容を確認"
+      :(data.copying?"コピーする募集を確認":"募集内容を確認");
+  }
+
+  if($("createConfirmSub")){
+    $("createConfirmSub").textContent=data.editing
+      ?"この内容で募集を更新します。"
+      :"この内容で新しい募集を公開します。";
+  }
+
+  if($("createConfirmSubmitButton")){
+    $("createConfirmSubmitButton").textContent=data.editing
+      ?"この内容で更新する"
+      :"この内容で募集する";
+  }
+}
+
+function openCreateConfirmation(){
+  renderCreateConfirmation();
+  openModal("createConfirmModal");
+}
+
+function closeCreateConfirm(){
+  createSubmitConfirmed=false;
+  closeModal("createConfirmModal");
+}
+
+function confirmCreateSubmission(){
+  const form=$("createForm");
+  const submitButton=$("createSubmitButton");
+  if(!form)return;
+
+  createSubmitConfirmed=true;
+  closeModal("createConfirmModal");
+  form.requestSubmit(submitButton||undefined);
+}
+
 $("createForm").addEventListener("submit",async e=>{
   e.preventDefault();
   if(!requireAuth(editingEventId?"募集を編集するにはログインしてください。":"募集を作成するにはログインしてください。"))return;
@@ -18106,6 +18567,15 @@ $("createForm").addEventListener("submit",async e=>{
     toast("「選択した人だけ」は友だちから1人以上選んでください");
     return;
   }
+
+  if(!createSubmitConfirmed){
+    openCreateConfirmation();
+    return;
+  }
+
+  // Confirmation was accepted. Reset immediately so another submit
+  // can never bypass the confirmation screen.
+  createSubmitConfirmed=false;
 
   const submitBtn=e.submitter||$("createSubmitButton");
   if(submitBtn){
