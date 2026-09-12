@@ -10661,10 +10661,69 @@ body{
   margin-top:8px !important;
 }
 
+
+/* =========================================================
+   V25.6.0 — GUEST BROWSING
+   Public events/details/comments visible without login.
+   My Gathers shows calendar only. Messages stays login-only.
+   ========================================================= */
+
+#mygathers.guest-calendar-only .mygathers-list-head,
+#mygathers.guest-calendar-only .mygathers-card-tabs,
+#mygathers.guest-calendar-only #myCreatedPanel,
+#mygathers.guest-calendar-only #myGatheredPanel,
+#mygathers.guest-calendar-only #mySavedPanel{
+  display:none !important;
+}
+
+#mygathers.guest-calendar-only .calendar-legend{
+  display:none !important;
+}
+
+.calendar-guest-note{
+  display:grid;
+  gap:5px;
+  padding:13px;
+  border:1px solid #E4E8EE;
+  border-radius:13px;
+  background:#F8FAFC;
+  text-align:left;
+}
+
+.calendar-guest-note strong{
+  color:#24313D;
+  font-size:10px;
+  font-weight:850;
+}
+
+.calendar-guest-note span{
+  color:#7B8794;
+  font-size:8px;
+  line-height:1.5;
+}
+
+.calendar-guest-note button{
+  width:max-content;
+  min-height:30px;
+  margin-top:3px;
+  padding:0 10px;
+  border:0;
+  border-radius:999px;
+  background:#2563EB;
+  color:#fff;
+  font:inherit;
+  font-size:8px;
+  font-weight:850;
+}
+
+.v23-6-board-help{
+  line-height:1.5;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.5.5 visibility/tag filters default to all -->
+<!-- v25.6.0 expanded guest browsing -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -11802,8 +11861,11 @@ async function loadNotifications(){
         .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
         .in("id",actorIds);
 
-      if(profileError)throw profileError;
-      (profiles||[]).forEach(remoteProfileToPerson);
+      if(profileError){
+        console.warn("comment profile lookup unavailable:",profileError);
+      }else{
+        (profiles||[]).forEach(remoteProfileToPerson);
+      }
     }
 
     updateNotificationBadge();
@@ -12350,7 +12412,7 @@ function gatherStatusHtml(e,{compact=false}={}){
 }
 
 function gatherHostControlHtml(e){
-  const mine=e.owner===(currentAuthUser?.id||meId());
+  const mine=!!currentAuthUser && e.owner===currentAuthUser.id;
   if(!mine)return "";
 
   if(eventIsCompleted(e)){
@@ -13223,37 +13285,29 @@ function renderCardDetailComments(e){
 
   if(!list || !e)return;
 
-  if(!currentAuthUser && e.source==="supabase"){
-    list.innerHTML=`
+  const comments=e.comments||[];
+
+  list.innerHTML=comments.length
+    ? comments.map(c=>{
+        const p=person(c.user);
+        return `
+          <article class="v23-6-board-comment">
+            <div class="v23-6-board-comment-head">
+              <div class="mini-avatar">${avatarHtml(p)}</div>
+              <div class="v23-6-board-comment-user">
+                <b>${esc(p.name)}</b>
+                <span>${esc(c.time||"")}</span>
+              </div>
+            </div>
+            <div class="v23-6-board-comment-text">${esc(c.text)}</div>
+          </article>
+        `;
+      }).join("")
+    : `
       <div class="v23-6-board-empty">
-        コメントを見るにはログインしてください。
+        まだコメントはありません。
       </div>
     `;
-  }else{
-    const comments=e.comments||[];
-
-    list.innerHTML=comments.length
-      ? comments.map(c=>{
-          const p=person(c.user);
-          return `
-            <article class="v23-6-board-comment">
-              <div class="v23-6-board-comment-head">
-                <div class="mini-avatar">${avatarHtml(p)}</div>
-                <div class="v23-6-board-comment-user">
-                  <b>${esc(p.name)}</b>
-                  <span>${esc(c.time||"")}</span>
-                </div>
-              </div>
-              <div class="v23-6-board-comment-text">${esc(c.text)}</div>
-            </article>
-          `;
-        }).join("")
-      : `
-        <div class="v23-6-board-empty">
-          まだコメントはありません。最初のコメントを書いてみよう。
-        </div>
-      `;
-  }
 
   if(input && submit){
     const allowed=canCurrentUserComment(e);
@@ -14937,20 +14991,14 @@ function renderMyCalendar(){
   const dayEvents=$("calendarDayEvents");
   if(!grid||!monthLabel||!selectedLabel||!dayEvents)return;
 
-  if(!currentAuthUser){
-    grid.innerHTML="";
-    monthLabel.textContent="";
-    selectedLabel.textContent="";
-    dayEvents.innerHTML=`<div class="my-event-empty">ログインすると予定をカレンダーで確認できます。</div>`;
-    return;
-  }
+  const guest=!currentAuthUser;
 
   const year=calendarViewDate.getFullYear();
   const month=calendarViewDate.getMonth();
   const first=new Date(year,month,1);
   const lastDate=new Date(year,month+1,0).getDate();
   const startDay=first.getDay();
-  const events=calendarEvents();
+  const events=guest?[]:calendarEvents();
 
   monthLabel.textContent=`${year}年 ${month+1}月`;
 
@@ -15023,9 +15071,15 @@ function renderMyCalendar(){
   const selectedEvents=(eventMap.get(selectedKey)||[])
     .sort((a,b)=>String(a.time||"").localeCompare(String(b.time||"")));
 
-  dayEvents.innerHTML=selectedEvents.length
-    ? selectedEvents.map(e=>calendarEventCard(e)).join("")
-    : `<div class="calendar-empty-day">この日の予定はありません。</div>`;
+  dayEvents.innerHTML=guest
+    ? `<div class="calendar-guest-note">
+        <strong>予定の確認はログイン後に</strong>
+        <span>カレンダーはそのまま使えます。自分の募集・参加予定はログインすると表示されます。</span>
+        <button type="button" onclick="requireAuth('マイ募集の予定を見るにはログインしてください。')">ログインする</button>
+      </div>`
+    : (selectedEvents.length
+      ? selectedEvents.map(e=>calendarEventCard(e)).join("")
+      : `<div class="calendar-empty-day">この日の予定はありません。</div>`);
 
   grid.querySelectorAll(".calendar-cell").forEach(btn=>{
     const onclick=btn.getAttribute("onclick")||"";
@@ -15076,14 +15130,18 @@ function renderMyGathers(){
   const savedPanel=$("mySavedPanel");
   if(!createdPanel||!gatheredPanel||!savedPanel)return;
 
+  const myPage=$("mygathers");
+
   if(!currentAuthUser){
-    createdPanel.innerHTML=`<div class="my-event-empty">ログインすると自分の募集を確認できます。</div>`;
-    gatheredPanel.innerHTML=`<div class="my-event-empty">ログインすると開催確定した募集を確認できます。</div>`;
-    savedPanel.innerHTML=`<div class="my-event-empty">ログインすると保存した募集を確認できます。</div>`;
-    switchMyGathersTab(window._myGathersCardTab||"created");
+    myPage?.classList.add("guest-calendar-only");
+    createdPanel.innerHTML="";
+    gatheredPanel.innerHTML="";
+    savedPanel.innerHTML="";
     renderMyCalendar();
     return;
   }
+
+  myPage?.classList.remove("guest-calendar-only");
 
   const uid=currentAuthUser.id;
   const created=state.events.filter(e=>e.owner===uid);
@@ -17315,13 +17373,6 @@ async function loadEventComments(ev){
   if(!ev||ev.source!=="supabase"||!ev.dbId)return;
 
   const list=$("commentList");
-  if(!currentAuthUser){
-    ev.comments=[];
-    if(list)list.innerHTML=`<div class="comment-state">コメントを見るにはログインしてください。</div>`;
-    updateCommentComposer(ev);
-    renderCardDetailComments(ev);
-    return;
-  }
 
   if(list)list.innerHTML=`<div class="comment-state">コメントを読み込んでいます…</div>`;
 
@@ -17402,14 +17453,10 @@ function renderEventDetail(){
   const e=state.events.find(x=>x.id===state.currentEventId);
   if(!e)return;
 
-  if(!currentAuthUser && e.source==="supabase"){
-    $("commentList").innerHTML=`<div class="comment-state">コメントを見るにはログインしてください。</div>`;
-  }else{
-    $("commentList").innerHTML=(e.comments||[]).map(c=>{
-      const p=person(c.user);
-      return `<div class="comment-card"><div class="comment-user"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(c.time||"")}</div></div></div><div class="comment-text">${esc(c.text)}</div></div>`
-    }).join("")||`<div class="comment-state">まだコメントはありません</div>`;
-  }
+  $("commentList").innerHTML=(e.comments||[]).map(c=>{
+    const p=person(c.user);
+    return `<div class="comment-card"><div class="comment-user"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(c.time||"")}</div></div></div><div class="comment-text">${esc(c.text)}</div></div>`
+  }).join("")||`<div class="comment-state">まだコメントはありません</div>`;
 
   const participantIds=eventParticipantIds(e);
   $("participantList").innerHTML=participantIds.length
