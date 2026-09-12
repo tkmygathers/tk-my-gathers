@@ -9084,10 +9084,200 @@ body{
   }
 }
 
+
+/* ===== V25.1 MESSAGE HUB — DM / EVENT COMMENTS ===== */
+.message-hub-tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px;
+  padding:4px;
+  margin:0 0 12px;
+  background:#edf1f6;
+  border:1px solid rgba(25,32,42,.08);
+  border-radius:14px;
+}
+.message-hub-tab{
+  border:0;
+  background:transparent;
+  color:#7c8796;
+  min-height:38px;
+  border-radius:10px;
+  font:inherit;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+}
+.message-hub-tab.active{
+  background:#fff;
+  color:#17202b;
+  box-shadow:0 1px 4px rgba(19,32,50,.08);
+}
+.message-comment-thread{
+  display:none;
+}
+.message-comment-thread.active{
+  display:block;
+}
+.message-comment-thread-headcopy{
+  min-width:0;
+}
+.message-comment-thread-headcopy .friend-name{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:250px;
+}
+.message-comment-card{
+  width:100%;
+  border:0;
+  border-bottom:1px solid var(--line);
+  background:transparent;
+  padding:13px 2px;
+  display:grid;
+  grid-template-columns:52px minmax(0,1fr) auto;
+  gap:11px;
+  align-items:center;
+  text-align:left;
+  cursor:pointer;
+}
+.message-comment-card:first-child{
+  border-top:1px solid var(--line);
+}
+.message-comment-thumb{
+  width:52px;
+  height:52px;
+  border-radius:12px;
+  overflow:hidden;
+  background:#e9edf2;
+}
+.message-comment-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.message-comment-main{
+  min-width:0;
+}
+.message-comment-title{
+  font-size:12px;
+  font-weight:800;
+  color:#17202b;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin-bottom:4px;
+}
+.message-comment-preview{
+  font-size:10px;
+  color:#6f7a89;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.message-comment-side{
+  display:grid;
+  justify-items:end;
+  gap:5px;
+  font-size:9px;
+  color:#8993a1;
+}
+.message-comment-count{
+  min-width:22px;
+  height:22px;
+  padding:0 7px;
+  display:grid;
+  place-items:center;
+  border-radius:999px;
+  background:#edf3ff;
+  color:#2d68db;
+  font-size:9px;
+  font-weight:800;
+}
+.message-comment-event-link-wrap{
+  display:flex;
+  justify-content:flex-end;
+  margin:-3px 0 10px;
+}
+.message-comment-event-link{
+  border:0;
+  background:transparent;
+  color:#2d68db;
+  font:inherit;
+  font-size:10px;
+  font-weight:800;
+  padding:5px 0;
+  cursor:pointer;
+}
+.message-comment-list{
+  display:grid;
+  gap:9px;
+  min-height:120px;
+  max-height:54vh;
+  overflow:auto;
+  padding:2px 0 12px;
+}
+.message-comment-item{
+  display:flex;
+  gap:9px;
+  align-items:flex-start;
+}
+.message-comment-item .mini-avatar{
+  flex:0 0 auto;
+}
+.message-comment-bubble{
+  min-width:0;
+  flex:1;
+  background:#f2f5f8;
+  border-radius:15px;
+  padding:9px 11px;
+}
+.message-comment-bubble.me{
+  background:#e8f0ff;
+}
+.message-comment-byline{
+  display:flex;
+  align-items:baseline;
+  gap:7px;
+  margin-bottom:4px;
+}
+.message-comment-author{
+  font-size:10px;
+  font-weight:800;
+  color:#17202b;
+}
+.message-comment-time{
+  font-size:8px;
+  color:#8b95a2;
+}
+.message-comment-body{
+  font-size:11px;
+  line-height:1.55;
+  color:#28313c;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.message-comment-form{
+  position:sticky;
+  bottom:74px;
+  padding:9px 0 calc(4px + env(safe-area-inset-bottom));
+  background:linear-gradient(to bottom,rgba(247,249,252,.82),#f7f9fc 28%);
+}
+.message-comment-form textarea{
+  resize:none;
+  min-height:42px;
+  max-height:90px;
+}
+@media(max-width:520px){
+  .message-comment-thread-headcopy .friend-name{max-width:210px}
+  .message-comment-card{grid-template-columns:48px minmax(0,1fr) auto}
+  .message-comment-thumb{width:48px;height:48px}
+}
+
 </style>
 </head>
 <body>
-<!-- v25.0.9 mobile layout fix -->
+<!-- v25.1.0 messages hub: DM + event comments -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -9230,14 +9420,45 @@ body{
 <div id="messageListView">
 <div class="message-page-head">
 <div class="page-title">メッセージ</div>
-<button class="new-message-btn" onclick="openNewMessage()">新しいメッセージ</button>
+<button class="new-message-btn" id="newMessageBtn" onclick="openNewMessage()">新しいメッセージ</button>
 </div>
+
+<div class="message-hub-tabs" role="tablist" aria-label="メッセージ表示切替">
+<button class="message-hub-tab active" id="messageDmTab" type="button" onclick="switchMessageHubTab('dm')">DM</button>
+<button class="message-hub-tab" id="messageCommentsTab" type="button" onclick="switchMessageHubTab('comments')">募集コメント</button>
+</div>
+
+<div class="message-hub-panel" id="dmThreadPanel">
 <div class="list" id="messageList"></div>
 </div>
+
+<div class="message-hub-panel" id="commentThreadPanel" hidden>
+<div class="list" id="commentThreadList"></div>
+</div>
+</div>
+
 <div class="chat-wrap" id="chatView">
 <div class="chat-head"><button class="back-btn" onclick="closeChat()">←</button><div><div class="friend-name" id="chatName"></div><div class="muted" id="chatHandle"></div></div></div>
 <div class="chat-messages" id="chatMessages"></div>
 <form class="input-row" id="chatForm"><input id="chatInput" placeholder="メッセージを入力"/><button class="send-btn">送信</button></form>
+</div>
+
+<div class="message-comment-thread" id="messageCommentThreadView">
+<div class="chat-head">
+<button class="back-btn" onclick="closeMessageCommentThread()">←</button>
+<div class="message-comment-thread-headcopy">
+<div class="friend-name" id="messageCommentThreadTitle"></div>
+<div class="muted" id="messageCommentThreadMeta"></div>
+</div>
+</div>
+<div class="message-comment-event-link-wrap">
+<button class="message-comment-event-link" type="button" onclick="openCurrentMessageCommentEvent()">募集の詳細を見る</button>
+</div>
+<div class="message-comment-list" id="messageCommentList"></div>
+<form class="input-row message-comment-form" id="messageCommentForm">
+<textarea id="messageCommentInput" maxlength="1000" placeholder="コメントを入力" rows="2"></textarea>
+<button class="send-btn" type="submit">送信</button>
+</form>
 </div>
 </section>
 <section class="page" id="mygathers">
@@ -10058,7 +10279,8 @@ function showPage(id){
   if(id==="mygathers"){renderMyGathers()}
   if(id==="messages"){
     closeChat();
-    loadMessageThreads();
+    closeMessageCommentThread();
+    switchMessageHubTab(window._messageHubTab||"dm");
   }
   window.scrollTo({top:0,behavior:"smooth"})
 }
@@ -11233,6 +11455,231 @@ async function ensurePeopleFromProfiles(ids){
   if(error){console.error("load dm profiles:",error);return}
   (data||[]).forEach(remoteProfileToPerson);
 }
+
+function switchMessageHubTab(tab){
+  const mode=tab==="comments"?"comments":"dm";
+  window._messageHubTab=mode;
+
+  const dmTab=$("messageDmTab");
+  const commentTab=$("messageCommentsTab");
+  const dmPanel=$("dmThreadPanel");
+  const commentPanel=$("commentThreadPanel");
+  const newBtn=$("newMessageBtn");
+
+  if(dmTab)dmTab.classList.toggle("active",mode==="dm");
+  if(commentTab)commentTab.classList.toggle("active",mode==="comments");
+  if(dmPanel)dmPanel.hidden=mode!=="dm";
+  if(commentPanel)commentPanel.hidden=mode!=="comments";
+  if(newBtn)newBtn.style.display=mode==="dm"?"":"none";
+
+  if(mode==="dm"){
+    loadMessageThreads();
+  }else{
+    loadMessageCommentThreads();
+  }
+}
+
+function messageCommentRelevantEvents(){
+  const rows=Array.isArray(state.events)?state.events:[];
+  return rows.filter(ev=>{
+    if(!ev)return false;
+    const hasComments=Array.isArray(ev.comments)&&ev.comments.length>0;
+    return !!(ev.mine||ev.joined||hasComments);
+  });
+}
+
+async function loadMessageCommentThreads(){
+  const list=$("commentThreadList");
+  if(!list)return;
+
+  if(!currentAuthUser){
+    list.innerHTML=`<div class="message-state">募集コメントを見るにはログインしてください。</div>`;
+    return;
+  }
+
+  list.innerHTML=`<div class="message-state">募集コメントを読み込んでいます…</div>`;
+
+  try{
+    const visibleEvents=Array.isArray(state.events)?state.events:[];
+    const supabaseEvents=visibleEvents.filter(ev=>ev?.source==="supabase"&&ev.dbId);
+    const dbIds=[...new Set(supabaseEvents.map(ev=>String(ev.dbId)).filter(Boolean))];
+
+    let rows=[];
+
+    if(dbIds.length){
+      const {data,error}=await sb
+        .from("comments")
+        .select("id,event_id,user_id,body,created_at")
+        .in("event_id",dbIds)
+        .order("created_at",{ascending:false});
+
+      if(error)throw error;
+      rows=data||[];
+
+      const userIds=[...new Set(rows.map(r=>r.user_id).filter(Boolean))];
+      if(userIds.length)await ensurePeopleFromProfiles(userIds);
+
+      const commentsByEvent=new Map();
+      rows.forEach(row=>{
+        const key=String(row.event_id);
+        if(!commentsByEvent.has(key))commentsByEvent.set(key,[]);
+        commentsByEvent.get(key).push({
+          id:row.id,
+          user:row.user_id,
+          text:row.body,
+          created_at:row.created_at,
+          time:commentTimeLabel(row.created_at),
+          source:"supabase"
+        });
+      });
+
+      supabaseEvents.forEach(ev=>{
+        const remote=commentsByEvent.get(String(ev.dbId));
+        if(remote)ev.comments=[...remote].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+      });
+    }
+
+    renderMessageCommentThreads();
+
+  }catch(error){
+    console.error("load message comment threads:",error);
+    list.innerHTML=`<div class="message-state">募集コメントを読み込めませんでした。</div>`;
+  }
+}
+
+function renderMessageCommentThreads(){
+  const list=$("commentThreadList");
+  if(!list)return;
+
+  const events=messageCommentRelevantEvents()
+    .map(ev=>{
+      const comments=Array.isArray(ev.comments)?ev.comments:[];
+      const last=comments.length?comments[comments.length-1]:null;
+      const lastAt=last?.created_at||"";
+      return {ev,comments,last,lastAt};
+    })
+    .sort((a,b)=>{
+      if(a.lastAt&&b.lastAt)return new Date(b.lastAt)-new Date(a.lastAt);
+      if(a.lastAt)return -1;
+      if(b.lastAt)return 1;
+      return String(a.ev.date||"").localeCompare(String(b.ev.date||""));
+    });
+
+  if(!events.length){
+    list.innerHTML=`<div class="message-state">まだ募集コメントはありません。<br>参加中・主催中の募集のコメントがここにまとまります。</div>`;
+    return;
+  }
+
+  list.innerHTML=events.map(({ev,comments,last})=>{
+    const author=last?person(last.user):null;
+    const preview=last
+      ? `${author?.name||"ユーザー"}「${last.text||""}」`
+      : "まだコメントはありません";
+    const when=last?(last.created_at?commentTimeLabel(last.created_at):last.time||""):`${dateLabel(ev.date)} ${ev.time||""}`;
+
+    return `<button class="message-comment-card" type="button" onclick="openMessageCommentThread('${escjs(String(ev.id))}')">
+      <div class="message-comment-thumb">
+        <img src="${eventImageSrc(ev)}" alt="" onerror="eventImageError(this,'${escjs(eventFallbackImage(ev))}')">
+      </div>
+      <div class="message-comment-main">
+        <div class="message-comment-title">${esc(ev.title||"募集")}</div>
+        <div class="message-comment-preview">${esc(preview)}</div>
+      </div>
+      <div class="message-comment-side">
+        <span>${esc(when||"")}</span>
+        <span class="message-comment-count">${comments.length}</span>
+      </div>
+    </button>`;
+  }).join("");
+}
+
+async function openMessageCommentThread(eventId){
+  if(!requireAuth("募集コメントを見るにはログインしてください。"))return;
+
+  const ev=(state.events||[]).find(x=>String(x.id)===String(eventId));
+  if(!ev){
+    toast("募集を見つけられませんでした");
+    return;
+  }
+
+  state.currentMessageCommentEventId=ev.id;
+
+  $("messageListView").style.display="none";
+  $("chatView").classList.remove("active");
+  $("messageCommentThreadView").classList.add("active");
+
+  $("messageCommentThreadTitle").textContent=ev.title||"募集コメント";
+  $("messageCommentThreadMeta").textContent=`${dateLabel(ev.date)} ${ev.time||""} · ${ev.place||""}`;
+
+  const list=$("messageCommentList");
+  if(list)list.innerHTML=`<div class="message-state">コメントを読み込んでいます…</div>`;
+
+  if(ev.source==="supabase"&&ev.dbId){
+    await loadEventComments(ev);
+  }
+
+  renderMessageCommentThread();
+}
+
+function closeMessageCommentThread(){
+  const view=$("messageCommentThreadView");
+  if(view)view.classList.remove("active");
+
+  if($("messageListView"))$("messageListView").style.display="block";
+  state.currentMessageCommentEventId=null;
+}
+
+function renderMessageCommentThread(){
+  const ev=(state.events||[]).find(x=>String(x.id)===String(state.currentMessageCommentEventId));
+  if(!ev)return;
+
+  $("messageCommentThreadTitle").textContent=ev.title||"募集コメント";
+  $("messageCommentThreadMeta").textContent=`${dateLabel(ev.date)} ${ev.time||""} · ${ev.place||""}`;
+
+  const comments=Array.isArray(ev.comments)?ev.comments:[];
+  const list=$("messageCommentList");
+
+  list.innerHTML=comments.length
+    ? comments.map(c=>{
+        const p=person(c.user);
+        const mine=String(c.user)===String(meId());
+        return `<div class="message-comment-item">
+          <div class="mini-avatar">${avatarHtml(p)}</div>
+          <div class="message-comment-bubble ${mine?"me":""}">
+            <div class="message-comment-byline">
+              <span class="message-comment-author">${esc(p.name||"ユーザー")}</span>
+              <span class="message-comment-time">${esc(c.created_at?commentTimeLabel(c.created_at):(c.time||""))}</span>
+            </div>
+            <div class="message-comment-body">${esc(c.text||"")}</div>
+          </div>
+        </div>`;
+      }).join("")
+    : `<div class="message-state">まだコメントはありません。最初のコメントを書いてみよう。</div>`;
+
+  const input=$("messageCommentInput");
+  const button=$("messageCommentForm")?.querySelector(".send-btn");
+  const allowed=canCurrentUserComment(ev);
+
+  if(input){
+    input.disabled=!allowed;
+    input.placeholder=!currentAuthUser
+      ?"コメントするにはログインしてください"
+      :allowed
+        ?"コメントを入力"
+        :"この募集にはコメントできません";
+  }
+  if(button)button.disabled=!allowed;
+
+  if(list)list.scrollTop=list.scrollHeight;
+}
+
+function openCurrentMessageCommentEvent(){
+  const ev=(state.events||[]).find(x=>String(x.id)===String(state.currentMessageCommentEventId));
+  if(!ev)return;
+  openEvent(ev.id);
+}
+
+
 async function loadMessageThreads(){
   if(!currentAuthUser){
     state.dmThreads=[];
@@ -11494,8 +11941,8 @@ function openChat(id){
   loadChatMessages(id);
 }
 function closeChat(){
-  $("messageListView").style.display="block";
-  $("chatView").classList.remove("active");
+  if($("messageListView"))$("messageListView").style.display="block";
+  if($("chatView"))$("chatView").classList.remove("active");
   state.currentChatUserId=null;
 }
 function renderChat(){
@@ -11558,6 +12005,66 @@ $("chatForm").addEventListener("submit",async e=>{
     if(submit)submit.disabled=false;
   }
 })
+
+
+$("messageCommentForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!requireAuth("コメントするにはログインしてください。"))return;
+
+  const ev=(state.events||[]).find(x=>String(x.id)===String(state.currentMessageCommentEventId));
+  if(!ev)return;
+
+  const input=$("messageCommentInput");
+  const text=(input?.value||"").trim();
+  if(!text)return;
+
+  if(!canCurrentUserComment(ev)){
+    toast("この募集にはコメントできません");
+    return;
+  }
+
+  const button=e.submitter||e.currentTarget.querySelector(".send-btn");
+  if(button)button.disabled=true;
+
+  try{
+    if(isRealSupabaseEvent(ev)){
+      const eventId=getSupabaseEventId(ev);
+      const {error}=await sb
+        .from("comments")
+        .insert({
+          event_id:eventId,
+          user_id:currentAuthUser.id,
+          body:text
+        });
+
+      if(error)throw error;
+
+      input.value="";
+      await loadEventComments(ev);
+      renderMessageCommentThread();
+      await loadNotifications();
+      toast("コメントを送信しました");
+    }else{
+      ev.comments=ev.comments||[];
+      ev.comments.push({
+        user:meId(),
+        text,
+        time:"たった今",
+        created_at:new Date().toISOString()
+      });
+      input.value="";
+      save();
+      renderMessageCommentThread();
+      renderMessageCommentThreads();
+      toast("コメントを送信しました");
+    }
+  }catch(error){
+    console.error("send message hub comment:",error);
+    toast("コメントを送信できませんでした");
+  }finally{
+    renderMessageCommentThread();
+  }
+});
 
 let calendarViewDate=new Date();
 let calendarSelectedDate=null;
@@ -13859,6 +14366,7 @@ $("commentForm").addEventListener("submit",async e=>{
       $("commentInput").value="";
       await loadEventComments(ev);
       await loadNotifications();
+      if($("commentThreadList"))renderMessageCommentThreads();
       toast("コメントを送信しました");
     }else{
       ev.comments.push({user:meId(),text,time:"たった今"});
