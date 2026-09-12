@@ -9912,10 +9912,32 @@ body{
   line-height:1.45;
 }
 
+
+/* ===== V25.3.0 EVENT EDIT + POST/UPDATE TIME ===== */
+.event-card-post-time{
+  margin-top:7px;
+  color:#919aa6;
+  font-size:8px;
+  line-height:1.3;
+}
+.event-detail-post-time{
+  margin:10px 0 2px;
+  color:#8993a0;
+  font-size:9px;
+}
+.my-event-post-time{
+  margin-top:5px;
+  color:#929ba7;
+  font-size:8px;
+}
+#createModalTitle{
+  transition:.15s ease;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.2.5 GATHER final host note -->
+<!-- v25.3.0 host event editing + posted/updated timestamps -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -10212,10 +10234,10 @@ body{
 <div class="sheet">
 <div class="handle"></div>
 <div class="sheet-head">
-<div><div class="sheet-title">プランをつくる</div><div class="sheet-sub">やりたいこと・日時・場所を決めて、そのまま募集できます。</div></div>
+<div><div class="sheet-title" id="createModalTitle">プランをつくる</div><div class="sheet-sub" id="createModalSub">やりたいこと・日時・場所を決めて、そのまま募集できます。</div></div>
 <button class="close-btn" onclick="closeModal('createModal')">×</button>
 </div>
-<div class="step">
+<div class="step" id="plannerAssistStep">
 <div class="step-label">プラン作りを手伝ってもらう</div>
 <button class="secondary-submit" onclick="closeModal('createModal');openPlanner()" type="button">条件からプランを作る</button>
 </div>
@@ -10299,7 +10321,7 @@ body{
 <div class="custom-tag-note">最大8個 / 1タグ24文字まで</div>
 </div>
 <div class="step"><div class="step-label">8. ひとこと</div><textarea class="textarea" id="eventNote" placeholder="例：集合場所は参加後にコメントで共有します"></textarea></div>
-<button class="submit" type="submit">プランを作成する</button>
+<button class="submit" id="createSubmitButton" type="submit">プランを作成する</button>
 </form>
 </div>
 </div>
@@ -11040,6 +11062,38 @@ function closeModal(id){const el=$(id);if(el)el.classList.remove("open")}
 function backdropClose(e,id){if(e.target.id===id)closeModal(id)}
 function toast(t){const el=$("toast");el.textContent=t;el.classList.add("show");clearTimeout(window._tt);window._tt=setTimeout(()=>el.classList.remove("show"),1800)}
 function dateLabel(d){const x=new Date(d+"T00:00:00");return `${x.getMonth()+1}/${x.getDate()}`}
+
+function eventDateTimeStamp(value){
+  if(!value)return "";
+  const d=new Date(value);
+  if(Number.isNaN(d.getTime()))return "";
+  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+
+function eventWasUpdated(e){
+  if(!e?.createdAt || !e?.updatedAt)return false;
+  const created=new Date(e.createdAt).getTime();
+  const updated=new Date(e.updatedAt).getTime();
+  if(!Number.isFinite(created)||!Number.isFinite(updated))return false;
+  return updated-created>5000;
+}
+
+function eventCardTimestamp(e){
+  if(eventWasUpdated(e)){
+    return `${eventDateTimeStamp(e.updatedAt)}（更新）`;
+  }
+  return e?.createdAt ? `${eventDateTimeStamp(e.createdAt)} 投稿` : "";
+}
+
+function eventDetailTimestamp(e){
+  const created=eventDateTimeStamp(e?.createdAt);
+  const updated=eventDateTimeStamp(e?.updatedAt);
+  if(!created)return "";
+  return eventWasUpdated(e)
+    ? `投稿日 ${created} ・ 更新 ${updated}`
+    : `投稿日 ${created}`;
+}
+
 function tagClass(cat){return cat==="食事・飲み"?"copper":cat==="ゲーム・遊び"?"plum":""}
 function eventFallbackImage(e){
   if(e.sub==="BBQ")return svgFallback.bbq;
@@ -11727,6 +11781,8 @@ function mapSupabaseEvent(row){
     status:row.status==="completed"?"history":row.status,
     gatheredAt:row.gathered_at||null,
     gatherNote:row.gather_note||"",
+    createdAt:row.created_at||null,
+    updatedAt:row.updated_at||row.created_at||null,
     participants:[row.owner_id],
     comments:[],
     funSent:[],
@@ -11789,7 +11845,8 @@ async function loadEventsFromSupabase(){
       status,
       gathered_at,
       gather_note,
-      created_at
+      created_at,
+      updated_at
     `;
 
     // 通常取得
@@ -12151,15 +12208,20 @@ function openCardDetail(id){
 
         <div class="v23-5-1-detail-note">${esc(e.note||"")}</div>
 
+        ${eventDetailTimestamp(e)?`<div class="event-detail-post-time">${esc(eventDetailTimestamp(e))}</div>`:""}
+
         <div class="v23-5-1-detail-tags">
           ${publicEventTags(e).map(t=>`<span>${esc(t)}</span>`).join("")}
         </div>
 
         <div class="v23-5-1-detail-actions">
-          <button class="${e.saved?"saved":""}" onclick="cardDetailToggleSave(${arg})">${e.saved?"保存済み":"保存"}</button>
-          ${mine
-            ? `<button class="danger" onclick="closeModal('cardDetailModal');removeEvent(${arg})">削除</button>`
-            : `<button class="primary ${e.joined?"joined":""}" onclick="cardDetailToggleJoin(${arg})">${e.joined?"参加中":"参加する"}</button>`}
+          ${mine ? `
+            <button onclick="closeModal('cardDetailModal');openEditEvent(${arg})">募集を編集</button>
+            <button class="danger" onclick="closeModal('cardDetailModal');removeEvent(${arg})">削除</button>
+          ` : `
+            <button class="${e.saved?"saved":""}" onclick="cardDetailToggleSave(${arg})">${e.saved?"保存済み":"保存"}</button>
+            <button class="primary ${e.joined?"joined":""}" onclick="cardDetailToggleJoin(${arg})">${e.joined?"参加中":"参加する"}</button>
+          `}
         </div>
 
         <section class="v23-6-board">
@@ -12267,20 +12329,20 @@ function eventCard(e){
         ${summary?`
           <p class="v24-4-17-summary">${esc(summary)}</p>
         `:""}
+
+        ${eventCardTimestamp(e)?`<div class="event-card-post-time">${esc(eventCardTimestamp(e))}</div>`:""}
       </div>
 
       <div class="fixed-layout-actions v24-4-17-actions v24-4-19-actions">
-        <button class="v22-action-button ${e.saved?"saved":""}" onclick="toggleSave(${arg})">
-          ${e.saved?"保存済み":"保存"}
-        </button>
-
-        <button class="v22-action-button" onclick="openCardDetail(${arg})">
-          詳細
-        </button>
-
-        ${mine
-          ? `<button class="v22-action-button danger" onclick="removeEvent(${arg})">削除</button>`
-          : `<button class="v22-action-button primary ${e.joined?"joined":""}" onclick="toggleJoin(${arg})">${e.joined?"参加中":"参加する"}</button>`}
+        ${mine ? `
+          <button class="v22-action-button" onclick="openEditEvent(${arg})">編集</button>
+          <button class="v22-action-button" onclick="openCardDetail(${arg})">詳細</button>
+          <button class="v22-action-button danger" onclick="removeEvent(${arg})">削除</button>
+        ` : `
+          <button class="v22-action-button ${e.saved?"saved":""}" onclick="toggleSave(${arg})">${e.saved?"保存済み":"保存"}</button>
+          <button class="v22-action-button" onclick="openCardDetail(${arg})">詳細</button>
+          <button class="v22-action-button primary ${e.joined?"joined":""}" onclick="toggleJoin(${arg})">${e.joined?"参加中":"参加する"}</button>
+        `}
       </div>
     </div>
   </article>`
@@ -13446,13 +13508,16 @@ function myEventCard(e,mode){
     <div class="my-event-main">
       <div class="my-event-title">${esc(e.title)} ${gatherStatusHtml(e,{compact:true})}</div>
       <div class="my-event-meta">${dateLabel(e.date)} ${esc(e.time)}<br>${esc(e.place)} · ${eventPeopleText(e)}</div>
+      ${eventCardTimestamp(e)?`<div class="my-event-post-time">${esc(eventCardTimestamp(e))}</div>`:""}
       ${eventIsGathered(e)&&e.gatherNote?`<div class="my-gather-note-preview"><strong>最終メモ</strong><span>${esc(e.gatherNote)}</span></div>`:""}
       ${mode==="created"?`<div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div>${gatherHostControlHtml(e)}`:""}
       <div class="my-event-actions">
         <button onclick="openEvent(${arg})">詳細を見る</button>
-        ${mode==="saved"
-          ? `<button onclick="toggleSave(${arg})">保存を外す</button>`
-          : `<button class="danger" onclick="removeEvent(${arg})">募集を削除</button>`}
+        ${mode==="created"
+          ? `<button onclick="openEditEvent(${arg})">編集</button><button class="danger" onclick="removeEvent(${arg})">募集を削除</button>`
+          : mode==="saved"
+            ? `<button onclick="toggleSave(${arg})">保存を外す</button>`
+            : ``}
       </div>
     </div>
   </div>`;
@@ -14699,7 +14764,127 @@ function openFullCreateFromQuick(){
   openCreate();
 }
 
-function openCreate(){if(!requireAuth("募集を作成するにはログインしてください。"))return;setDefaultDate();renderCategories();renderSubs();renderMemberPicker();renderQuickTags();updateVisibilityCreateHint();$("eventImagePreview").style.display=selectedEventImageFile?"block":"none";openModal("createModal")}
+function setCreateModalMode(mode){
+  const editing=mode==="edit";
+  if($("createModalTitle"))$("createModalTitle").textContent=editing?"募集を編集":"プランをつくる";
+  if($("createModalSub"))$("createModalSub").textContent=editing
+    ?"変更内容は保存後すぐに募集カードへ反映されます。"
+    :"やりたいこと・日時・場所を決めて、そのまま募集できます。";
+  if($("createSubmitButton"))$("createSubmitButton").textContent=editing?"変更を保存する":"プランを作成する";
+  if($("plannerAssistStep"))$("plannerAssistStep").style.display=editing?"none":"";
+}
+
+function openCreate(){
+  if(!requireAuth("募集を作成するにはログインしてください。"))return;
+  editingEventId=null;
+  editingExistingImageUrl=null;
+  editingRemoveImage=false;
+  setCreateModalMode("create");
+  setDefaultDate();
+  renderCategories();
+  renderSubs();
+  renderMemberPicker();
+  renderQuickTags();
+  updateVisibilityCreateHint();
+  $("eventImagePreview").style.display=selectedEventImageFile?"block":"none";
+  openModal("createModal");
+}
+
+async function openEditEvent(id){
+  if(!requireAuth("募集を編集するにはログインしてください。"))return;
+
+  const ev=resolveEventByAnyId(id);
+  if(!ev)return;
+
+  if(ev.owner!==currentAuthUser.id){
+    toast("募集を編集できるのは主催者だけです");
+    return;
+  }
+
+  editingEventId=ev.id;
+  editingExistingImageUrl=ev.image||null;
+  editingRemoveImage=false;
+  selectedEventImageFile=null;
+
+  if(selectedEventImagePreviewUrl){
+    URL.revokeObjectURL(selectedEventImagePreviewUrl);
+    selectedEventImagePreviewUrl=null;
+  }
+
+  setCreateModalMode("edit");
+
+  state.cat=categories[ev.category] ? ev.category : "その他・オリジナル";
+  const knownSubs=categories[state.cat]||[];
+  const eventSub=ev.sub||ev.title||"";
+
+  if(state.cat!=="その他・オリジナル" && knownSubs.includes(eventSub)){
+    state.sub=eventSub;
+    $("customBox").classList.remove("show");
+    $("customTitle").value="";
+  }else{
+    state.sub="";
+    $("customTitle").value=eventSub;
+    $("customBox").classList.add("show");
+  }
+
+  $("eventDate").value=ev.date||"";
+  $("eventTime").value=ev.time||"";
+  $("eventPlace").value=ev.place||"";
+  $("capacity").value=String(ev.capacity||4);
+  $("budget").value=ev.budget==="未設定"?"":(ev.budget||"");
+  $("eventNote").value=ev.note||"";
+
+  const mode=isFlexibleCapacityEvent(ev)?"flexible":"fixed";
+  document.querySelectorAll('input[name="capacityMode"]').forEach(r=>{
+    r.checked=r.value===mode;
+  });
+
+  const visValue=ev.visibility||visibilityLabel(ev.visibilityDb||"public");
+  document.querySelectorAll('input[name="vis"]').forEach(r=>{
+    r.checked=r.value===visValue;
+  });
+
+  state.selectedTags=[...publicEventTags(ev)];
+  state.selectedMembers=[];
+
+  if((ev.visibilityDb||visibilityDbValue(ev.visibility))==="selected" && isRealSupabaseEvent(ev)){
+    try{
+      const {data,error}=await sb
+        .from("event_selected_users")
+        .select("user_id")
+        .eq("event_id",getSupabaseEventId(ev));
+      if(error)throw error;
+      state.selectedMembers=(data||[]).map(x=>x.user_id);
+    }catch(error){
+      console.warn("load selected users for edit:",error);
+    }
+  }
+
+  renderCategories();
+  renderSubs();
+  if(state.cat==="その他・オリジナル" || !knownSubs.includes(eventSub)){
+    $("customBox").classList.add("show");
+    $("customTitle").value=eventSub;
+  }
+  renderQuickTags();
+  renderMemberPicker();
+  updateVisibilityCreateHint();
+  updateCapacityModeUI();
+
+  if(editingExistingImageUrl){
+    $("eventImagePreview").src=editingExistingImageUrl;
+    $("eventImagePreview").style.display="block";
+    $("eventUploadCard").classList.add("is-ready");
+    $("eventImageFileInfo").textContent="現在の募集画像";
+  }else{
+    $("eventImagePreview").removeAttribute("src");
+    $("eventImagePreview").style.display="none";
+    $("eventUploadCard").classList.remove("is-ready");
+    $("eventImageFileInfo").textContent="JPEG・PNG・WebP / 5MBまで";
+  }
+
+  openModal("createModal");
+}
 function setDefaultDate(){if(!$("eventDate").value){const d=new Date();d.setDate(d.getDate()+1);$("eventDate").value=d.toISOString().slice(0,10)}if(!$("eventTime").value)$("eventTime").value="19:00"}
 function renderCategories(){$("categoryGrid").innerHTML=Object.keys(categories).map(c=>`<button type="button" class="category-btn ${state.cat===c?"active":""}" onclick="selectCat('${escjs(c)}')">${esc(c==="その他・オリジナル"?"オリジナル":c)}</button>`).join("")}
 function selectCat(c){state.cat=c;state.sub="";renderCategories();renderSubs()}
@@ -14811,6 +14996,9 @@ $("customTagInput")?.addEventListener("keydown",e=>{
 document.querySelectorAll('input[name="vis"]').forEach(r=>r.addEventListener("change",updateVisibilityCreateHint))
 let selectedEventImageFile=null;
 let selectedEventImagePreviewUrl=null;
+let editingEventId=null;
+let editingExistingImageUrl=null;
+let editingRemoveImage=false;
 
 $("eventImageInput").addEventListener("change",e=>{
   const file=e.target.files?.[0];
@@ -14834,6 +15022,7 @@ $("eventImageInput").addEventListener("change",e=>{
   }
 
   selectedEventImageFile=file;
+  editingRemoveImage=false;
   selectedEventImagePreviewUrl=URL.createObjectURL(file);
 
   $("eventImagePreview").src=selectedEventImagePreviewUrl;
@@ -14842,7 +15031,7 @@ $("eventImageInput").addEventListener("change",e=>{
   $("eventImageFileInfo").innerHTML=`<strong>${esc(file.name)}</strong> · ${(file.size/1024/1024).toFixed(1)}MB`;
 });
 
-function clearEventImage(){
+function clearEventImage(markRemoval=true){
   selectedEventImageFile=null;
   $("eventImageInput").value="";
 
@@ -14851,10 +15040,14 @@ function clearEventImage(){
     selectedEventImagePreviewUrl=null;
   }
 
+  if(markRemoval && editingEventId){
+    editingRemoveImage=true;
+  }
+
   $("eventImagePreview").removeAttribute("src");
   $("eventImagePreview").style.display="none";
   $("eventUploadCard").classList.remove("is-ready");
-  $("eventImageFileInfo").textContent="JPEG・PNG・WebP / 5MBまで";
+  $("eventImageFileInfo").textContent=editingEventId ? "画像なし" : "JPEG・PNG・WebP / 5MBまで";
   $("eventImageUploadStatus").classList.remove("show");
 }
 
@@ -14919,7 +15112,11 @@ function resetCreateState(form){
   state.sub="麻雀";
   form.reset();
   updateCapacityModeUI();
-  clearEventImage();
+  clearEventImage(false);
+  editingEventId=null;
+  editingExistingImageUrl=null;
+  editingRemoveImage=false;
+  setCreateModalMode("create");
   setDefaultDate();
   renderCategories();
   renderSubs();
@@ -14938,7 +15135,15 @@ updateCapacityModeUI();
 
 $("createForm").addEventListener("submit",async e=>{
   e.preventDefault();
-  if(!requireAuth("募集を作成するにはログインしてください。"))return;
+  if(!requireAuth(editingEventId?"募集を編集するにはログインしてください。":"募集を作成するにはログインしてください。"))return;
+
+  const editing=!!editingEventId;
+  const editingEvent=editing ? resolveEventByAnyId(editingEventId) : null;
+
+  if(editing && (!editingEvent || editingEvent.owner!==currentAuthUser.id)){
+    toast("この募集は編集できません");
+    return;
+  }
 
   let sub=state.sub;
   const custom=$("customTitle").value.trim();
@@ -14952,10 +15157,10 @@ $("createForm").addEventListener("submit",async e=>{
     return;
   }
 
-  const submitBtn=e.submitter;
+  const submitBtn=e.submitter||$("createSubmitButton");
   if(submitBtn){
     submitBtn.classList.add("is-saving");
-    submitBtn.textContent="保存しています…";
+    submitBtn.textContent=editing?"変更を保存しています…":"保存しています…";
   }
 
   let uploadedImage=null;
@@ -14966,11 +15171,18 @@ $("createForm").addEventListener("submit",async e=>{
       if(submitBtn)submitBtn.textContent="画像をアップロード中…";
       uploadedImage=await uploadEventImage(selectedEventImageFile);
       $("eventImageUploadStatus").classList.remove("show");
-      if(submitBtn)submitBtn.textContent="募集を保存しています…";
+      if(submitBtn)submitBtn.textContent=editing?"変更を保存しています…":"募集を保存しています…";
     }
 
+    const tags=[
+      ...[...(state.selectedTags||[])].map(normalizeEventTag).filter(Boolean).slice(0,8),
+      ...(document.querySelector('input[name="capacityMode"]:checked')?.value==="flexible"?[FLEX_CAPACITY_TAG]:[])
+    ];
+
+    const imageUrl=uploadedImage?.publicUrl
+      || (editing ? (editingRemoveImage?null:editingExistingImageUrl) : null);
+
     const eventPayload={
-      owner_id:currentAuthUser.id,
       title:sub,
       category:state.cat,
       activity:sub,
@@ -14980,14 +15192,60 @@ $("createForm").addEventListener("submit",async e=>{
       capacity:Number($("capacity").value),
       budget:$("budget").value.trim()||"未設定",
       description:$("eventNote").value.trim()||"気軽に参加できる募集です。",
-      image_url:uploadedImage?.publicUrl||null,
-      tags:[
-        ...[...(state.selectedTags||[])].map(normalizeEventTag).filter(Boolean).slice(0,8),
-        ...(document.querySelector('input[name="capacityMode"]:checked')?.value==="flexible"?[FLEX_CAPACITY_TAG]:[])
-      ],
+      image_url:imageUrl,
+      tags,
       visibility:visDb,
-      status:"upcoming"
+      updated_at:new Date().toISOString()
     };
+
+    let eventId=null;
+
+    if(editing){
+      eventId=getSupabaseEventId(editingEvent);
+
+      const {error:updateError}=await sb
+        .from("events")
+        .update(eventPayload)
+        .eq("id",eventId)
+        .eq("owner_id",currentAuthUser.id);
+
+      if(updateError)throw updateError;
+
+      // 「選択した人だけ」の対象も編集内容へ同期
+      const {error:deleteSelectedError}=await sb
+        .from("event_selected_users")
+        .delete()
+        .eq("event_id",eventId);
+
+      if(deleteSelectedError){
+        console.warn("clear selected users on edit:",deleteSelectedError);
+      }
+
+      if(visDb==="selected"){
+        const selectedRows=state.selectedMembers
+          .filter(id=>looksLikeUuid(id))
+          .map(user_id=>({event_id:eventId,user_id}));
+
+        if(selectedRows.length){
+          const {error:selectedError}=await sb
+            .from("event_selected_users")
+            .insert(selectedRows);
+          if(selectedError)throw selectedError;
+        }
+      }
+
+      resetCreateState(e.target);
+      closeModal("createModal");
+      await loadEventsFromSupabase();
+      renderHome();
+      renderDiscover();
+      renderMyGathers();
+      toast("募集を更新しました");
+      return;
+    }
+
+    eventPayload.owner_id=currentAuthUser.id;
+    eventPayload.status="upcoming";
 
     const {data:created,error:createError}=await sb
       .from("events")
@@ -14996,6 +15254,7 @@ $("createForm").addEventListener("submit",async e=>{
       .single();
 
     if(createError)throw createError;
+    eventId=created.id;
 
     const {error:memberError}=await sb
       .from("event_members")
@@ -15008,7 +15267,7 @@ $("createForm").addEventListener("submit",async e=>{
 
     if(memberError)console.warn("organizer membership:",memberError);
 
-    if(visLabel==="選択した人だけ"){
+    if(visDb==="selected"){
       const selectedRows=state.selectedMembers
         .filter(id=>looksLikeUuid(id))
         .map(user_id=>({event_id:created.id,user_id}));
@@ -15027,7 +15286,6 @@ $("createForm").addEventListener("submit",async e=>{
 
     await loadEventsFromSupabase();
 
-    // 万一一覧取得の直後に反映が遅れても、自分の新規募集を個別取得して補完
     const existsNow=state.events.some(ev=>String(ev.dbId||ev.id)===String(created.id));
 
     if(!existsNow){
@@ -15050,7 +15308,10 @@ $("createForm").addEventListener("submit",async e=>{
           tags,
           visibility,
           status,
-          created_at
+          gathered_at,
+          gather_note,
+          created_at,
+          updated_at
         `)
         .eq("id",created.id)
         .maybeSingle();
@@ -15084,7 +15345,7 @@ $("createForm").addEventListener("submit",async e=>{
     toast("募集を公開しました");
 
   }catch(error){
-    console.error("create event:",error);
+    console.error(editing?"update event:":"create event:",error);
 
     if(uploadedImage?.path){
       try{
@@ -15095,13 +15356,11 @@ $("createForm").addEventListener("submit",async e=>{
     }
 
     $("eventImageUploadStatus").classList.remove("show");
-    toast(error?.message?.includes("mime")||error?.message?.includes("size")
-      ?"画像をアップロードできませんでした"
-      :"募集を保存できませんでした");
+    toast(editing?"募集を更新できませんでした":"募集を保存できませんでした");
   }finally{
     if(submitBtn){
       submitBtn.classList.remove("is-saving");
-      submitBtn.textContent="プランを作成する";
+      submitBtn.textContent=editingEventId?"変更を保存する":"プランを作成する";
     }
   }
 })
