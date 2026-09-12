@@ -12064,10 +12064,252 @@ a,
   color:#18794E;
 }
 
+
+/* =========================================================
+   V25.13.0 — EVENT IMAGE PRESETS
+   ========================================================= */
+
+.preset-image-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.preset-image-head strong{
+  display:block;
+  color:#0F172A;
+  font-size:10px;
+  font-weight:900;
+}
+
+.preset-image-head small{
+  display:block;
+  margin-top:3px;
+  color:#8290A3;
+  font-size:8px;
+  line-height:1.45;
+}
+
+.preset-reset-btn{
+  flex:0 0 auto;
+  min-height:30px;
+  padding:0 9px;
+  border:1px solid #D6E2F2;
+  border-radius:999px;
+  background:#F7FAFF;
+  color:#356AC3;
+  font:inherit;
+  font-size:7.5px;
+  font-weight:850;
+  cursor:pointer;
+}
+
+.preset-image-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+
+.preset-image-option{
+  min-width:0;
+  overflow:hidden;
+  padding:0;
+  border:1px solid #E1E7EF;
+  border-radius:12px;
+  background:#fff;
+  text-align:left;
+  cursor:pointer;
+  transition:.15s ease;
+}
+
+.preset-image-option img{
+  width:100%;
+  aspect-ratio:4 / 3;
+  display:block;
+  object-fit:cover;
+  background:#EEF2F6;
+}
+
+.preset-image-option span{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+  padding:7px 7px 8px;
+  color:#475569;
+  font-size:7.5px;
+  font-weight:850;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.preset-image-option span i{
+  width:8px;
+  height:8px;
+  flex:0 0 8px;
+  border:1.5px solid #B7C2D0;
+  border-radius:50%;
+  background:#fff;
+}
+
+.preset-image-option.active{
+  border-color:#3B82F6;
+  box-shadow:0 0 0 2px rgba(59,130,246,.10);
+}
+
+.preset-image-option.active span{
+  color:#2563EB;
+}
+
+.preset-image-option.active span i{
+  border-color:#3B82F6;
+  background:#3B82F6;
+  box-shadow:inset 0 0 0 2px #fff;
+}
+
+.preset-upload-card{
+  margin-top:11px;
+}
+
+.preset-selected-label{
+  margin-bottom:8px;
+  color:#64748B;
+  font-size:8px;
+  font-weight:850;
+}
+
+.preset-upload-row{
+  align-items:flex-start;
+}
+
+.preset-upload-actions{
+  display:grid;
+  gap:7px;
+  min-width:118px;
+}
+
+.preset-image-note{
+  margin-top:8px;
+  line-height:1.45;
+}
+
+@media(max-width:360px){
+  .preset-image-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .preset-image-head{
+    display:grid;
+  }
+
+  .preset-reset-btn{
+    justify-self:start;
+  }
+}
+
+
+/* =========================================================
+   V25.13.1 — SELECTED IMAGE LAYOUT
+   Preview inside existing frame, controls on the right.
+   ========================================================= */
+
+.preset-upload-card{
+  min-height:0 !important;
+}
+
+.preset-selected-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 152px;
+  gap:12px;
+  align-items:stretch;
+}
+
+.preset-selected-preview{
+  position:relative;
+  min-width:0;
+  height:180px;
+  overflow:hidden;
+  border:1px solid #DDE4EC;
+  border-radius:14px;
+  background:#F4F7FA;
+}
+
+.preset-selected-preview .preview-img{
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  display:block;
+  object-fit:cover;
+  border-radius:0 !important;
+}
+
+.preset-selected-placeholder{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+  color:#94A3B8;
+  font-size:9px;
+  font-weight:850;
+}
+
+.preset-upload-actions{
+  display:grid;
+  grid-template-rows:1fr 1fr;
+  gap:10px;
+  min-width:0;
+}
+
+.preset-upload-actions .upload-btn{
+  width:100%;
+  min-height:0;
+  height:100%;
+  padding:12px 10px;
+  border-radius:14px;
+  white-space:normal;
+  line-height:1.35;
+  font-size:9px;
+  font-weight:850;
+}
+
+.preset-image-note{
+  margin-top:10px;
+}
+
+@media(max-width:420px){
+  .preset-selected-layout{
+    grid-template-columns:minmax(0,1fr) 122px;
+    gap:10px;
+  }
+
+  .preset-selected-preview{
+    height:150px;
+  }
+
+  .preset-upload-actions .upload-btn{
+    padding:10px 8px;
+    font-size:8px;
+  }
+}
+
+@media(max-width:340px){
+  .preset-selected-layout{
+    grid-template-columns:minmax(0,1fr) 108px;
+  }
+
+  .preset-selected-preview{
+    height:138px;
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.12.0 smart in-app notifications -->
+<!-- v25.13.1 selected-image layout -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -12444,17 +12686,37 @@ a,
 <div class="field" style="margin-top:9px"><label class="label">場所</label><input class="input" id="eventPlace" placeholder="例：渋谷駅周辺" required=""/></div>
 </div>
 <div class="step">
-<div class="step-label">4. 画像を追加</div>
-<div class="upload-card" id="eventUploadCard">
-<div class="upload-row">
-<img alt="募集画像プレビュー" class="preview-img" id="eventImagePreview" style="display:none"/>
-<button class="upload-btn" onclick="$('eventImageInput').click()" type="button">写真を追加</button>
-<button class="upload-btn" onclick="clearEventImage()" type="button">画像を外す</button>
+<div class="step-label">4. 募集画像</div>
+
+<div class="preset-image-head">
+  <div>
+    <strong>おすすめ画像</strong>
+    <small>やりたいことに合わせて自動で選ばれます。あとから変更できます。</small>
+  </div>
+  <button type="button" class="preset-reset-btn" onclick="applySuggestedPreset(true)">おすすめに戻す</button>
 </div>
-<input accept="image/jpeg,image/png,image/webp" hidden="" id="eventImageInput" type="file"/>
-<div class="upload-file-info" id="eventImageFileInfo">JPEG・PNG・WebP / 5MBまで</div>
-<div class="upload-status" id="eventImageUploadStatus">画像をアップロードしています…</div>
-<div class="muted" style="margin-top:8px">画像を選ばない場合はカテゴリに合わせた背景を使います。</div>
+
+<div class="preset-image-grid" id="presetImageGrid"></div>
+
+<div class="upload-card preset-upload-card" id="eventUploadCard">
+  <div class="preset-selected-label">選択中の画像</div>
+
+  <div class="preset-selected-layout">
+    <div class="preset-selected-preview">
+      <img alt="募集画像プレビュー" class="preview-img" id="eventImagePreview" style="display:none"/>
+      <div class="preset-selected-placeholder" id="eventImagePlaceholder">プリセット画像</div>
+    </div>
+
+    <div class="preset-upload-actions">
+      <button class="upload-btn" onclick="$('eventImageInput').click()" type="button">自分の写真を使う</button>
+      <button class="upload-btn" onclick="clearEventImage()" type="button">画像を外す</button>
+    </div>
+  </div>
+
+  <input accept="image/jpeg,image/png,image/webp" hidden="" id="eventImageInput" type="file"/>
+  <div class="upload-file-info" id="eventImageFileInfo">おすすめ画像を使用中</div>
+  <div class="upload-status" id="eventImageUploadStatus">画像をアップロードしています…</div>
+  <div class="muted preset-image-note">自分の写真を選ぶと、プリセットより優先して使われます。</div>
 </div>
 </div>
 <div class="step">
@@ -18172,6 +18434,8 @@ function openCreate(){
   editingExistingImageUrl=null;
   editingRemoveImage=false;
   copyingEventSourceId=null;
+  selectedPresetImageKey=null;
+  selectedPresetImageUrl=null;
   createSubmitConfirmed=false;
   closeModal("createConfirmModal");
   setCreateModalMode("create");
@@ -18182,7 +18446,8 @@ function openCreate(){
   renderQuickTags();
   setAudienceConditionValues([],[]);
   updateVisibilityCreateHint();
-  $("eventImagePreview").style.display=selectedEventImageFile?"block":"none";
+  renderPresetImageGrid();
+  applySuggestedPreset(true);
   openModal("createModal");
 }
 
@@ -18278,16 +18543,11 @@ async function openDuplicateEvent(id){
   updateVisibilityCreateHint();
   updateCapacityModeUI();
 
+  renderPresetImageGrid();
   if(editingExistingImageUrl){
-    $("eventImagePreview").src=editingExistingImageUrl;
-    $("eventImagePreview").style.display="block";
-    $("eventUploadCard").classList.add("is-ready");
-    $("eventImageFileInfo").textContent="コピー元の募集画像";
+    setImagePreviewSource(editingExistingImageUrl,"コピー元の募集画像");
   }else{
-    $("eventImagePreview").removeAttribute("src");
-    $("eventImagePreview").style.display="none";
-    $("eventUploadCard").classList.remove("is-ready");
-    $("eventImageFileInfo").textContent="JPEG・PNG・WebP / 5MBまで";
+    applySuggestedPreset(true);
   }
 
   openModal("createModal");
@@ -18380,26 +18640,21 @@ async function openEditEvent(id){
   updateVisibilityCreateHint();
   updateCapacityModeUI();
 
+  renderPresetImageGrid();
   if(editingExistingImageUrl){
-    $("eventImagePreview").src=editingExistingImageUrl;
-    $("eventImagePreview").style.display="block";
-    $("eventUploadCard").classList.add("is-ready");
-    $("eventImageFileInfo").textContent="現在の募集画像";
+    setImagePreviewSource(editingExistingImageUrl,"現在の募集画像");
   }else{
-    $("eventImagePreview").removeAttribute("src");
-    $("eventImagePreview").style.display="none";
-    $("eventUploadCard").classList.remove("is-ready");
-    $("eventImageFileInfo").textContent="JPEG・PNG・WebP / 5MBまで";
+    applySuggestedPreset(true);
   }
 
   openModal("createModal");
 }
 function setDefaultDate(){if(!$("eventDate").value){const d=new Date();d.setDate(d.getDate()+1);$("eventDate").value=d.toISOString().slice(0,10)}if(!$("eventTime").value)$("eventTime").value="19:00"}
 function renderCategories(){$("categoryGrid").innerHTML=Object.keys(categories).map(c=>`<button type="button" class="category-btn ${state.cat===c?"active":""}" onclick="selectCat('${escjs(c)}')">${esc(c==="その他・オリジナル"?"オリジナル":c)}</button>`).join("")}
-function selectCat(c){state.cat=c;state.sub="";renderCategories();renderSubs()}
+function selectCat(c){state.cat=c;state.sub="";renderCategories();renderSubs();refreshPresetSuggestion()}
 function renderSubs(){const list=categories[state.cat]||[];$("subs").innerHTML=(state.cat==="その他・オリジナル"?`<button type="button" class="sub-btn active">オリジナルを入力</button>`:list.map(x=>`<button type="button" class="sub-btn ${state.sub===x?"active":""}" onclick="selectSub('${escjs(x)}')">${esc(x)}</button>`).join("")+`<button type="button" class="sub-btn" onclick="useCustom()">＋ オリジナル</button>`);$("customBox").classList.toggle("show",state.cat==="その他・オリジナル")}
-function selectSub(x){state.sub=x;$("customBox").classList.remove("show");renderSubs()}
-function useCustom(){state.sub="";$("customBox").classList.add("show")}
+function selectSub(x){state.sub=x;$("customBox").classList.remove("show");renderSubs();refreshPresetSuggestion()}
+function useCustom(){state.sub="";$("customBox").classList.add("show");refreshPresetSuggestion()}
 
 function normalizeEventTag(value){
   return String(value||"")
@@ -18502,14 +18757,152 @@ $("customTagInput")?.addEventListener("keydown",e=>{
   addCustomTag();
 });
 
+$("customTitle")?.addEventListener("input",()=>{
+  if(!selectedEventImageFile && !editingExistingImageUrl){
+    applySuggestedPreset(false);
+  }
+});
+
 document.querySelectorAll('input[name="vis"]').forEach(r=>r.addEventListener("change",updateVisibilityCreateHint))
 let selectedEventImageFile=null;
 let selectedEventImagePreviewUrl=null;
+let selectedPresetImageKey=null;
+let selectedPresetImageUrl=null;
 let editingEventId=null;
 let editingExistingImageUrl=null;
 let editingRemoveImage=false;
 let copyingEventSourceId=null;
 let createSubmitConfirmed=false;
+
+
+const EVENT_IMAGE_PRESETS=[
+  {key:"drinks",label:"飲み会",keywords:["飲み会","居酒屋","バー"],tone:["#0F172A","#B7791F"]},
+  {key:"bbq",label:"BBQ",keywords:["BBQ","バーベキュー"],tone:["#18392B","#D97706"]},
+  {key:"cafe",label:"カフェ",keywords:["カフェ","コーヒー"],tone:["#5B4636","#D6B37A"]},
+  {key:"food",label:"ごはん",keywords:["ごはん","ランチ","ディナー","食事"],tone:["#7C2D12","#FDBA74"]},
+  {key:"games",label:"麻雀・ゲーム",keywords:["麻雀","ボードゲーム","ゲーム"],tone:["#14532D","#EAB308"]},
+  {key:"karaoke",label:"カラオケ",keywords:["カラオケ"],tone:["#312E81","#A855F7"]},
+  {key:"sports",label:"スポーツ",keywords:["スポーツ","キャッチボール","フットサル","バスケ","ランニング"],tone:["#0C4A6E","#38BDF8"]},
+  {key:"walk",label:"散歩",keywords:["散歩","ウォーキング","街歩き"],tone:["#365314","#86EFAC"]},
+  {key:"relax",label:"サウナ",keywords:["サウナ","温泉","リラックス"],tone:["#7C2D12","#F59E0B"]},
+  {key:"outing",label:"おでかけ",keywords:["映画","美術館","おでかけ","観光"],tone:["#164E63","#67E8F9"]},
+  {key:"study",label:"勉強・作業",keywords:["勉強","作業","勉強会","作業会"],tone:["#334155","#94A3B8"]},
+  {key:"gather",label:"集まり",keywords:["その他","オリジナル","集まり"],tone:["#172554","#60A5FA"]}
+];
+
+function presetSvgData(preset){
+  const [a,b]=preset.tone||["#0F172A","#3B82F6"];
+  const label=String(preset.label||"GATHER").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="${a}"/>
+        <stop offset="1" stop-color="${b}"/>
+      </linearGradient>
+      <filter id="blur"><feGaussianBlur stdDeviation="32"/></filter>
+    </defs>
+    <rect width="1200" height="800" fill="url(#g)"/>
+    <circle cx="930" cy="150" r="220" fill="rgba(255,255,255,.14)" filter="url(#blur)"/>
+    <circle cx="180" cy="700" r="260" fill="rgba(255,255,255,.08)" filter="url(#blur)"/>
+    <path d="M0 640 C220 520 390 760 640 610 S980 470 1200 570 V800 H0Z" fill="rgba(255,255,255,.10)"/>
+    <text x="70" y="675" font-family="Arial, sans-serif" font-size="62" font-weight="700" fill="white" opacity=".96">${label}</text>
+    <text x="72" y="730" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="white" opacity=".56" letter-spacing="5">TK MY GATHERS</text>
+  </svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+EVENT_IMAGE_PRESETS.forEach(p=>p.url=presetSvgData(p));
+
+function getEventImagePreset(key){
+  return EVENT_IMAGE_PRESETS.find(p=>p.key===key)||null;
+}
+
+function suggestedPreset(){
+  const text=[state.cat,state.sub,$("customTitle")?.value||""].filter(Boolean).join(" ");
+  return EVENT_IMAGE_PRESETS.find(p=>p.keywords.some(k=>text.includes(k)))
+    || EVENT_IMAGE_PRESETS.find(p=>p.key==="gather");
+}
+
+function renderPresetImageGrid(){
+  const grid=$("presetImageGrid");
+  if(!grid)return;
+
+  grid.innerHTML=EVENT_IMAGE_PRESETS.map(p=>`
+    <button type="button"
+      class="preset-image-option ${selectedPresetImageKey===p.key && !selectedEventImageFile?"active":""}"
+      onclick="selectPresetImage('${p.key}')">
+      <img src="${p.url}" alt="${esc(p.label)}">
+      <span><i></i>${esc(p.label)}</span>
+    </button>
+  `).join("");
+}
+
+function setImagePreviewSource(url,label=""){
+  const img=$("eventImagePreview");
+  const placeholder=$("eventImagePlaceholder");
+  if(!img)return;
+
+  if(url){
+    img.src=url;
+    img.style.display="block";
+    if(placeholder)placeholder.style.display="none";
+    $("eventUploadCard")?.classList.add("is-ready");
+  }else{
+    img.removeAttribute("src");
+    img.style.display="none";
+    if(placeholder)placeholder.style.display="grid";
+    $("eventUploadCard")?.classList.remove("is-ready");
+  }
+
+  if(label && $("eventImageFileInfo")){
+    $("eventImageFileInfo").textContent=label;
+  }
+}
+
+function selectPresetImage(key,{silent=false}={}){
+  const preset=getEventImagePreset(key);
+  if(!preset)return;
+
+  selectedPresetImageKey=preset.key;
+  selectedPresetImageUrl=preset.url;
+  editingExistingImageUrl=null;
+  editingRemoveImage=false;
+
+  selectedEventImageFile=null;
+  $("eventImageInput").value="";
+
+  if(selectedEventImagePreviewUrl){
+    URL.revokeObjectURL(selectedEventImagePreviewUrl);
+    selectedEventImagePreviewUrl=null;
+  }
+
+  setImagePreviewSource(preset.url,`プリセット「${preset.label}」を使用中`);
+  renderPresetImageGrid();
+
+  if(!silent)toast(`${preset.label}の画像を選びました`);
+}
+
+function applySuggestedPreset(force=false){
+  if(!force){
+    if(selectedEventImageFile)return;
+    if(editingExistingImageUrl)return;
+  }
+
+  const preset=suggestedPreset();
+  if(!preset)return;
+
+  selectPresetImage(preset.key,{silent:true});
+}
+
+function refreshPresetSuggestion(){
+  renderPresetImageGrid();
+
+  // New post only: selecting a category/activity refreshes the suggestion
+  // unless the user already chose/uploaded an image manually.
+  if(!editingEventId && !copyingEventSourceId && !selectedEventImageFile){
+    applySuggestedPreset(false);
+  }
+}
 
 $("eventImageInput").addEventListener("change",e=>{
   const file=e.target.files?.[0];
@@ -18533,6 +18926,8 @@ $("eventImageInput").addEventListener("change",e=>{
   }
 
   selectedEventImageFile=file;
+  selectedPresetImageKey=null;
+  selectedPresetImageUrl=null;
   editingRemoveImage=false;
   selectedEventImagePreviewUrl=URL.createObjectURL(file);
 
@@ -18540,10 +18935,13 @@ $("eventImageInput").addEventListener("change",e=>{
   $("eventImagePreview").style.display="block";
   $("eventUploadCard").classList.add("is-ready");
   $("eventImageFileInfo").innerHTML=`<strong>${esc(file.name)}</strong> · ${(file.size/1024/1024).toFixed(1)}MB`;
+  renderPresetImageGrid();
 });
 
 function clearEventImage(markRemoval=true){
   selectedEventImageFile=null;
+  selectedPresetImageKey=null;
+  selectedPresetImageUrl=null;
   $("eventImageInput").value="";
 
   if(selectedEventImagePreviewUrl){
@@ -18557,9 +18955,11 @@ function clearEventImage(markRemoval=true){
 
   $("eventImagePreview").removeAttribute("src");
   $("eventImagePreview").style.display="none";
+  if($("eventImagePlaceholder"))$("eventImagePlaceholder").style.display="grid";
   $("eventUploadCard").classList.remove("is-ready");
-  $("eventImageFileInfo").textContent=(editingEventId||copyingEventSourceId) ? "画像なし" : "JPEG・PNG・WebP / 5MBまで";
+  $("eventImageFileInfo").textContent=(editingEventId||copyingEventSourceId) ? "画像なし" : "画像なし";
   $("eventImageUploadStatus").classList.remove("show");
+  renderPresetImageGrid();
 }
 
 function eventImageExtension(file){
@@ -18675,6 +19075,7 @@ function createConfirmationData(){
     tags:[...(state.selectedTags||[])],
     selectedCount:visDb==="selected" ? (state.selectedMembers||[]).length : 0,
     image:selectedEventImagePreviewUrl
+      || selectedPresetImageUrl
       || (!editingRemoveImage ? editingExistingImageUrl : null)
       || null,
     editing:!!editingEventId,
@@ -18856,6 +19257,7 @@ $("createForm").addEventListener("submit",async e=>{
     ];
 
     const imageUrl=uploadedImage?.publicUrl
+      || selectedPresetImageUrl
       || (editing
         ? (editingRemoveImage?null:editingExistingImageUrl)
         : (copyingEventSourceId && !editingRemoveImage ? editingExistingImageUrl : null));
