@@ -12433,10 +12433,96 @@ a,
   }
 }
 
+
+/* =========================================================
+   V25.14.2 — PREVIEW RATIO MATCH
+   募集カードに実際に表示される比率へ合わせたプレビュー
+   ========================================================= */
+
+.preset-selected-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 138px !important;
+  gap:12px !important;
+  align-items:stretch !important;
+}
+
+.preset-selected-preview{
+  position:relative !important;
+  width:100% !important;
+  height:auto !important;
+  aspect-ratio:112 / 126 !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+  border:1px solid #DDE4EC !important;
+  border-radius:14px !important;
+  background:#EEF2F6 !important;
+}
+
+.preset-selected-preview .preview-img{
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  display:block !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:#EEF2F6 !important;
+}
+
+.preset-selected-placeholder{
+  width:100% !important;
+  height:100% !important;
+  display:grid;
+  place-items:center;
+  padding:14px;
+  text-align:center;
+  color:#94A3B8;
+  font-size:9px;
+  font-weight:850;
+}
+
+.preset-upload-actions{
+  display:grid !important;
+  grid-template-rows:repeat(3,1fr) !important;
+  gap:8px !important;
+  min-width:0 !important;
+}
+
+.preset-upload-actions .upload-btn{
+  width:100% !important;
+  min-height:0 !important;
+  height:100% !important;
+  padding:10px 8px !important;
+  border-radius:14px !important;
+  white-space:normal !important;
+  line-height:1.35 !important;
+  font-size:9px !important;
+  font-weight:850 !important;
+}
+
+.preset-image-note{
+  display:none !important;
+}
+
+@media(max-width:420px){
+  .preset-selected-layout{
+    grid-template-columns:minmax(0,1fr) 122px !important;
+    gap:10px !important;
+  }
+}
+
+@media(max-width:340px){
+  .preset-selected-layout{
+    grid-template-columns:minmax(0,1fr) 108px !important;
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.14.1 compact preset picker: single suggested image + optional full browser -->
+<!-- v25.14.2 compact preset picker + preview ratio match -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -12834,7 +12920,6 @@ a,
   <input accept="image/jpeg,image/png,image/webp" hidden="" id="eventImageInput" type="file"/>
   <div class="upload-file-info" id="eventImageFileInfo">やりたいことに合う画像を自動選択します</div>
   <div class="upload-status" id="eventImageUploadStatus">画像をアップロードしています…</div>
-  <div class="muted preset-image-note">通常は選択した「やりたいこと」の画像だけ表示します。</div>
 </div>
 
 <div class="preset-picker-panel" id="presetPickerPanel">
