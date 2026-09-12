@@ -11537,10 +11537,65 @@ a,
   font-weight:650;
 }
 
+
+/* =========================================================
+   V25.9.1 — STRONGER CARD STATES + COPY FROM MY GATHERS
+   ========================================================= */
+
+/* Slightly stronger differentiation */
+.card.event-card-mine,
+.my-event-card.event-card-mine{
+  background:#E8F1FF !important;
+  border-color:#AFCBF5 !important;
+}
+
+.card.event-card-joined,
+.my-event-card.event-card-joined{
+  background:#E8F7FA !important;
+  border-color:#ABDDE5 !important;
+}
+
+/* Expired own events: clearly inactive */
+.card.event-card-expired,
+.my-event-card.event-card-expired{
+  background:#DDE1E6 !important;
+  border-color:#B7BEC7 !important;
+  box-shadow:none !important;
+}
+
+.card.event-card-expired .fixed-layout-photo img,
+.my-event-card.event-card-expired > img{
+  filter:grayscale(1) saturate(.15) contrast(.92) !important;
+  opacity:.52 !important;
+}
+
+.card.event-card-expired .fixed-layout-right,
+.card.event-card-expired .v24-4-19-tag-footer,
+.my-event-card.event-card-expired .my-event-main{
+  opacity:.70 !important;
+}
+
+.card.event-card-expired .event-expired-note,
+.my-event-card.event-card-expired .event-expired-note{
+  opacity:1 !important;
+  background:#C9CED5 !important;
+  border-color:#ADB4BD !important;
+  color:#3F4751 !important;
+}
+
+.my-event-card.event-card-expired .my-event-actions{
+  opacity:1 !important;
+}
+
+/* Copy action should read as secondary, not destructive */
+.my-event-actions button:not(.danger){
+  white-space:nowrap;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.9.0 card states + public audience conditions -->
+<!-- v25.9.1 stronger card states + my-gathers copy -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -16035,10 +16090,13 @@ function calendarEventCard(e){
 
 function myEventCard(e,mode){
   const arg=eventIdArg(e.id);
-  return `<div class="my-event-card">
+  const visual=eventVisualState(e);
+
+  return `<div class="my-event-card ${visual.className}">
     <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
     <div class="my-event-main">
       <div class="my-event-title">${esc(e.title)} ${gatherStatusHtml(e,{compact:true})}</div>
+      ${visual.expired?`<div class="event-expired-note"><span></span>開催日時を過ぎています</div>`:""}
       <div class="my-event-meta">${dateLabel(e.date)} ${esc(e.time)}<br>${esc(e.place)} · ${eventPeopleText(e)}</div>
       ${eventCardTimestamp(e)?`<div class="my-event-post-time">${esc(eventCardTimestamp(e))}</div>`:""}
       ${eventIsGathered(e)&&e.gatherNote?`<div class="my-gather-note-preview"><strong>最終メモ</strong><span>${esc(e.gatherNote)}</span></div>`:""}
@@ -16046,7 +16104,7 @@ function myEventCard(e,mode){
       <div class="my-event-actions">
         <button onclick="openEvent(${arg})">詳細を見る</button>
         ${mode==="created"
-          ? `<button onclick="openEditEvent(${arg})">編集</button><button class="danger" onclick="removeEvent(${arg})">募集を削除</button>`
+          ? `<button onclick="openEditEvent(${arg})">編集</button><button onclick="openDuplicateEvent(${arg})">コピーして募集</button><button class="danger" onclick="removeEvent(${arg})">募集を削除</button>`
           : mode==="saved"
             ? `<button onclick="toggleSave(${arg})">保存を外す</button>`
             : ``}
@@ -17391,6 +17449,7 @@ function openCreate(){
   editingEventId=null;
   editingExistingImageUrl=null;
   editingRemoveImage=false;
+  copyingEventSourceId=null;
   setCreateModalMode("create");
   setDefaultDate();
   renderCategories();
@@ -17400,6 +17459,113 @@ function openCreate(){
   setAudienceConditionValues([],[]);
   updateVisibilityCreateHint();
   $("eventImagePreview").style.display=selectedEventImageFile?"block":"none";
+  openModal("createModal");
+}
+
+async function openDuplicateEvent(id){
+  if(!requireAuth("募集をコピーするにはログインしてください。"))return;
+
+  const ev=resolveEventByAnyId(id);
+  if(!ev)return;
+
+  if(ev.owner!==currentAuthUser.id){
+    toast("コピーできるのは自分の募集だけです");
+    return;
+  }
+
+  editingEventId=null;
+  copyingEventSourceId=ev.id;
+  editingExistingImageUrl=ev.image||null;
+  editingRemoveImage=false;
+  selectedEventImageFile=null;
+
+  if(selectedEventImagePreviewUrl){
+    URL.revokeObjectURL(selectedEventImagePreviewUrl);
+    selectedEventImagePreviewUrl=null;
+  }
+
+  setCreateModalMode("create");
+  if($("createModalTitle"))$("createModalTitle").textContent="募集をコピー";
+  if($("createModalSub"))$("createModalSub").textContent="元の募集内容を引き継いで、新しい募集として編集できます。";
+  if($("createSubmitButton"))$("createSubmitButton").textContent="コピーして募集を作成";
+
+  state.cat=categories[ev.category] ? ev.category : "その他・オリジナル";
+  const knownSubs=categories[state.cat]||[];
+  const eventSub=ev.sub||ev.title||"";
+
+  if(state.cat!=="その他・オリジナル" && knownSubs.includes(eventSub)){
+    state.sub=eventSub;
+    $("customBox").classList.remove("show");
+    $("customTitle").value="";
+  }else{
+    state.sub="";
+    $("customTitle").value=eventSub;
+    $("customBox").classList.add("show");
+  }
+
+  $("eventDate").value=ev.date||"";
+  $("eventTime").value=ev.time||"";
+  $("eventPlace").value=ev.place||"";
+  $("capacity").value=String(ev.capacity||4);
+  $("budget").value=ev.budget==="未設定"?"":formatBudgetLabel(ev.budget||"");
+  $("eventNote").value=ev.note||"";
+
+  const mode=isFlexibleCapacityEvent(ev)?"flexible":"fixed";
+  document.querySelectorAll('input[name="capacityMode"]').forEach(r=>{
+    r.checked=r.value===mode;
+  });
+
+  const visValue=ev.visibility||visibilityLabel(ev.visibilityDb||"public");
+  document.querySelectorAll('input[name="vis"]').forEach(r=>{
+    r.checked=r.value===visValue;
+  });
+
+  setAudienceConditionValues(
+    ev.allowedGenders||[],
+    ev.allowedAgeRanges||[]
+  );
+
+  state.selectedTags=[...publicEventTags(ev)];
+  state.selectedMembers=[];
+
+  if((ev.visibilityDb||visibilityDbValue(ev.visibility))==="selected" && isRealSupabaseEvent(ev)){
+    try{
+      const {data,error}=await sb
+        .from("event_selected_users")
+        .select("user_id")
+        .eq("event_id",getSupabaseEventId(ev));
+      if(error)throw error;
+      state.selectedMembers=(data||[]).map(x=>x.user_id);
+    }catch(error){
+      console.warn("load selected users for copy:",error);
+    }
+  }
+
+  renderCategories();
+  renderSubs();
+
+  if(state.cat==="その他・オリジナル" || !knownSubs.includes(eventSub)){
+    $("customBox").classList.add("show");
+    $("customTitle").value=eventSub;
+  }
+
+  renderQuickTags();
+  renderMemberPicker();
+  updateVisibilityCreateHint();
+  updateCapacityModeUI();
+
+  if(editingExistingImageUrl){
+    $("eventImagePreview").src=editingExistingImageUrl;
+    $("eventImagePreview").style.display="block";
+    $("eventUploadCard").classList.add("is-ready");
+    $("eventImageFileInfo").textContent="コピー元の募集画像";
+  }else{
+    $("eventImagePreview").removeAttribute("src");
+    $("eventImagePreview").style.display="none";
+    $("eventUploadCard").classList.remove("is-ready");
+    $("eventImageFileInfo").textContent="JPEG・PNG・WebP / 5MBまで";
+  }
+
   openModal("createModal");
 }
 
@@ -17417,6 +17583,7 @@ async function openEditEvent(id){
   editingEventId=ev.id;
   editingExistingImageUrl=ev.image||null;
   editingRemoveImage=false;
+  copyingEventSourceId=null;
   selectedEventImageFile=null;
 
   if(selectedEventImagePreviewUrl){
@@ -17617,6 +17784,7 @@ let selectedEventImagePreviewUrl=null;
 let editingEventId=null;
 let editingExistingImageUrl=null;
 let editingRemoveImage=false;
+let copyingEventSourceId=null;
 
 $("eventImageInput").addEventListener("change",e=>{
   const file=e.target.files?.[0];
@@ -17658,14 +17826,14 @@ function clearEventImage(markRemoval=true){
     selectedEventImagePreviewUrl=null;
   }
 
-  if(markRemoval && editingEventId){
+  if(markRemoval && (editingEventId || copyingEventSourceId)){
     editingRemoveImage=true;
   }
 
   $("eventImagePreview").removeAttribute("src");
   $("eventImagePreview").style.display="none";
   $("eventUploadCard").classList.remove("is-ready");
-  $("eventImageFileInfo").textContent=editingEventId ? "画像なし" : "JPEG・PNG・WebP / 5MBまで";
+  $("eventImageFileInfo").textContent=(editingEventId||copyingEventSourceId) ? "画像なし" : "JPEG・PNG・WebP / 5MBまで";
   $("eventImageUploadStatus").classList.remove("show");
 }
 
@@ -17734,6 +17902,7 @@ function resetCreateState(form){
   editingEventId=null;
   editingExistingImageUrl=null;
   editingRemoveImage=false;
+  copyingEventSourceId=null;
   setCreateModalMode("create");
   setDefaultDate();
   renderCategories();
@@ -17799,7 +17968,9 @@ $("createForm").addEventListener("submit",async e=>{
     ];
 
     const imageUrl=uploadedImage?.publicUrl
-      || (editing ? (editingRemoveImage?null:editingExistingImageUrl) : null);
+      || (editing
+        ? (editingRemoveImage?null:editingExistingImageUrl)
+        : (copyingEventSourceId && !editingRemoveImage ? editingExistingImageUrl : null));
 
     const allowedGenders=visDb==="public"
       ? selectedAudienceValues("allowedGender")
