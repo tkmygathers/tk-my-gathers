@@ -10651,10 +10651,18 @@ body{
   }
 }
 
+
+/* ===== V25.5.1 DISCOVER STATUS FILTER ===== */
+#discoverStatusFilters .v25-5-filter-chip.active{
+  background:#F0F6FF;
+  border-color:#8FB5F7;
+  color:#245FCF;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.5.0 compact live discover filters -->
+<!-- v25.5.1 discover defaults to recruitable events only -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -10837,6 +10845,14 @@ body{
         <strong>人数</strong>
       </div>
       <div class="v25-5-filter-chip-row wrap" id="discoverPeopleFilters"></div>
+    </div>
+
+    <div class="v25-5-filter-section">
+      <div class="v25-5-filter-section-head">
+        <strong>開催状態</strong>
+        <span>通常は募集中のみ表示</span>
+      </div>
+      <div class="v25-5-filter-chip-row wrap" id="discoverStatusFilters"></div>
     </div>
   </div>
 
@@ -11483,6 +11499,7 @@ if(!Array.isArray(state.discoverTagFilters))state.discoverTagFilters=[];
 if(!state.discoverDateFilter)state.discoverDateFilter="all";
 if(!state.discoverBudgetFilter)state.discoverBudgetFilter="all";
 if(!state.discoverPeopleFilter)state.discoverPeopleFilter="all";
+if(!Array.isArray(state.discoverStatusFilters))state.discoverStatusFilters=["upcoming"];
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 function budgetDigits(value){
   return String(value??"").replace(/[^\d]/g,"");
@@ -13662,6 +13679,12 @@ const DISCOVER_PEOPLE_OPTIONS=[
   ["available","空きあり"]
 ];
 
+const DISCOVER_STATUS_OPTIONS=[
+  ["upcoming","募集中"],
+  ["gathered","GATHER"],
+  ["completed","GATHERED"]
+];
+
 function discoverCategoryDisplayName(value){
   return value==="その他・オリジナル" ? "オリジナル" : value;
 }
@@ -13736,6 +13759,18 @@ function setDiscoverPeopleFilter(value){
   renderDiscover();
 }
 
+function toggleDiscoverStatus(value){
+  const current=new Set(state.discoverStatusFilters||["upcoming"]);
+  current.has(value)?current.delete(value):current.add(value);
+
+  // 何も選ばれていない場合は、安全側で「募集中のみ」に戻す。
+  if(current.size===0)current.add("upcoming");
+
+  state.discoverStatusFilters=[...current];
+  renderDiscoverFilterControls();
+  renderDiscover();
+}
+
 function resetDiscoverDetailFilters(){
   state.discoverCategory="all";
   state.discoverSub="all";
@@ -13744,6 +13779,7 @@ function resetDiscoverDetailFilters(){
   state.discoverDateFilter="all";
   state.discoverBudgetFilter="all";
   state.discoverPeopleFilter="all";
+  state.discoverStatusFilters=["upcoming"];
   renderDiscoverFilterControls();
   renderDiscover();
 }
@@ -13764,6 +13800,9 @@ function clearDiscoverFilter(kind,value){
     state.discoverBudgetFilter="all";
   }else if(kind==="people"){
     state.discoverPeopleFilter="all";
+  }else if(kind==="status"){
+    state.discoverStatusFilters=(state.discoverStatusFilters||["upcoming"]).filter(x=>x!==value);
+    if(state.discoverStatusFilters.length===0)state.discoverStatusFilters=["upcoming"];
   }
   renderDiscoverFilterControls();
   renderDiscover();
@@ -13848,6 +13887,18 @@ function renderDiscoverFilterControls(){
   renderDiscoverSingleChoice("discoverBudgetFilters",DISCOVER_BUDGET_OPTIONS,state.discoverBudgetFilter||"all","setDiscoverBudgetFilter");
   renderDiscoverSingleChoice("discoverPeopleFilters",DISCOVER_PEOPLE_OPTIONS,state.discoverPeopleFilter||"all","setDiscoverPeopleFilter");
 
+  const statusRow=$("discoverStatusFilters");
+  if(statusRow){
+    const selected=new Set(state.discoverStatusFilters||["upcoming"]);
+    statusRow.innerHTML=DISCOVER_STATUS_OPTIONS.map(([value,label])=>`
+      <button type="button"
+        class="v25-5-filter-chip ${selected.has(value)?"active":""}"
+        onclick="toggleDiscoverStatus('${value}')">
+        ${esc(label)}
+      </button>
+    `).join("");
+  }
+
   updateDiscoverActiveFilterUi();
 }
 
@@ -13901,6 +13952,12 @@ function discoverActiveFilterItems(){
   if(people!=="all"){
     items.push({kind:"people",value:people,label:DISCOVER_PEOPLE_OPTIONS.find(x=>x[0]===people)?.[1]||people});
   }
+
+  const statuses=state.discoverStatusFilters||["upcoming"];
+  statuses.filter(v=>v!=="upcoming").forEach(v=>{
+    const label=DISCOVER_STATUS_OPTIONS.find(x=>x[0]===v)?.[1]||v;
+    items.push({kind:"status",value:v,label});
+  });
 
   return items;
 }
@@ -14058,8 +14115,15 @@ function discoverPeopleMatches(e){
   return true;
 }
 
+function discoverStatusMatches(e){
+  const selected=state.discoverStatusFilters||["upcoming"];
+  const status=eventIsCompleted(e)?"completed":(eventIsGathered(e)?"gathered":"upcoming");
+  return selected.includes(status);
+}
+
 function discoverAllFiltersMatch(e,query){
-  return discoverKeywordMatches(e,query)
+  return discoverStatusMatches(e)
+    && discoverKeywordMatches(e,query)
     && discoverCategoryMatches(e)
     && discoverVisibilityMatches(e)
     && discoverTagMatches(e)
