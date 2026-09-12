@@ -9277,7 +9277,7 @@ body{
 
 /* ===== V25.1.1 MY GATHERS — CALENDAR FIRST ===== */
 .mygathers-calendar-top{
-  margin-top:12px;
+  margin-top:6px;
 }
 .mygathers-list-head{
   display:flex;
@@ -10337,10 +10337,6 @@ body{
    V25.5.0 — COMPACT DISCOVER + LIVE DETAIL FILTERS
    ========================================================= */
 
-.v25-5-discover-head{
-  margin-bottom:8px !important;
-}
-
 .v25-5-search-toolbar{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
@@ -10659,10 +10655,16 @@ body{
   color:#245FCF;
 }
 
+
+/* ===== V25.5.2 DISCOVER HEADER CLEANUP ===== */
+#discover .v25-5-search-toolbar{
+  margin-top:8px !important;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.5.1 discover defaults to recruitable events only -->
+<!-- v25.5.4 calendar-first mygathers + date filter defaults to all -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -10761,13 +10763,6 @@ body{
 </div>
 </section>
 <section class="page discover-v23 discover-simple" id="discover">
-<div class="discover-head-row v25-5-discover-head">
-<div>
-<div class="eyebrow">DISCOVER</div>
-<div class="page-title">探す</div>
-</div>
-</div>
-
 <div class="v25-5-search-toolbar">
   <div class="discover-searchbox v25-5-searchbox">
     <span class="discover-search-icon">⌕</span>
@@ -10907,13 +10902,6 @@ body{
 </div>
 </section>
 <section class="page" id="mygathers">
-<div class="page-title-row">
-<div>
-<div class="eyebrow">MY GATHERS</div>
-<div class="page-title">マイ募集</div>
-</div>
-</div>
-
 <div class="mygathers-panel mygathers-calendar-top" id="myCalendarPanel">
 <div class="calendar-shell">
 <div class="calendar-head">
@@ -11496,7 +11484,7 @@ if(!state.discoverCategory)state.discoverCategory="all";
 if(!state.discoverSub)state.discoverSub="all";
 if(!Array.isArray(state.discoverVisibilityFilters))state.discoverVisibilityFilters=[];
 if(!Array.isArray(state.discoverTagFilters))state.discoverTagFilters=[];
-if(!state.discoverDateFilter)state.discoverDateFilter="all";
+state.discoverDateFilter="all";
 if(!state.discoverBudgetFilter)state.discoverBudgetFilter="all";
 if(!state.discoverPeopleFilter)state.discoverPeopleFilter="all";
 if(!Array.isArray(state.discoverStatusFilters))state.discoverStatusFilters=["upcoming"];
