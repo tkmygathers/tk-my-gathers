@@ -11277,15 +11277,21 @@ a,
 
 
 /* =========================================================
-   V25.8.3 — COMPACT FUN COUNT CARD
-   Same font sizing feel, less vertical space.
+   V25.8.4 — TRUE TWO-LINE FUN COUNT CARD
+   Left = label + explanation (2 lines total)
+   Right = large count spanning both lines.
    ========================================================= */
 
 .fun-total,
 .other-fun-total{
-  display:block !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-rows:auto auto;
+  column-gap:12px;
+  row-gap:2px;
+  align-items:center;
   margin-top:14px;
-  padding:11px 14px !important;
+  padding:10px 14px !important;
   border:1px solid #D7E3F5 !important;
   border-radius:16px !important;
   background:#F3F7FD !important;
@@ -11293,39 +11299,51 @@ a,
   box-shadow:none !important;
 }
 
-.fun-total-head,
-.other-fun-total-head{
-  display:flex;
-  align-items:baseline;
-  justify-content:space-between;
-  gap:12px;
-}
-
-.fun-total-head > small,
-.other-fun-total-head > small{
+.fun-total > small,
+.other-fun-total > small{
+  grid-column:1;
+  grid-row:1;
   min-width:0;
   color:#334155 !important;
   font-size:10px !important;
-  line-height:1.35;
+  line-height:1.25;
   font-weight:850 !important;
   letter-spacing:0 !important;
   opacity:1 !important;
+  white-space:nowrap;
+}
+
+.fun-total > p,
+.other-fun-total > p{
+  grid-column:1;
+  grid-row:2;
+  min-width:0;
+  margin:0 !important;
+  color:#64748B !important;
+  font-size:8.7px;
+  line-height:1.25;
+  font-weight:650;
+  white-space:nowrap;
 }
 
 .fun-total-number,
 .other-fun-total-number{
-  flex:0 0 auto;
+  grid-column:2;
+  grid-row:1 / 3;
+  align-self:center;
+  justify-self:end;
   display:flex;
   align-items:baseline;
   gap:4px;
   margin:0;
+  white-space:nowrap;
 }
 
 .fun-total-number strong,
 .other-fun-total-number strong{
   color:#0F172A !important;
   font-size:31px !important;
-  line-height:.95 !important;
+  line-height:.9 !important;
   font-weight:850 !important;
   letter-spacing:-.04em !important;
 }
@@ -11335,15 +11353,6 @@ a,
   color:#334155 !important;
   font-size:12px;
   font-weight:800;
-}
-
-.fun-total > p,
-.other-fun-total > p{
-  margin:4px 0 0;
-  color:#64748B !important;
-  font-size:8.7px;
-  line-height:1.4;
-  font-weight:650;
 }
 
 .fun-spark{
@@ -11357,33 +11366,29 @@ a,
 @media(max-width:360px){
   .fun-total,
   .other-fun-total{
-    padding:10px 12px !important;
+    column-gap:8px;
+    padding:9px 12px !important;
   }
 
-  .fun-total-head,
-  .other-fun-total-head{
-    gap:8px;
+  .fun-total > small,
+  .other-fun-total > small{
+    font-size:9px !important;
+  }
+
+  .fun-total > p,
+  .other-fun-total > p{
+    font-size:7.6px;
   }
 
   .fun-total-number strong,
   .other-fun-total-number strong{
     font-size:29px !important;
   }
-
-  .fun-total-head > small,
-  .other-fun-total-head > small{
-    font-size:9.5px !important;
-  }
-
-  .fun-total > p,
-  .other-fun-total > p{
-    font-size:8px;
-  }
 }
 </style>
 </head>
 <body>
-<!-- v25.8.3 compact fun count card -->
+<!-- v25.8.4 true two-line fun count card -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -11703,11 +11708,9 @@ a,
 <button class="count-btn" onclick="showMutuals()"><strong id="mutualCount">0</strong>友だち</button>
 </div>
 <div class="fun-total">
-  <div class="fun-total-head">
-    <small>もらった「楽しかった！」</small>
-    <div class="fun-total-number"><strong id="myFunTotal">0</strong><span>件</span></div>
-  </div>
+  <small>もらった楽しかった！</small>
   <p>一緒に集まった人から届いた合計</p>
+  <div class="fun-total-number"><strong id="myFunTotal">0</strong><span>件</span></div>
 </div>
 </div>
 <div class="section-head"><div><div class="section-title">興味・関心</div><div class="section-note">やりたいことをプロフィールに表示</div></div><button class="text-btn" onclick="openWant()">追加</button></div>
@@ -16098,11 +16101,9 @@ async function renderOtherProfile(id){
           </div>
 
           <div class="other-fun-total">
-            <div class="other-fun-total-head">
-              <small>もらった「楽しかった！」</small>
-              <div class="other-fun-total-number"><strong>${receivedFunCount}</strong><span>件</span></div>
-            </div>
+            <small>もらった楽しかった！</small>
             <p>一緒に集まった人から届いた合計</p>
+            <div class="other-fun-total-number"><strong>${receivedFunCount}</strong><span>件</span></div>
           </div>
 
           <div class="follow-actions v24-4-24-actions">
