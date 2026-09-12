@@ -10664,7 +10664,7 @@ body{
 </style>
 </head>
 <body>
-<!-- v25.5.4 calendar-first mygathers + date filter defaults to all -->
+<!-- v25.5.5 visibility/tag filters default to all -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -10808,7 +10808,7 @@ body{
     <div class="v25-5-filter-section">
       <div class="v25-5-filter-section-head">
         <strong>公開範囲</strong>
-        <span>複数選択可</span>
+        <span>デフォルト：すべて</span>
       </div>
       <div class="v25-5-filter-chip-row wrap" id="discoverVisibilityFilters"></div>
     </div>
@@ -10816,7 +10816,7 @@ body{
     <div class="v25-5-filter-section">
       <div class="v25-5-filter-section-head">
         <strong>タグ</strong>
-        <span>選んだタグをすべて含む</span>
+        <span>デフォルト：すべて</span>
       </div>
       <div class="v25-5-filter-chip-row wrap" id="discoverTagFilters"></div>
     </div>
@@ -13713,10 +13713,22 @@ function setDiscoverSub(sub){
   renderDiscover();
 }
 
+function setDiscoverVisibilityAll(){
+  state.discoverVisibilityFilters=[];
+  renderDiscoverFilterControls();
+  renderDiscover();
+}
+
 function toggleDiscoverVisibility(value){
   const current=new Set(state.discoverVisibilityFilters||[]);
   current.has(value)?current.delete(value):current.add(value);
   state.discoverVisibilityFilters=[...current];
+  renderDiscoverFilterControls();
+  renderDiscover();
+}
+
+function setDiscoverTagAll(){
+  state.discoverTagFilters=[];
   renderDiscoverFilterControls();
   renderDiscover();
 }
@@ -13850,25 +13862,39 @@ function renderDiscoverFilterControls(){
   const visRow=$("discoverVisibilityFilters");
   if(visRow){
     const selected=new Set(state.discoverVisibilityFilters||[]);
-    visRow.innerHTML=DISCOVER_VISIBILITY_OPTIONS.map(([value,label])=>`
-      <button type="button"
-        class="v25-5-filter-chip ${selected.has(value)?"active":""}"
-        onclick="toggleDiscoverVisibility('${value}')">
-        ${esc(label)}
-      </button>
-    `).join("");
+    visRow.innerHTML=[
+      `<button type="button"
+        class="v25-5-filter-chip ${selected.size===0?"active":""}"
+        onclick="setDiscoverVisibilityAll()">
+        すべて
+      </button>`,
+      ...DISCOVER_VISIBILITY_OPTIONS.map(([value,label])=>`
+        <button type="button"
+          class="v25-5-filter-chip ${selected.has(value)?"active":""}"
+          onclick="toggleDiscoverVisibility('${value}')">
+          ${esc(label)}
+        </button>
+      `)
+    ].join("");
   }
 
   const tagRow=$("discoverTagFilters");
   if(tagRow){
     const selected=new Set(state.discoverTagFilters||[]);
-    tagRow.innerHTML=discoverAvailableTags().map(tag=>`
-      <button type="button"
-        class="v25-5-filter-chip ${selected.has(tag)?"active":""}"
-        onclick="toggleDiscoverTag('${escjs(tag)}')">
-        # ${esc(tag)}
-      </button>
-    `).join("");
+    tagRow.innerHTML=[
+      `<button type="button"
+        class="v25-5-filter-chip ${selected.size===0?"active":""}"
+        onclick="setDiscoverTagAll()">
+        すべて
+      </button>`,
+      ...discoverAvailableTags().map(tag=>`
+        <button type="button"
+          class="v25-5-filter-chip ${selected.has(tag)?"active":""}"
+          onclick="toggleDiscoverTag('${escjs(tag)}')">
+          # ${esc(tag)}
+        </button>
+      `)
+    ].join("");
   }
 
   renderDiscoverSingleChoice("discoverDateFilters",DISCOVER_DATE_OPTIONS,state.discoverDateFilter||"all","setDiscoverDateFilter");
