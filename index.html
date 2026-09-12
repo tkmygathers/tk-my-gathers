@@ -10784,10 +10784,501 @@ body{
   }
 }
 
+
+/* =========================================================
+   V25.8.0 — NAVY × ELECTRIC BLUE PRODUCT THEME
+   Visual styling only.
+   Layout, HTML structure, Supabase logic and all interactions unchanged.
+   Reference direction:
+   Graphite Navy #0F172A / Smoky Navy #334155 /
+   Electric Blue #3B82F6 / Surface #F8FAFC /
+   Separator #CBD5E1 / Muted #64748B
+   ========================================================= */
+
+:root{
+  --tk-navy:#0F172A;
+  --tk-navy-2:#1E293B;
+  --tk-slate:#334155;
+  --tk-muted:#64748B;
+  --tk-border:#CBD5E1;
+  --tk-border-soft:#E2E8F0;
+  --tk-surface:#F8FAFC;
+  --tk-card:#FFFFFF;
+  --tk-blue:#3B82F6;
+  --tk-blue-deep:#2563EB;
+  --tk-blue-soft:#EFF6FF;
+  --tk-text:#0F172A;
+  --tk-text-2:#475569;
+  --tk-danger:#B42318;
+  --tk-success:#18794E;
+
+  --app-bg:var(--tk-surface) !important;
+  --app-paper:var(--tk-card) !important;
+  --app-ink:var(--tk-text) !important;
+  --app-line:var(--tk-border-soft) !important;
+  --app-accent:var(--tk-blue) !important;
+  --app-accent-dark:var(--tk-blue-deep) !important;
+  --app-accent-soft:var(--tk-blue-soft) !important;
+  --cobalt:var(--tk-blue) !important;
+  --cobalt-dark:var(--tk-blue-deep) !important;
+  --cobalt-soft:var(--tk-blue-soft) !important;
+  --charcoal:var(--tk-text) !important;
+}
+
+html,
+body,
+button,
+input,
+textarea,
+select{
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Helvetica Neue",
+    "Noto Sans JP",
+    "Hiragino Kaku Gothic ProN",
+    "Yu Gothic UI",
+    Meiryo,
+    sans-serif !important;
+}
+
+html,body{
+  background:var(--tk-surface) !important;
+  color:var(--tk-text) !important;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+/* ---------- APP SHELL ---------- */
+
+.shell{
+  background:var(--tk-surface) !important;
+}
+
+.topbar{
+  background:linear-gradient(180deg,#0B1424 0%,#0F172A 100%) !important;
+  border-bottom:1px solid rgba(255,255,255,.07) !important;
+  box-shadow:0 4px 14px rgba(15,23,42,.12) !important;
+}
+
+.brand-title{
+  color:#fff !important;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    "Noto Serif JP",
+    serif !important;
+  font-weight:700 !important;
+  letter-spacing:.17em !important;
+}
+
+.brand-title em{
+  color:#60A5FA !important;
+  font-style:normal !important;
+}
+
+.brand-sub{
+  color:rgba(255,255,255,.64) !important;
+}
+
+.notification-btn,
+.avatar-btn,
+.icon-btn{
+  background:rgba(255,255,255,.05) !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  color:#fff !important;
+  box-shadow:none !important;
+}
+
+.notification-btn svg{
+  stroke:#fff !important;
+}
+
+.notification-badge{
+  background:var(--tk-blue) !important;
+}
+
+/* ---------- TYPOGRAPHY ---------- */
+
+h1,h2,h3,h4,
+.home-title,
+.sheet-title,
+.profile-name,
+.v25-0-4-create-intro h2,
+.v25-section-head strong,
+.card-title,
+.my-event-title,
+.v23-5-1-detail-body h3{
+  color:var(--tk-text) !important;
+  letter-spacing:-.025em !important;
+}
+
+.muted,
+.sheet-sub,
+.label,
+.field-note,
+.event-card-meta,
+.my-event-meta,
+.profile-handle,
+.discover-count,
+.v25-0-4-create-intro p,
+.v25-home-empty span{
+  color:var(--tk-muted) !important;
+}
+
+/* ---------- HERO ---------- */
+
+.v25-home-hero{
+  box-shadow:0 8px 24px rgba(15,23,42,.12) !important;
+}
+
+.v25-0-7-photo-overlay{
+  background:
+    linear-gradient(90deg,
+      rgba(15,23,42,.72) 0%,
+      rgba(15,23,42,.38) 47%,
+      rgba(15,23,42,.08) 100%) !important;
+}
+
+.v25-0-7-photo-overlay-soft{
+  background:
+    linear-gradient(90deg,
+      rgba(15,23,42,.62) 0%,
+      rgba(15,23,42,.30) 48%,
+      rgba(15,23,42,.06) 100%) !important;
+}
+
+.v25-home-hero-copy,
+.v25-0-7-slide-copy{
+  color:#fff !important;
+}
+
+.v25-home-hero-copy small,
+.v25-0-7-slide-copy small{
+  color:#DBEAFE !important;
+  font-weight:700 !important;
+  letter-spacing:.14em !important;
+  opacity:.92 !important;
+}
+
+.v25-home-hero-copy h1,
+.v25-0-7-slide-copy strong{
+  color:#fff !important;
+  font-weight:760 !important;
+  text-shadow:0 2px 12px rgba(0,0,0,.24) !important;
+}
+
+.v25-home-hero-copy p,
+.v25-0-7-slide-copy span{
+  color:rgba(255,255,255,.86) !important;
+}
+
+.v25-0-2-hero-dots button{
+  background:rgba(255,255,255,.52) !important;
+}
+
+.v25-0-2-hero-dots button.active{
+  background:#fff !important;
+}
+
+/* ---------- CARD SURFACES ---------- */
+
+.v25-0-4-create-hub,
+.card,
+.step,
+.profile-card,
+.message-card,
+.notification-row,
+.my-event-card,
+.v23-5-1-detail-card,
+.v23-6-board,
+.gather-final-note-card,
+.calendar-wrap,
+.calendar-card,
+.calendar-event-card,
+.sheet,
+.v25-home-empty,
+.calendar-guest-note{
+  background:#fff !important;
+  border-color:var(--tk-border-soft) !important;
+  box-shadow:0 1px 2px rgba(15,23,42,.03),0 8px 22px rgba(15,23,42,.045) !important;
+}
+
+.v25-0-4-create-hub{
+  border:1px solid var(--tk-border) !important;
+}
+
+/* ---------- PRIMARY CTA ---------- */
+
+.v25-0-4-create-main,
+.submit,
+.send-btn,
+.custom-tag-add,
+.gather-final-note-save,
+.v25-5-filter-apply,
+.calendar-guest-note button{
+  background:linear-gradient(180deg,#3B82F6 0%,#2563EB 100%) !important;
+  border-color:#2563EB !important;
+  color:#fff !important;
+  box-shadow:0 6px 14px rgba(37,99,235,.18) !important;
+}
+
+.v25-0-4-create-icon{
+  background:rgba(255,255,255,.14) !important;
+}
+
+.v25-0-4-create-copy strong,
+.v25-0-4-create-copy small,
+.v25-0-4-create-arrow{
+  color:#fff !important;
+}
+
+.v25-0-4-create-intro small,
+.v25-section-head small,
+.v25-5-filter-section-head span,
+.v25-5-filter-sheet-head span{
+  color:var(--tk-blue) !important;
+}
+
+/* ---------- INPUTS ---------- */
+
+.input,
+.select,
+textarea,
+input[type="search"],
+.discover-searchbox,
+.v25-5-searchbox{
+  background:#fff !important;
+  color:var(--tk-text) !important;
+  border-color:var(--tk-border) !important;
+  box-shadow:none !important;
+}
+
+.input::placeholder,
+textarea::placeholder,
+input::placeholder{
+  color:#94A3B8 !important;
+}
+
+.input:focus,
+.select:focus,
+textarea:focus,
+input[type="search"]:focus{
+  border-color:#60A5FA !important;
+  box-shadow:0 0 0 3px rgba(59,130,246,.10) !important;
+  outline:none !important;
+}
+
+/* ---------- FILTERS / CHIPS ---------- */
+
+.quick-tag,
+.home-category-chip,
+.v25-5-filter-chip,
+.home-visibility-chip,
+.selected-tag-chip,
+.people-mode-badge,
+.event-tag,
+.visibility-pill,
+.event-visibility-badge{
+  background:#fff !important;
+  border-color:var(--tk-border-soft) !important;
+  color:var(--tk-slate) !important;
+  box-shadow:none !important;
+}
+
+.quick-tag.active,
+.home-category-chip.active,
+.v25-5-filter-chip.active,
+.home-visibility-chip.active{
+  background:var(--tk-blue-soft) !important;
+  border-color:#BFDBFE !important;
+  color:var(--tk-blue-deep) !important;
+}
+
+.v25-5-active-filter-chip{
+  background:var(--tk-blue-soft) !important;
+  border-color:#BFDBFE !important;
+  color:var(--tk-blue-deep) !important;
+}
+
+/* ---------- EVENT ACTIONS ---------- */
+
+.card .action,
+.v22-action-button,
+.my-event-actions button,
+.v23-5-1-detail-actions button,
+.v23-5-1-detail-contact,
+.v25-5-detail-filter-button{
+  background:#fff !important;
+  border-color:var(--tk-border) !important;
+  color:var(--tk-text) !important;
+  box-shadow:none !important;
+}
+
+.card .action.primary,
+.v22-action-button.primary,
+.v23-5-1-detail-actions .primary{
+  background:var(--tk-blue) !important;
+  border-color:var(--tk-blue) !important;
+  color:#fff !important;
+}
+
+.action.saved{
+  background:var(--tk-blue-soft) !important;
+  color:var(--tk-blue-deep) !important;
+  border-color:#BFDBFE !important;
+}
+
+.danger,
+.v22-main-action.danger,
+.my-event-actions .danger{
+  color:var(--tk-danger) !important;
+}
+
+/* ---------- STATUS ---------- */
+
+.gather-status,
+.gather-status-badge{
+  background:#ECFDF3 !important;
+  color:var(--tk-success) !important;
+  border-color:#BBE4CB !important;
+  box-shadow:none !important;
+}
+
+/* ---------- DISCOVER ---------- */
+
+.discover-summary-row{
+  color:var(--tk-muted) !important;
+}
+
+.v25-5-detail-filter-button{
+  background:#fff !important;
+}
+
+/* ---------- CALENDAR ---------- */
+
+.calendar-cell{
+  background:#fff !important;
+  color:var(--tk-text) !important;
+  border-color:transparent !important;
+}
+
+.calendar-cell.today{
+  color:var(--tk-blue) !important;
+}
+
+.calendar-cell.selected{
+  background:var(--tk-blue) !important;
+  color:#fff !important;
+}
+
+.calendar-dot.own,
+.calendar-dot.joined{
+  background:var(--tk-blue) !important;
+}
+
+/* ---------- MESSAGES ---------- */
+
+.message-hub-tabs{
+  background:#EEF2F7 !important;
+  border-color:var(--tk-border-soft) !important;
+}
+
+.message-hub-tab{
+  color:var(--tk-muted) !important;
+}
+
+.message-hub-tab.active{
+  background:#fff !important;
+  color:var(--tk-text) !important;
+  box-shadow:0 1px 3px rgba(15,23,42,.07) !important;
+}
+
+.bubble.me{
+  background:var(--tk-blue) !important;
+  color:#fff !important;
+}
+
+.bubble.them{
+  background:#EEF2F7 !important;
+  color:var(--tk-text) !important;
+}
+
+/* ---------- PROFILE ---------- */
+
+.profile-tab{
+  color:var(--tk-muted) !important;
+}
+
+.profile-tab.active{
+  color:var(--tk-text) !important;
+  border-bottom-color:var(--tk-blue) !important;
+}
+
+.fun-total{
+  background:#fff !important;
+  border-color:var(--tk-border-soft) !important;
+  color:var(--tk-text) !important;
+}
+
+/* ---------- BOTTOM NAV ---------- */
+
+.nav{
+  background:linear-gradient(180deg,#111C2F 0%,#0F172A 100%) !important;
+  border-top:1px solid rgba(255,255,255,.08) !important;
+  box-shadow:0 -6px 18px rgba(15,23,42,.12) !important;
+}
+
+.nav-btn{
+  color:#CBD5E1 !important;
+}
+
+.nav-btn.active{
+  color:#60A5FA !important;
+}
+
+.nav-btn .nav-label{
+  color:inherit !important;
+}
+
+.nav-btn .nav-symbol{
+  color:inherit !important;
+}
+
+.fab{
+  background:var(--tk-blue) !important;
+  color:#fff !important;
+}
+
+/* ---------- MODALS / TOAST ---------- */
+
+.modal{
+  background:rgba(15,23,42,.32) !important;
+}
+
+.toast{
+  background:#111827 !important;
+  color:#fff !important;
+  box-shadow:0 10px 28px rgba(15,23,42,.18) !important;
+}
+
+/* ---------- SMALL ACCENTS ---------- */
+
+a,
+.v25-section-head button,
+.v25-discover-bridge button,
+.notification-read-all{
+  color:var(--tk-blue-deep) !important;
+}
+
+/* Keep all dimensions and positions exactly as existing. */
+
 </style>
 </head>
 <body>
-<!-- v25.6.7 final five banner images wired -->
+<!-- v25.8.0 navy electric blue theme; functionality unchanged -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
