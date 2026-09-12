@@ -9420,10 +9420,274 @@ body{
   }
 }
 
+
+/* ===== V25.2.0 GATHER CONFIRMATION ===== */
+.fixed-photo-gather{
+  position:absolute;
+  top:9px;
+  right:9px;
+  z-index:3;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:25px;
+  padding:0 9px;
+  border-radius:999px;
+  background:#fff;
+  color:#2865df;
+  border:1px solid rgba(255,255,255,.78);
+  box-shadow:0 5px 18px rgba(12,33,68,.18);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.12em;
+}
+.gather-confirmed-strip{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:max-content;
+  max-width:100%;
+  margin:8px 0 10px;
+  padding:7px 10px;
+  border-radius:999px;
+  background:#eaf2ff;
+  border:1px solid #c8dafa;
+  color:#245fcf;
+}
+.gather-confirmed-strip span{
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.14em;
+}
+.gather-confirmed-strip strong{
+  font-size:10px;
+}
+.gather-badge-mini{
+  display:inline-flex;
+  vertical-align:middle;
+  align-items:center;
+  min-height:20px;
+  margin-left:5px;
+  padding:0 7px;
+  border-radius:999px;
+  background:#eaf2ff;
+  border:1px solid #c8dafa;
+  color:#245fcf;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.1em;
+}
+.gather-host-box,
+.gather-host-confirmed{
+  margin:12px 0;
+  padding:13px;
+  border:1px solid #dfe5ed;
+  border-radius:16px;
+  background:#f8fafc;
+}
+.gather-host-box{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+}
+.gather-host-box.ready{
+  border-color:#b8cef7;
+  background:linear-gradient(135deg,#f4f8ff,#eef5ff);
+}
+.gather-host-copy{
+  min-width:0;
+}
+.gather-host-kicker{
+  display:block;
+  margin-bottom:4px;
+  color:#2d68db;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.14em;
+}
+.gather-host-copy strong,
+.gather-host-confirmed strong{
+  display:block;
+  color:#17202b;
+  font-size:12px;
+  margin-bottom:3px;
+}
+.gather-host-copy small,
+.gather-host-confirmed small{
+  display:block;
+  color:#75808e;
+  font-size:9px;
+  line-height:1.45;
+}
+.gather-host-button{
+  min-width:104px;
+  min-height:54px;
+  padding:8px 12px;
+  border:0;
+  border-radius:15px;
+  background:#2d68db;
+  color:#fff;
+  box-shadow:0 7px 18px rgba(45,104,219,.18);
+  cursor:pointer;
+}
+.gather-host-button span{
+  display:block;
+  font-size:14px;
+  font-weight:950;
+  letter-spacing:.06em;
+}
+.gather-host-button small{
+  display:block;
+  margin-top:2px;
+  font-size:8px;
+  font-weight:700;
+  opacity:.86;
+}
+.gather-host-button:disabled{
+  background:#d9dfe7;
+  color:#8c96a3;
+  box-shadow:none;
+  cursor:not-allowed;
+}
+.gather-host-confirmed{
+  background:#eef5ff;
+  border-color:#c8dafa;
+}
+.gather-celebration{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:grid;
+  place-items:center;
+  padding:22px;
+  background:rgba(13,22,35,.42);
+  backdrop-filter:blur(7px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease;
+}
+.gather-celebration.show{
+  opacity:1;
+  pointer-events:auto;
+}
+.gather-pop-card{
+  position:relative;
+  overflow:hidden;
+  width:min(360px,92vw);
+  padding:34px 24px 24px;
+  border-radius:28px;
+  background:#fff;
+  box-shadow:0 26px 80px rgba(13,35,72,.28);
+  text-align:center;
+  transform:translateY(18px) scale(.94);
+  transition:transform .28s cubic-bezier(.2,.8,.2,1);
+}
+.gather-celebration.show .gather-pop-card{
+  transform:translateY(0) scale(1);
+}
+.gather-pop-close{
+  position:absolute;
+  top:12px;
+  right:12px;
+  z-index:3;
+  width:34px;
+  height:34px;
+  border:0;
+  border-radius:50%;
+  background:#f1f4f8;
+  color:#52606f;
+  font-size:20px;
+  cursor:pointer;
+}
+.gather-pop-mark{
+  position:relative;
+  z-index:2;
+  display:inline-block;
+  margin-bottom:12px;
+  padding:10px 16px;
+  border-radius:999px;
+  background:#2d68db;
+  color:#fff;
+  box-shadow:0 10px 26px rgba(45,104,219,.24);
+  font-size:20px;
+  font-weight:950;
+  letter-spacing:.09em;
+}
+.gather-pop-title{
+  position:relative;
+  z-index:2;
+  color:#151c25;
+  font-size:22px;
+  font-weight:900;
+  line-height:1.25;
+}
+.gather-pop-event{
+  position:relative;
+  z-index:2;
+  margin-top:12px;
+  color:#263241;
+  font-size:14px;
+  font-weight:850;
+}
+.gather-pop-meta{
+  position:relative;
+  z-index:2;
+  margin-top:6px;
+  color:#7c8794;
+  font-size:10px;
+  line-height:1.5;
+}
+.gather-pop-action{
+  position:relative;
+  z-index:2;
+  width:100%;
+  min-height:48px;
+  margin-top:20px;
+  border:0;
+  border-radius:14px;
+  background:#17202b;
+  color:#fff;
+  font:inherit;
+  font-size:11px;
+  font-weight:850;
+  cursor:pointer;
+}
+.gather-confetti{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+}
+.gather-confetti i{
+  position:absolute;
+  top:-18px;
+  left:var(--x);
+  width:8px;
+  height:14px;
+  border-radius:3px;
+  background:hsl(calc(var(--i) * 31deg),80%,58%);
+  transform:rotate(calc(var(--i) * 17deg));
+  animation:gather-confetti-fall 1.35s var(--d) ease-out both;
+}
+@keyframes gather-confetti-fall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:0}
+  12%{opacity:1}
+  100%{transform:translateY(390px) rotate(540deg);opacity:.15}
+}
+@media(max-width:420px){
+  .gather-host-box{
+    grid-template-columns:1fr;
+  }
+  .gather-host-button{
+    width:100%;
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.1.4 capacity card layout fix -->
+<!-- v25.2.0 GATHER host confirmation + participant celebration -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -10739,7 +11003,7 @@ function eventPeopleModeText(e){
 
 function eventIsOneMore(e){
   if(isFlexibleCapacityEvent(e))return false;
-  return Math.max(0,Number(e?.capacity||0)-Number(e?.people||0))===1 && !e?.joined;
+  return !eventIsGathered(e) && Math.max(0,Number(e?.capacity||0)-Number(e?.people||0))===1 && !e?.joined;
 }
 
 function updateCapacityModeUI(){
@@ -10754,6 +11018,193 @@ function updateCapacityModeUI(){
     hint.textContent=mode==="flexible"
       ? `${cap}人くらいを目安に表示します。目安人数を超えても参加できます。`
       : `${cap}人までの募集として表示します。`;
+  }
+}
+
+
+function eventIsGathered(e){
+  return e?.status==="gathered";
+}
+
+function canHostGather(e){
+  if(!e || eventIsGathered(e))return false;
+  if(e.owner!==(currentAuthUser?.id||meId()))return false;
+  if(isFlexibleCapacityEvent(e))return true;
+  return Number(e.people||0)>=Number(e.capacity||0);
+}
+
+function gatherHostMessage(e){
+  if(eventIsGathered(e))return "開催確定";
+  if(isFlexibleCapacityEvent(e))return "人数は目安。準備ができたら開催確定できます。";
+  const left=Math.max(0,Number(e.capacity||0)-Number(e.people||0));
+  return left===0
+    ? "定員に達しました。開催を確定できます。"
+    : `あと${left}人でGATHERできます。`;
+}
+
+function gatherStatusHtml(e,{compact=false}={}){
+  if(!eventIsGathered(e))return "";
+  return compact
+    ? `<span class="gather-badge-mini">GATHER</span>`
+    : `<div class="gather-confirmed-strip"><span>GATHER</span><strong>開催決定</strong></div>`;
+}
+
+function gatherHostControlHtml(e){
+  const mine=e.owner===(currentAuthUser?.id||meId());
+  if(!mine)return "";
+
+  if(eventIsGathered(e)){
+    return `<div class="gather-host-confirmed">
+      <span class="gather-host-kicker">GATHER</span>
+      <strong>開催確定済み</strong>
+      <small>参加者にも開催決定が表示されます。</small>
+    </div>`;
+  }
+
+  const ready=canHostGather(e);
+  return `<div class="gather-host-box ${ready?"ready":""}">
+    <div class="gather-host-copy">
+      <span class="gather-host-kicker">HOST ACTION</span>
+      <strong>${ready?"みんな、集まろう。":"開催確定まで"}</strong>
+      <small>${esc(gatherHostMessage(e))}</small>
+    </div>
+    <button type="button" class="gather-host-button" ${ready?"":"disabled"} onclick="gatherEvent('${escjs(String(e.id))}')">
+      <span>GATHER!</span>
+      <small>開催を確定</small>
+    </button>
+  </div>`;
+}
+
+function gatherSeenStorageKey(){
+  const uid=currentAuthUser?.id||"guest";
+  return `tkmygathers_gather_seen_${uid}`;
+}
+
+function getGatherSeenIds(){
+  try{
+    const raw=localStorage.getItem(gatherSeenStorageKey());
+    const arr=JSON.parse(raw||"[]");
+    return new Set(Array.isArray(arr)?arr.map(String):[]);
+  }catch{
+    return new Set();
+  }
+}
+
+function markGatherSeen(eventId){
+  const seen=getGatherSeenIds();
+  seen.add(String(eventId));
+  localStorage.setItem(gatherSeenStorageKey(),JSON.stringify([...seen].slice(-200)));
+}
+
+function closeGatherCelebration(){
+  const el=$("gatherCelebration");
+  if(el)el.classList.remove("show");
+}
+
+function showGatherCelebration(e,{host=false}={}){
+  if(!e)return;
+
+  let el=$("gatherCelebration");
+  if(!el){
+    el=document.createElement("div");
+    el.id="gatherCelebration";
+    el.className="gather-celebration";
+    document.body.appendChild(el);
+  }
+
+  const pieces=Array.from({length:22},(_,i)=>
+    `<i style="--i:${i};--x:${(i*37)%100}%;--d:${(i%7)*.08}s"></i>`
+  ).join("");
+
+  el.innerHTML=`
+    <div class="gather-pop-card" role="dialog" aria-modal="true" aria-label="開催決定">
+      <div class="gather-confetti" aria-hidden="true">${pieces}</div>
+      <button type="button" class="gather-pop-close" onclick="closeGatherCelebration()" aria-label="閉じる">×</button>
+      <div class="gather-pop-mark">GATHER!</div>
+      <div class="gather-pop-title">${host?"開催を確定しました！":"開催が決まりました！"}</div>
+      <div class="gather-pop-event">${esc(e.title||"募集")}</div>
+      <div class="gather-pop-meta">${dateLabel(e.date)} ${esc(e.time||"")} · ${esc(e.place||"")}</div>
+      <button type="button" class="gather-pop-action" onclick="closeGatherCelebration();openCardDetail('${escjs(String(e.id))}')">募集を見る</button>
+    </div>`;
+
+  requestAnimationFrame(()=>el.classList.add("show"));
+}
+
+function maybeShowGatherCelebration(){
+  if(!currentAuthUser)return;
+
+  const seen=getGatherSeenIds();
+  const target=(state.events||[]).find(e=>
+    eventIsGathered(e) &&
+    e.joined &&
+    !e.mine &&
+    !seen.has(String(e.dbId||e.id))
+  );
+
+  if(!target)return;
+
+  markGatherSeen(target.dbId||target.id);
+  setTimeout(()=>showGatherCelebration(target),350);
+}
+
+async function gatherEvent(id){
+  if(!requireAuth("開催を確定するにはログインしてください。"))return;
+
+  const ev=resolveEventByAnyId(id);
+  if(!ev)return;
+
+  if(ev.owner!==currentAuthUser.id){
+    toast("GATHERできるのは主催者だけです");
+    return;
+  }
+
+  if(eventIsGathered(ev)){
+    toast("この募集は開催確定済みです");
+    return;
+  }
+
+  if(!canHostGather(ev)){
+    toast(gatherHostMessage(ev));
+    return;
+  }
+
+  const gatheredAt=new Date().toISOString();
+
+  try{
+    if(isRealSupabaseEvent(ev)){
+      const eventId=getSupabaseEventId(ev);
+      const {error}=await sb
+        .from("events")
+        .update({
+          status:"gathered",
+          gathered_at:gatheredAt
+        })
+        .eq("id",eventId)
+        .eq("owner_id",currentAuthUser.id);
+
+      if(error)throw error;
+    }else{
+      ev.status="gathered";
+      ev.gatheredAt=gatheredAt;
+      save();
+    }
+
+    ev.status="gathered";
+    ev.gatheredAt=gatheredAt;
+    markGatherSeen(ev.dbId||ev.id);
+
+    renderHome();
+    renderDiscover();
+    renderMyGathers();
+
+    showGatherCelebration(ev,{host:true});
+
+    if(isRealSupabaseEvent(ev)){
+      await loadEventsFromSupabase();
+    }
+  }catch(error){
+    console.error("gather event:",error);
+    toast("開催確定を保存できませんでした");
   }
 }
 
@@ -10780,6 +11231,7 @@ function mapSupabaseEvent(row){
     saved:false,
     mine:!!currentAuthUser && row.owner_id===currentAuthUser.id,
     status:row.status==="completed"?"history":row.status,
+    gatheredAt:row.gathered_at||null,
     participants:[row.owner_id],
     comments:[],
     funSent:[],
@@ -10840,6 +11292,7 @@ async function loadEventsFromSupabase(){
       tags,
       visibility,
       status,
+      gathered_at,
       created_at
     `;
 
@@ -10996,6 +11449,7 @@ async function loadEventsFromSupabase(){
 
     if(currentAuthUser){
       renderProfile();
+      maybeShowGatherCelebration();
     }
 
   }catch(error){
@@ -11173,7 +11627,10 @@ function openCardDetail(id){
 
         <h3>${esc(e.title)}</h3>
 
-        ${eventIsOneMore(e) ? `
+        ${eventIsGathered(e)?gatherStatusHtml(e):""}
+        ${gatherHostControlHtml(e)}
+
+        ${!eventIsGathered(e) && eventIsOneMore(e) ? `
           <div class="detail-one-more-focus">
             <div>
               <span class="one-more-dot"></span>
@@ -11262,7 +11719,7 @@ function eventCard(e){
       <button class="fixed-layout-photo" onclick="openCardDetail(${arg})">
         <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
         <span class="fixed-photo-category">${esc(e.sub||e.category)}</span>
-        ${oneMore?`<span class="fixed-photo-urgency">あと1人</span>`:""}
+        ${eventIsGathered(e)?`<span class="fixed-photo-gather">GATHER</span>`:(oneMore?`<span class="fixed-photo-urgency">あと1人</span>`:"")}
       </button>
 
       <div class="v24-4-19-tag-footer">
@@ -11291,7 +11748,9 @@ function eventCard(e){
 
         <button class="fixed-card-title v24-4-17-title" onclick="openCardDetail(${arg})">${esc(e.title)}</button>
 
-        ${oneMore?`
+        ${eventIsGathered(e)?gatherStatusHtml(e):""}
+
+        ${!eventIsGathered(e)&&oneMore?`
           <div class="v24-4-17-one-more">
             <span class="one-more-dot"></span>
             <strong>あと1人で開催</strong>
@@ -12474,7 +12933,7 @@ function calendarEventCard(e){
         <strong>${esc(e.title)}</strong>
         <small>${esc(e.place||"場所未定")}</small>
       </span>
-      <span class="calendar-event-type">${kind==="own"?"自分の募集":"参加予定"}</span>
+      <span class="calendar-event-type">${eventIsGathered(e)?"GATHER":(kind==="own"?"自分の募集":"参加予定")}</span>
     </button>
   `;
 }
@@ -12484,9 +12943,9 @@ function myEventCard(e,mode){
   return `<div class="my-event-card">
     <img src="${eventImageSrc(e)}" alt="${esc(e.sub)}" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">
     <div class="my-event-main">
-      <div class="my-event-title">${esc(e.title)}</div>
+      <div class="my-event-title">${esc(e.title)} ${gatherStatusHtml(e,{compact:true})}</div>
       <div class="my-event-meta">${dateLabel(e.date)} ${esc(e.time)}<br>${esc(e.place)} · ${eventPeopleText(e)}</div>
-      ${mode==="created"?`<div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div>`:""}
+      ${mode==="created"?`<div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div>${gatherHostControlHtml(e)}`:""}
       <div class="my-event-actions">
         <button onclick="openEvent(${arg})">詳細を見る</button>
         ${mode==="saved"
@@ -14562,7 +15021,7 @@ function openEvent(id){
   $("detailTitle").textContent=e.title;
   $("detailSub").textContent=`${u.name} · ${dateLabel(e.date)} ${e.time}`;
   $("detailCover").innerHTML=`<img src="${eventImageSrc(e)}" alt="" onerror="eventImageError(this,'${escjs(eventFallbackImage(e))}')">`;
-  $("detailMeta").innerHTML=`<div class="meta-line">場所　${esc(e.place)}</div><div class="meta-line">人数　${eventPeopleText(e)}</div><div class="meta-line">人数設定　${eventPeopleModeText(e)}</div><div class="meta-line">予算　${esc(e.budget)}</div><div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div><div class="visibility-note"><strong>公開範囲</strong><br>${esc(visibilityDescription(e.visibilityDb||e.visibility))}</div><div class="event-note">${esc(e.note)}</div><div class="event-tags">${publicEventTags(e).map(t=>`<span class="event-tag">${esc(t)}</span>`).join("")}</div>`;
+  $("detailMeta").innerHTML=`${eventIsGathered(e)?gatherStatusHtml(e):""}${gatherHostControlHtml(e)}<div class="meta-line">場所　${esc(e.place)}</div><div class="meta-line">人数　${eventPeopleText(e)}</div><div class="meta-line">人数設定　${eventPeopleModeText(e)}</div><div class="meta-line">予算　${esc(e.budget)}</div><div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div><div class="visibility-note"><strong>公開範囲</strong><br>${esc(visibilityDescription(e.visibilityDb||e.visibility))}</div><div class="event-note">${esc(e.note)}</div><div class="event-tags">${publicEventTags(e).map(t=>`<span class="event-tag">${esc(t)}</span>`).join("")}</div>`;
   renderEventDetail();
   openModal("eventModal");
   if(e.source==="supabase")loadEventComments(e);
