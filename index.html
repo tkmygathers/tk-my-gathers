@@ -12309,7 +12309,7 @@ a,
 </style>
 </head>
 <body>
-<!-- v25.13.1 selected-image layout -->
+<!-- v25.14.0 real preset images: 73 exact category mappings -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -18775,62 +18775,32 @@ let copyingEventSourceId=null;
 let createSubmitConfirmed=false;
 
 
-const EVENT_IMAGE_PRESETS=[
-  {key:"drinks",label:"飲み会",keywords:["飲み会","居酒屋","バー"],tone:["#0F172A","#B7791F"]},
-  {key:"bbq",label:"BBQ",keywords:["BBQ","バーベキュー"],tone:["#18392B","#D97706"]},
-  {key:"cafe",label:"カフェ",keywords:["カフェ","コーヒー"],tone:["#5B4636","#D6B37A"]},
-  {key:"food",label:"ごはん",keywords:["ごはん","ランチ","ディナー","食事"],tone:["#7C2D12","#FDBA74"]},
-  {key:"games",label:"麻雀・ゲーム",keywords:["麻雀","ボードゲーム","ゲーム"],tone:["#14532D","#EAB308"]},
-  {key:"karaoke",label:"カラオケ",keywords:["カラオケ"],tone:["#312E81","#A855F7"]},
-  {key:"sports",label:"スポーツ",keywords:["スポーツ","キャッチボール","フットサル","バスケ","ランニング"],tone:["#0C4A6E","#38BDF8"]},
-  {key:"walk",label:"散歩",keywords:["散歩","ウォーキング","街歩き"],tone:["#365314","#86EFAC"]},
-  {key:"relax",label:"サウナ",keywords:["サウナ","温泉","リラックス"],tone:["#7C2D12","#F59E0B"]},
-  {key:"outing",label:"おでかけ",keywords:["映画","美術館","おでかけ","観光"],tone:["#164E63","#67E8F9"]},
-  {key:"study",label:"勉強・作業",keywords:["勉強","作業","勉強会","作業会"],tone:["#334155","#94A3B8"]},
-  {key:"gather",label:"集まり",keywords:["その他","オリジナル","集まり"],tone:["#172554","#60A5FA"]}
-];
-
-function presetSvgData(preset){
-  const [a,b]=preset.tone||["#0F172A","#3B82F6"];
-  const label=String(preset.label||"GATHER").replace(/&/g,"&amp;").replace(/</g,"&lt;");
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
-    <defs>
-      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="${a}"/>
-        <stop offset="1" stop-color="${b}"/>
-      </linearGradient>
-      <filter id="blur"><feGaussianBlur stdDeviation="32"/></filter>
-    </defs>
-    <rect width="1200" height="800" fill="url(#g)"/>
-    <circle cx="930" cy="150" r="220" fill="rgba(255,255,255,.14)" filter="url(#blur)"/>
-    <circle cx="180" cy="700" r="260" fill="rgba(255,255,255,.08)" filter="url(#blur)"/>
-    <path d="M0 640 C220 520 390 760 640 610 S980 470 1200 570 V800 H0Z" fill="rgba(255,255,255,.10)"/>
-    <text x="70" y="675" font-family="Arial, sans-serif" font-size="62" font-weight="700" fill="white" opacity=".96">${label}</text>
-    <text x="72" y="730" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="white" opacity=".56" letter-spacing="5">TK MY GATHERS</text>
-  </svg>`;
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
-EVENT_IMAGE_PRESETS.forEach(p=>p.url=presetSvgData(p));
+const EVENT_IMAGE_PRESETS=[{"key":"食事_飲み_飲み会","label":"飲み会","category":"食事・飲み","url":"assets/presets/01_food_drink/01_drinks.webp"},{"key":"食事_飲み_ランチ","label":"ランチ","category":"食事・飲み","url":"assets/presets/01_food_drink/02_lunch.webp"},{"key":"食事_飲み_夜ごはん","label":"夜ごはん","category":"食事・飲み","url":"assets/presets/01_food_drink/03_dinner.webp"},{"key":"食事_飲み_カフェ","label":"カフェ","category":"食事・飲み","url":"assets/presets/01_food_drink/04_cafe.webp"},{"key":"食事_飲み_ラーメン","label":"ラーメン","category":"食事・飲み","url":"assets/presets/01_food_drink/05_ramen.webp"},{"key":"食事_飲み_焼肉","label":"焼肉","category":"食事・飲み","url":"assets/presets/01_food_drink/06_yakiniku.webp"},{"key":"食事_飲み_食べ歩き","label":"食べ歩き","category":"食事・飲み","url":"assets/presets/01_food_drink/07_food_walk.webp"},{"key":"食事_飲み_スイーツ巡り","label":"スイーツ巡り","category":"食事・飲み","url":"assets/presets/01_food_drink/08_sweets.webp"},{"key":"食事_飲み_せんべろ","label":"せんべろ","category":"食事・飲み","url":"assets/presets/01_food_drink/09_senbero.webp"},{"key":"食事_飲み_はしご酒","label":"はしご酒","category":"食事・飲み","url":"assets/presets/01_food_drink/10_bar_hopping.webp"},{"key":"食事_飲み_新しい店に行く","label":"新しい店に行く","category":"食事・飲み","url":"assets/presets/01_food_drink/11_new_restaurant.webp"},{"key":"スポーツ_キャッチボール","label":"キャッチボール","category":"スポーツ","url":"assets/presets/02_sports/01_catchball.webp"},{"key":"スポーツ_フットサル","label":"フットサル","category":"スポーツ","url":"assets/presets/02_sports/02_futsal.webp"},{"key":"スポーツ_バスケ","label":"バスケ","category":"スポーツ","url":"assets/presets/02_sports/03_basketball.webp"},{"key":"スポーツ_バドミントン","label":"バドミントン","category":"スポーツ","url":"assets/presets/02_sports/04_badminton.webp"},{"key":"スポーツ_テニス","label":"テニス","category":"スポーツ","url":"assets/presets/02_sports/05_tennis.webp"},{"key":"スポーツ_卓球","label":"卓球","category":"スポーツ","url":"assets/presets/02_sports/06_table_tennis.webp"},{"key":"スポーツ_ボウリング","label":"ボウリング","category":"スポーツ","url":"assets/presets/02_sports/07_bowling.webp"},{"key":"スポーツ_ランニング","label":"ランニング","category":"スポーツ","url":"assets/presets/02_sports/08_running.webp"},{"key":"スポーツ_サイクリング","label":"サイクリング","category":"スポーツ","url":"assets/presets/02_sports/09_cycling.webp"},{"key":"スポーツ_ボルダリング","label":"ボルダリング","category":"スポーツ","url":"assets/presets/02_sports/10_bouldering.webp"},{"key":"スポーツ_ゴルフ練習","label":"ゴルフ練習","category":"スポーツ","url":"assets/presets/02_sports/11_golf_practice.webp"},{"key":"スポーツ_筋トレ","label":"筋トレ","category":"スポーツ","url":"assets/presets/02_sports/12_strength_training.webp"},{"key":"ゲーム_遊び_麻雀","label":"麻雀","category":"ゲーム・遊び","url":"assets/presets/03_games/01_mahjong.webp"},{"key":"ゲーム_遊び_ボードゲーム","label":"ボードゲーム","category":"ゲーム・遊び","url":"assets/presets/03_games/02_board_game.webp"},{"key":"ゲーム_遊び_ダーツ","label":"ダーツ","category":"ゲーム・遊び","url":"assets/presets/03_games/03_darts.webp"},{"key":"ゲーム_遊び_ビリヤード","label":"ビリヤード","category":"ゲーム・遊び","url":"assets/presets/03_games/04_billiards.webp"},{"key":"ゲーム_遊び_カラオケ","label":"カラオケ","category":"ゲーム・遊び","url":"assets/presets/03_games/05_karaoke.webp"},{"key":"ゲーム_遊び_謎解き","label":"謎解き","category":"ゲーム・遊び","url":"assets/presets/03_games/06_nazotoki.webp"},{"key":"ゲーム_遊び_脱出ゲーム","label":"脱出ゲーム","category":"ゲーム・遊び","url":"assets/presets/03_games/07_escape_game.webp"},{"key":"ゲーム_遊び_ゲームセンター","label":"ゲームセンター","category":"ゲーム・遊び","url":"assets/presets/03_games/08_arcade.webp"},{"key":"ゲーム_遊び_カードゲーム","label":"カードゲーム","category":"ゲーム・遊び","url":"assets/presets/03_games/09_card_game.webp"},{"key":"ゲーム_遊び_人狼","label":"人狼","category":"ゲーム・遊び","url":"assets/presets/03_games/10_werewolf.webp"},{"key":"ゲーム_遊び_eスポーツ","label":"eスポーツ","category":"ゲーム・遊び","url":"assets/presets/03_games/11_esports.webp"},{"key":"おでかけ_BBQ","label":"BBQ","category":"おでかけ","url":"assets/presets/04_outing/01_outdoor_bbq.webp"},{"key":"おでかけ_ピクニック","label":"ピクニック","category":"おでかけ","url":"assets/presets/04_outing/02_picnic.webp"},{"key":"おでかけ_街歩き","label":"街歩き","category":"おでかけ","url":"assets/presets/04_outing/03_city_walk.webp"},{"key":"おでかけ_夜散歩","label":"夜散歩","category":"おでかけ","url":"assets/presets/04_outing/04_old_town_night.webp"},{"key":"おでかけ_夜景","label":"夜景","category":"おでかけ","url":"assets/presets/04_outing/05_night_view.webp"},{"key":"おでかけ_水族館","label":"水族館","category":"おでかけ","url":"assets/presets/04_outing/06_aquarium.webp"},{"key":"おでかけ_動物園","label":"動物園","category":"おでかけ","url":"assets/presets/04_outing/07_zoo.webp"},{"key":"おでかけ_プラネタリウム","label":"プラネタリウム","category":"おでかけ","url":"assets/presets/04_outing/08_planetarium.webp"},{"key":"おでかけ_神社_寺巡り","label":"神社・寺巡り","category":"おでかけ","url":"assets/presets/04_outing/09_shrine_temple.webp"},{"key":"おでかけ_商店街巡り","label":"商店街巡り","category":"おでかけ","url":"assets/presets/04_outing/10_old_street.webp"},{"key":"おでかけ_日帰り旅行","label":"日帰り旅行","category":"おでかけ","url":"assets/presets/04_outing/11_day_trip.webp"},{"key":"カルチャー_趣味_映画","label":"映画","category":"カルチャー・趣味","url":"assets/presets/05_culture_hobby/01_movie.webp"},{"key":"カルチャー_趣味_美術館","label":"美術館","category":"カルチャー・趣味","url":"assets/presets/05_culture_hobby/02_museum.webp"},{"key":"カルチャー_趣味_展覧会","label":"展覧会","category":"カルチャー・趣味","url":"assets/presets/05_culture_hobby/03_exhibition.webp"},{"key":"カルチャー_趣味_写真散歩","label":"写真散歩","category":"カルチャー・趣味","url":"assets/presets/05_culture_hobby/04_photo_walk.webp"},{"key":"カルチャー_趣味_カメラ","label":"カメラ","category":"カルチャー・趣味","url":"assets/presets/05_culture_hobby/05_camera.webp"},{"key":"カルチャー_趣味_古着巡り","label":"古着巡り","category":"カルチャー・趣味","url":"assets/presets/05_culture_hobby/06_vintage_clothes.webp"},{"key":"カルチャー_趣味_本屋巡り","label":"本屋巡り","category":"カルチャー・趣味","url":"assets/presets/05_culture_hobby/07_bookstore.webp"},{"key":"カルチャー_趣味_レコード屋巡り","label":"レコード屋巡り","category":"カルチャー・趣味","url":"assets/presets/05_culture_hobby/08_record_shop.webp"},{"key":"カルチャー_趣味_ライブ","label":"ライブ","category":"カルチャー・趣味","url":"assets/presets/05_culture_hobby/09_live_music.webp"},{"key":"カルチャー_趣味_お笑い","label":"お笑い","category":"カルチャー・趣味","url":"assets/presets/05_culture_hobby/10_comedy.webp"},{"key":"カルチャー_趣味_音楽セッション","label":"音楽セッション","category":"カルチャー・趣味","url":"assets/presets/05_culture_hobby/11_music_session.webp"},{"key":"カルチャー_趣味_絵を描く","label":"絵を描く","category":"カルチャー・趣味","url":"assets/presets/05_culture_hobby/12_drawing.webp"},{"key":"リラックス_サウナ","label":"サウナ","category":"リラックス","url":"assets/presets/06_relax/01_sauna.webp"},{"key":"リラックス_銭湯","label":"銭湯","category":"リラックス","url":"assets/presets/06_relax/02_onsen.webp"},{"key":"リラックス_岩盤浴","label":"岩盤浴","category":"リラックス","url":"assets/presets/06_relax/03_spa.webp"},{"key":"リラックス_公園でのんびり","label":"公園でのんびり","category":"リラックス","url":"assets/presets/06_relax/04_park_relax.webp"},{"key":"リラックス_カフェでゆっくり","label":"カフェでゆっくり","category":"リラックス","url":"assets/presets/06_relax/05_cafe_relax.webp"},{"key":"学ぶ_作る_勉強会","label":"勉強会","category":"学ぶ・作る","url":"assets/presets/07_learn_make/01_self_study.webp"},{"key":"学ぶ_作る_読書会","label":"読書会","category":"学ぶ・作る","url":"assets/presets/07_learn_make/02_reading.webp"},{"key":"学ぶ_作る_英会話","label":"英会話","category":"学ぶ・作る","url":"assets/presets/07_learn_make/03_language_study.webp"},{"key":"学ぶ_作る_作業会","label":"作業会","category":"学ぶ・作る","url":"assets/presets/07_learn_make/04_coworking.webp"},{"key":"学ぶ_作る_プログラミング","label":"プログラミング","category":"学ぶ・作る","url":"assets/presets/07_learn_make/05_programming.webp"},{"key":"学ぶ_作る_資格勉強","label":"資格勉強","category":"学ぶ・作る","url":"assets/presets/07_learn_make/06_qualification.webp"},{"key":"学ぶ_作る_アイデア出し","label":"アイデア出し","category":"学ぶ・作る","url":"assets/presets/07_learn_make/07_planning.webp"},{"key":"学ぶ_作る_料理教室","label":"料理教室","category":"学ぶ・作る","url":"assets/presets/07_learn_make/08_cooking.webp"},{"key":"学ぶ_作る_陶芸","label":"陶芸","category":"学ぶ・作る","url":"assets/presets/07_learn_make/09_pottery.webp"},{"key":"学ぶ_作る_ハンドメイド","label":"ハンドメイド","category":"学ぶ・作る","url":"assets/presets/07_learn_make/10_handmade.webp"},{"key":"その他_オリジナル_オリジナル","label":"オリジナル","category":"その他・オリジナル","url":"assets/presets/08_other/01_anything.webp"}];
 
 function getEventImagePreset(key){
   return EVENT_IMAGE_PRESETS.find(p=>p.key===key)||null;
 }
 
 function suggestedPreset(){
-  const text=[state.cat,state.sub,$("customTitle")?.value||""].filter(Boolean).join(" ");
-  return EVENT_IMAGE_PRESETS.find(p=>p.keywords.some(k=>text.includes(k)))
-    || EVENT_IMAGE_PRESETS.find(p=>p.key==="gather");
+  const exact=EVENT_IMAGE_PRESETS.find(p=>p.category===state.cat && p.label===state.sub);
+  if(exact)return exact;
+  const custom=String($("customTitle")?.value||"").trim();
+  if(custom){
+    const byText=EVENT_IMAGE_PRESETS.find(p=>custom.includes(p.label));
+    if(byText)return byText;
+  }
+  const sameCategory=EVENT_IMAGE_PRESETS.find(p=>p.category===state.cat);
+  return sameCategory || EVENT_IMAGE_PRESETS.find(p=>p.category==="その他・オリジナル");
 }
 
 function renderPresetImageGrid(){
   const grid=$("presetImageGrid");
   if(!grid)return;
-
-  grid.innerHTML=EVENT_IMAGE_PRESETS.map(p=>`
+  const visible=EVENT_IMAGE_PRESETS.filter(p=>p.category===state.cat);
+  grid.innerHTML=visible.map(p=>`
     <button type="button"
       class="preset-image-option ${selectedPresetImageKey===p.key && !selectedEventImageFile?"active":""}"
-      onclick="selectPresetImage('${p.key}')">
+      onclick="selectPresetImage('${escjs(p.key)}')">
       <img src="${p.url}" alt="${esc(p.label)}">
       <span><i></i>${esc(p.label)}</span>
     </button>
