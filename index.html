@@ -10155,10 +10155,25 @@ body{
   }
 }
 
+
+/* ===== V25.3.3 PARTICIPANTS IN DETAIL ONLY ===== */
+.detail-participant-summary{
+  padding:2px 2px 9px;
+  color:#7f8a98;
+  font-size:9px;
+  font-weight:800;
+}
+.detail-participant-row{
+  border-bottom:1px solid rgba(28,37,49,.07);
+}
+.detail-participant-row:last-child{
+  border-bottom:0;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.3.2 event participant avatars + profile access -->
+<!-- v25.3.3 participants shown in detail only -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -12605,8 +12620,6 @@ function eventCard(e){
           <span><small>人数</small><strong>${eventPeopleText(e)}</strong></span>
           <span><small>予算</small><strong>${esc(e.budget||"未定")}</strong></span>
         </div>
-
-        ${eventParticipantsHtml(e)}
 
         ${summary?`
           <p class="v24-4-17-summary">${esc(summary)}</p>
@@ -16095,19 +16108,23 @@ function renderEventDetail(){
     }).join("")||`<div class="comment-state">まだコメントはありません</div>`;
   }
 
-  $("participantList").innerHTML=eventParticipantIds(e).map(id=>{
-    const p=person(id);
-    return `<div class="friend">
-      <button type="button" class="friend-left participant-profile-button" onclick="openOtherProfile('${escjs(String(id))}')">
-        <div class="mini-avatar">${avatarHtml(p)}</div>
-        <div>
-          <div class="friend-name">${esc(p.name)}</div>
-          <div class="muted">${id===e.owner?"主催者 · ":""}${esc(p.handle||"")}</div>
-        </div>
-      </button>
-      ${id!==meId()?`<button class="small-btn" onclick="startChat('${escjs(String(id))}')">連絡</button>`:""}
-    </div>`
-  }).join("")||`<div class="comment-state">参加者情報はまだありません</div>`;
+  const participantIds=eventParticipantIds(e);
+  $("participantList").innerHTML=participantIds.length
+    ? `<div class="detail-participant-summary">参加者 ${participantIds.length}人</div>` +
+      participantIds.map(id=>{
+        const p=person(id);
+        return `<div class="friend detail-participant-row">
+          <button type="button" class="friend-left participant-profile-button" onclick="openOtherProfile('${escjs(String(id))}')">
+            <div class="mini-avatar">${avatarHtml(p)}</div>
+            <div>
+              <div class="friend-name">${esc(p.name)}</div>
+              <div class="muted">${id===e.owner?"主催者 · ":""}${esc(p.handle||"")}</div>
+            </div>
+          </button>
+          ${id!==meId()?`<button class="small-btn" onclick="startChat('${escjs(String(id))}')">連絡</button>`:""}
+        </div>`;
+      }).join("")
+    : `<div class="comment-state">参加者情報はまだありません</div>`;
 
   updateCommentComposer(e);
 }
