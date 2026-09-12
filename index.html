@@ -8507,7 +8507,7 @@ html,body{
   inset:0;
   opacity:0;
   pointer-events:none;
-  transition:opacity .35s ease;
+  transition:opacity .28s ease;
 }
 
 .v25-0-2-slide.active{
@@ -10720,7 +10720,7 @@ body{
 </style>
 </head>
 <body>
-<!-- v25.6.1 remove home category examples -->
+<!-- v25.6.3 five home banners + 5 second rotation -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -10774,7 +10774,27 @@ body{
 <div class="v25-0-7-slide-copy">
 <small>PICK UP</small>
 <strong>東京で、いい時間を。</strong>
-<span>将来はここを特集・キャンペーン・広告にも使えるスペースに。</span>
+<span>気になる集まりを見つけて、次の予定をつくろう。</span>
+</div>
+</article>
+
+<article class="v25-0-2-slide v25-0-7-photo-slide" data-hero-slide="3" data-kind="feature">
+<img alt="あと1人から、集まりが始まる。" class="v25-0-7-banner-img" decoding="async" loading="lazy" src="hero_banner_gather.webp"/>
+<div class="v25-0-7-photo-overlay"></div>
+<div class="v25-0-7-slide-copy">
+<small>ONE MORE</small>
+<strong>あと1人から、集まりが始まる。</strong>
+<span>もう少しで開催できる募集を、ホームからチェック。</span>
+</div>
+</article>
+
+<article class="v25-0-2-slide v25-0-7-photo-slide" data-hero-slide="4" data-kind="feature">
+<img alt="気になる募集を、見つけよう。" class="v25-0-7-banner-img" decoding="async" loading="lazy" src="hero_banner_create.webp"/>
+<div class="v25-0-7-photo-overlay v25-0-7-photo-overlay-soft"></div>
+<div class="v25-0-7-slide-copy">
+<small>DISCOVER</small>
+<strong>気になる募集を、見つけよう。</strong>
+<span>カテゴリやタグ、予算から自分に合う集まりを探せます。</span>
 </div>
 </article>
 </div>
@@ -10782,6 +10802,8 @@ body{
 <button aria-label="1枚目" class="active" onclick="setHomeHeroSlide(0)" type="button"></button>
 <button aria-label="2枚目" onclick="setHomeHeroSlide(1)" type="button"></button>
 <button aria-label="3枚目" onclick="setHomeHeroSlide(2)" type="button"></button>
+<button aria-label="4枚目" onclick="setHomeHeroSlide(3)" type="button"></button>
+<button aria-label="5枚目" onclick="setHomeHeroSlide(4)" type="button"></button>
 </div>
 </section>
 <section class="v25-create-block v25-0-4-create-hub">
@@ -13635,7 +13657,7 @@ function restartHomeHeroTimer(){
     const slides=[...document.querySelectorAll("[data-hero-slide]")];
     if(!slides.length)return;
     setHomeHeroSlide((v25HeroIndex+1)%slides.length);
-  },8000);
+  },5000);
 }
 
 function initHomeHeroRotation(){
