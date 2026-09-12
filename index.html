@@ -9684,10 +9684,45 @@ body{
   }
 }
 
+
+/* ===== V25.2.1 GATHER CANCEL ===== */
+.gather-host-confirmed{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+}
+.gather-host-confirmed-copy{
+  min-width:0;
+}
+.gather-cancel-button{
+  min-height:40px;
+  padding:0 12px;
+  border:1px solid #d4dbe4;
+  border-radius:12px;
+  background:#fff;
+  color:#5f6a78;
+  font:inherit;
+  font-size:9px;
+  font-weight:800;
+  cursor:pointer;
+}
+.gather-cancel-button:hover{
+  background:#f5f7fa;
+}
+@media(max-width:420px){
+  .gather-host-confirmed{
+    grid-template-columns:1fr;
+  }
+  .gather-cancel-button{
+    width:100%;
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.2.0 GATHER host confirmation + participant celebration -->
+<!-- v25.2.1 GATHER cancel support -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -11055,9 +11090,14 @@ function gatherHostControlHtml(e){
 
   if(eventIsGathered(e)){
     return `<div class="gather-host-confirmed">
-      <span class="gather-host-kicker">GATHER</span>
-      <strong>開催確定済み</strong>
-      <small>参加者にも開催決定が表示されます。</small>
+      <div class="gather-host-confirmed-copy">
+        <span class="gather-host-kicker">GATHER</span>
+        <strong>開催確定済み</strong>
+        <small>参加者にも開催決定が表示されます。</small>
+      </div>
+      <button type="button" class="gather-cancel-button" onclick="confirmCancelGather('${escjs(String(e.id))}')">
+        GATHERを取り消す
+      </button>
     </div>`;
   }
 
@@ -11205,6 +11245,77 @@ async function gatherEvent(id){
   }catch(error){
     console.error("gather event:",error);
     toast("開催確定を保存できませんでした");
+  }
+}
+
+
+function confirmCancelGather(id){
+  const ev=resolveEventByAnyId(id);
+  if(!ev)return;
+
+  if(ev.owner!==(currentAuthUser?.id||meId())){
+    toast("GATHERを取り消せるのは主催者だけです");
+    return;
+  }
+
+  const ok=window.confirm(
+    `「${ev.title||"この募集"}」のGATHERを取り消しますか？\n\n開催確定前の状態に戻ります。`
+  );
+
+  if(!ok)return;
+  cancelGatherEvent(id);
+}
+
+async function cancelGatherEvent(id){
+  if(!requireAuth("GATHERを取り消すにはログインしてください。"))return;
+
+  const ev=resolveEventByAnyId(id);
+  if(!ev)return;
+
+  if(ev.owner!==currentAuthUser.id){
+    toast("GATHERを取り消せるのは主催者だけです");
+    return;
+  }
+
+  if(!eventIsGathered(ev)){
+    toast("この募集はGATHERされていません");
+    return;
+  }
+
+  try{
+    if(isRealSupabaseEvent(ev)){
+      const eventId=getSupabaseEventId(ev);
+      const {error}=await sb
+        .from("events")
+        .update({
+          status:"upcoming",
+          gathered_at:null
+        })
+        .eq("id",eventId)
+        .eq("owner_id",currentAuthUser.id);
+
+      if(error)throw error;
+    }else{
+      ev.status="upcoming";
+      ev.gatheredAt=null;
+      save();
+    }
+
+    ev.status="upcoming";
+    ev.gatheredAt=null;
+
+    renderHome();
+    renderDiscover();
+    renderMyGathers();
+
+    toast("GATHERを取り消しました");
+
+    if(isRealSupabaseEvent(ev)){
+      await loadEventsFromSupabase();
+    }
+  }catch(error){
+    console.error("cancel gather event:",error);
+    toast("GATHERを取り消せませんでした");
   }
 }
 
