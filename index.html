@@ -10170,10 +10170,58 @@ body{
   border-bottom:0;
 }
 
+
+/* ===== V25.3.4 PROFILE BASIC INFO ===== */
+.profile-basic-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.profile-basic-note{
+  margin-top:7px;
+  color:#8a94a2;
+  font-size:8.5px;
+  line-height:1.5;
+}
+.profile-basic-meta,
+.v24-4-24-basic-meta{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:7px;
+  color:#536070;
+  font-size:9px;
+  font-weight:800;
+}
+.profile-basic-meta span,
+.v24-4-24-basic-meta span{
+  display:inline-flex;
+  align-items:center;
+  min-height:24px;
+  padding:0 8px;
+  border-radius:999px;
+  background:#f2f5f8;
+  border:1px solid #e3e8ef;
+  color:#4f5b69;
+}
+.profile-basic-meta i,
+.v24-4-24-basic-meta i{
+  display:none;
+}
+.v24-4-24-basic-meta{
+  margin-top:10px;
+}
+@media(max-width:360px){
+  .profile-basic-grid{
+    grid-template-columns:1fr;
+  }
+}
+
 </style>
 </head>
 <body>
-<!-- v25.3.3 participants shown in detail only -->
+<!-- v25.3.4 profile gender + age range -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -10423,6 +10471,7 @@ body{
 <div class="profile-name" id="profileName"></div>
 <div class="profile-handle" id="profileHandle"></div>
 <p class="bio" id="profileBio"></p>
+<div class="profile-basic-meta" id="profileBasicMeta"></div>
 <div class="muted" id="profileArea"></div>
 <div class="counts">
 <button class="count-btn" onclick="showFollowList('followers')"><strong id="followersCount">0</strong>フォロワー</button>
@@ -10599,6 +10648,34 @@ body{
 <form id="profileEditForm">
 <div class="step"><div class="field"><label class="label">名前</label><input class="input" id="editName" required=""/></div><div class="field" style="margin-top:8px"><label class="label">@ユーザー名</label><input class="input" id="editHandle" required=""/></div></div>
 <div class="step"><div class="field"><label class="label">自己紹介</label><textarea class="textarea" id="editBio"></textarea></div><div class="field" style="margin-top:8px"><label class="label">活動エリア</label><input class="input" id="editArea"/></div></div>
+<div class="step">
+<div class="step-label">基本情報</div>
+<div class="profile-basic-grid">
+<div class="field">
+<label class="label">性別</label>
+<select class="select" id="editGender">
+<option value="">未設定</option>
+<option value="男性">男性</option>
+<option value="女性">女性</option>
+<option value="その他">その他</option>
+<option value="回答しない">回答しない</option>
+</select>
+</div>
+<div class="field">
+<label class="label">年代</label>
+<select class="select" id="editAgeRange">
+<option value="">未設定</option>
+<option value="20代前半">20代前半</option>
+<option value="20代後半">20代後半</option>
+<option value="30代前半">30代前半</option>
+<option value="30代後半">30代後半</option>
+<option value="40代">40代</option>
+<option value="50代以上">50代以上</option>
+</select>
+</div>
+</div>
+<div class="profile-basic-note">正確な年齢や誕生日は表示しません。</div>
+</div>
 <div class="step">
 <div class="step-label">プロフィール画像</div>
 <div class="profile-avatar-edit-preview">
@@ -11119,7 +11196,7 @@ async function loadNotifications(){
     if(actorIds.length){
       const {data:profiles,error:profileError}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
         .in("id",actorIds);
 
       if(profileError)throw profileError;
@@ -11371,6 +11448,8 @@ function remoteProfileToPerson(p){
     banner:p.banner_url||null,
     bio:p.bio||"",
     area:p.area||"",
+    gender:p.gender||"",
+    ageRange:p.age_range||"",
     interests:Array.isArray(p.interests)?p.interests:[],
     fun:0,
     mutual:false,
@@ -11386,7 +11465,9 @@ function remoteProfileToPerson(p){
       name:item.name,
       handle:item.handle,
       avatar:item.avatar,
-      banner:item.banner
+      banner:item.banner,
+      gender:item.gender||"",
+      ageRange:item.ageRange||""
     });
   }
   return item;
@@ -12132,7 +12213,7 @@ async function loadEventsFromSupabase(){
     if(ownerIds.length){
       const {data:profilesData,error:profilesError}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
         .in("id",ownerIds);
 
       if(profilesError)throw profilesError;
@@ -12996,7 +13077,7 @@ async function ensurePeopleFromProfiles(ids){
   if(!unique.length)return;
   const {data,error}=await sb
     .from("profiles")
-    .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
+    .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
     .in("id",unique);
   if(error){console.error("load dm profiles:",error);return}
   (data||[]).forEach(remoteProfileToPerson);
@@ -13374,7 +13455,7 @@ async function openNewMessage(){
   try{
     const {data,error}=await sb
       .from("profiles")
-      .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
+      .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
       .neq("id",currentAuthUser.id)
       .order("display_name",{ascending:true});
 
@@ -13930,7 +14011,7 @@ async function loadFollowState(){
     if(allIds.length){
       const {data:profiles,error}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
         .in("id",allIds);
 
       if(error)throw error;
@@ -14025,7 +14106,7 @@ async function renderOtherProfile(id){
     if(isRealUserId(id)){
       const {data,error}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
         .eq("id",id)
         .maybeSingle();
 
@@ -14066,6 +14147,9 @@ async function renderOtherProfile(id){
             <span class="v24-4-24-relation ${mutual?"mutual":following?"following":""}">${esc(connectionLabel)}</span>
           </div>
 
+          ${(p.gender||p.ageRange)?`<div class="v24-4-24-basic-meta">
+            ${[p.gender,p.ageRange].filter(Boolean).map(x=>`<span>${esc(x)}</span>`).join(`<i>・</i>`)}
+          </div>`:""}
           ${p.bio?`<div class="other-profile-bio v24-4-24-bio">${esc(p.bio)}</div>`:`<div class="v24-4-24-empty-copy">自己紹介はまだありません。</div>`}
           ${p.area?`<div class="v24-4-24-area">${esc(p.area)}</div>`:""}
 
@@ -14175,7 +14259,7 @@ async function showFollowList(type){
   try{
     const {data,error}=await sb
       .from("profiles")
-      .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
+      .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
       .in("id",ids);
 
     if(error)throw error;
@@ -14207,7 +14291,14 @@ if(banner){
     ? `<img src="${esc(m.banner)}" alt="プロフィールバナー">`
     : `<div class="profile-banner-empty">BANNER</div>`;
 }
-$("profileName").textContent=m.name;$("profileHandle").textContent=m.handle;$("profileBio").textContent=m.bio;$("profileArea").textContent=m.area;$("followersCount").textContent=m.followers;$("followingCount").textContent=m.following;$("mutualCount").textContent=mutuals().length;$("myFunTotal").textContent=m.fun;$("profileAvatar").innerHTML=m.avatar?`<img src="${m.avatar}" alt="">`:esc(m.name.slice(0,2));$("interestGrid").innerHTML=m.interests.map(x=>`<button class="interest-chip light" onclick="prefill('${escjs(x)}')">${esc(x)}</button>`).join("");$("upcoming").innerHTML=profileList(state.events.filter(e=>e.joined&&["upcoming","gathered"].includes(e.status)),"まだ参加予定はありません",false);$("created").innerHTML=profileList(state.events.filter(e=>e.owner===(currentAuthUser?.id||meId())),"まだ自分の募集はありません",false);$("history").innerHTML=profileList(state.events.filter(e=>e.status==="history"&&e.participants.includes(meId())),"まだ履歴はありません",true)}
+$("profileName").textContent=m.name;$("profileHandle").textContent=m.handle;$("profileBio").textContent=m.bio;
+const basicMeta=$("profileBasicMeta");
+if(basicMeta){
+  const parts=[m.gender,m.ageRange].filter(Boolean);
+  basicMeta.innerHTML=parts.length?parts.map(x=>`<span>${esc(x)}</span>`).join(`<i>・</i>`):"";
+  basicMeta.style.display=parts.length?"flex":"none";
+}
+$("profileArea").textContent=m.area;$("followersCount").textContent=m.followers;$("followingCount").textContent=m.following;$("mutualCount").textContent=mutuals().length;$("myFunTotal").textContent=m.fun;$("profileAvatar").innerHTML=m.avatar?`<img src="${m.avatar}" alt="">`:esc(m.name.slice(0,2));$("interestGrid").innerHTML=m.interests.map(x=>`<button class="interest-chip light" onclick="prefill('${escjs(x)}')">${esc(x)}</button>`).join("");$("upcoming").innerHTML=profileList(state.events.filter(e=>e.joined&&["upcoming","gathered"].includes(e.status)),"まだ参加予定はありません",false);$("created").innerHTML=profileList(state.events.filter(e=>e.owner===(currentAuthUser?.id||meId())),"まだ自分の募集はありません",false);$("history").innerHTML=profileList(state.events.filter(e=>e.status==="history"&&e.participants.includes(meId())),"まだ履歴はありません",true)}
 function profileList(list,empty,historyMode){if(!list.length)return `<div class="panel" style="padding:18px;text-align:center;color:var(--muted)">${empty}</div>`;return `<div class="list">${list.map(e=>{const arg=eventIdArg(e.id);return `<div class="friend"><div class="friend-left" onclick="openEvent(${arg})" style="cursor:pointer"><div class="mini-avatar">${esc(e.sub.slice(0,2))}</div><div><div class="friend-name">${esc(e.title)}</div><div class="muted">${dateLabel(e.date)} ${esc(e.time)} · ${esc(e.place)}</div></div></div>${historyMode?`<button class="fun-btn" onclick="openFun(${arg})">楽しかった！</button>`:`<div class="muted">${eventPeopleText(e)}</div>`}</div>`}).join("")}</div>`}
 function switchProfileTab(id){document.querySelectorAll(".profile-tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("active",p.id===id))}
 
@@ -14721,6 +14812,8 @@ function openProfileEdit(){
   $("editHandle").value=m.handle;
   $("editBio").value=m.bio;
   $("editArea").value=m.area;
+  $("editGender").value=m.gender||"";
+  $("editAgeRange").value=m.ageRange||"";
 
   const preview=$("profileImagePreview");
   const imagePlaceholder=$("profileImagePlaceholder");
@@ -14774,6 +14867,8 @@ $("profileEditForm").addEventListener("submit",async e=>{
   const rawHandle=$("editHandle").value.trim().replace(/^@/,"").replace(/\s+/g,"_");
   const newBio=$("editBio").value.trim();
   const newArea=$("editArea").value.trim();
+  const newGender=$("editGender").value;
+  const newAgeRange=$("editAgeRange").value;
 
   if(!newName || !rawHandle){
     toast("名前とユーザー名を入力してください");
@@ -14841,12 +14936,14 @@ $("profileEditForm").addEventListener("submit",async e=>{
         username:rawHandle,
         bio:newBio,
         area:newArea,
+        gender:newGender||null,
+        age_range:newAgeRange||null,
         avatar_url:nextAvatar,
         banner_url:nextBanner,
         interests:m.interests||[]
       })
       .eq("id",currentAuthUser.id)
-      .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
+      .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
       .single();
 
     if(result.error)throw result.error;
@@ -14886,6 +14983,8 @@ $("profileEditForm").addEventListener("submit",async e=>{
       handle:p.handle,
       bio:p.bio||"",
       area:p.area||"",
+      gender:p.gender||"",
+      ageRange:p.ageRange||"",
       avatar:p.avatar||null,
       banner:p.banner||null,
       interests:p.interests||[],
@@ -16036,7 +16135,7 @@ async function loadEventComments(ev){
     if(userIds.length){
       const {data:profiles,error:profileError}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,banner_url,bio,area,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
         .in("id",userIds);
 
       if(profileError)throw profileError;
