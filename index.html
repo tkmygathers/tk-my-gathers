@@ -13032,10 +13032,53 @@ a,
   line-height:1.7;
 }
 
+
+/* =========================================================
+   V25.17.0 — FIND FRIENDS BY USER ID
+   ========================================================= */
+.profile-find-friends-btn{
+  min-height:34px;
+  padding:0 11px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.48);
+  background:rgba(255,255,255,.94);
+  color:#0F172A;
+  font-size:9px;
+  font-weight:850;
+}
+.find-friends-search{
+  display:flex;align-items:center;gap:8px;margin-top:14px;padding:0 12px;
+  min-height:46px;border:1px solid #D9E2EC;border-radius:14px;background:#FFFFFF;
+}
+.find-friends-search span{color:#64748B;font-weight:900}
+.find-friends-search input{
+  flex:1;min-width:0;border:0;outline:0;background:transparent;color:#0F172A;font-size:12px;
+}
+.find-friends-note{margin-top:7px;color:#8290A3;font-size:8.5px;line-height:1.55}
+.find-friends-results{display:grid;margin-top:12px;border-top:1px solid #EEF2F6}
+.find-friends-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #EEF2F6}
+.find-friends-profile-btn{
+  flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:0;border:0;background:transparent;text-align:left;
+}
+.find-friends-profile-btn .mini-avatar{width:40px!important;height:40px!important;flex:0 0 40px}
+.find-friends-copy{min-width:0;display:grid;gap:2px}
+.find-friends-copy strong{
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#0F172A;font-size:11px
+}
+.find-friends-copy span{
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#8290A3;font-size:9px
+}
+.find-friends-follow{
+  flex:0 0 auto;min-height:32px;padding:0 11px;border:1px solid #3B82F6;border-radius:999px;
+  background:#3B82F6;color:#fff;font-size:9px;font-weight:850;
+}
+.find-friends-follow.following{background:#FFFFFF;color:#2563EB}
+.find-friends-state{padding:24px 8px;text-align:center;color:#8290A3;font-size:9px;line-height:1.6}
+
 </style>
 </head>
 <body>
-<!-- v25.16.0 fun giver breakdown + privacy setting -->
+<!-- v25.17.0 find friends by username from profile -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -13338,6 +13381,7 @@ a,
 <div class="profile-hero">
 <div class="profile-cover profile-banner" id="profileBanner"><div class="profile-banner-empty">BANNER</div></div>
 <div class="profile-hero-actions">
+<button class="profile-find-friends-btn" onclick="openFindFriends()" type="button">友だちを探す</button>
 <button class="profile-hero-btn" onclick="openProfileEdit()">プロフィール編集</button>
 <button class="profile-hero-btn" onclick="openAccountSwitcher()">アカウント</button>
 </div>
@@ -13601,6 +13645,41 @@ a,
 <div class="detail-panel" id="participants"><div class="list" id="participantList"></div></div>
 </div>
 </div>
+<!-- find friends -->
+<div class="modal" id="findFriendsModal" onclick="backdropClose(event,'findFriendsModal')">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sheet-head">
+      <div>
+        <div class="sheet-title">友だちを探す</div>
+        <div class="sheet-sub">@ユーザーIDから探せます</div>
+      </div>
+      <button class="close-btn" onclick="closeModal('findFriendsModal')" type="button">×</button>
+    </div>
+
+    <div class="find-friends-search">
+      <span>@</span>
+      <input
+        id="findFriendsInput"
+        type="text"
+        maxlength="20"
+        placeholder="shuzo"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+      />
+    </div>
+
+    <div class="find-friends-note">
+      2文字以上で検索できます。相互フォローでなくても、IDが分かればプロフィールを見つけられます。
+    </div>
+
+    <div class="find-friends-results" id="findFriendsResults">
+      <div class="find-friends-state">ユーザーIDを入力してください。</div>
+    </div>
+  </div>
+</div>
+
 <!-- fun giver breakdown -->
 <div class="modal" id="funBreakdownModal" onclick="backdropClose(event,'funBreakdownModal')">
   <div class="sheet">
@@ -18289,6 +18368,170 @@ async function fetchReceivedFunCount(userId){
   }
 }
 
+
+
+let findFriendsTimer=null;
+let findFriendsSeq=0;
+
+function normalizeFriendSearch(value){
+  return String(value||"").trim().replace(/^@+/,"").toLowerCase();
+}
+
+function openFindFriends(){
+  if(!requireAuth("友だちを探すにはログインしてください。"))return;
+
+  $("findFriendsInput").value="";
+  $("findFriendsResults").innerHTML=`
+    <div class="find-friends-state">ユーザーIDを入力してください。</div>
+  `;
+
+  openModal("findFriendsModal");
+  setTimeout(()=>$("findFriendsInput")?.focus(),80);
+}
+
+async function searchFriendsNow(){
+  const input=$("findFriendsInput");
+  const box=$("findFriendsResults");
+  if(!input||!box)return;
+
+  const q=normalizeFriendSearch(input.value);
+  input.value=q;
+
+  if(q.length<2){
+    box.innerHTML=`<div class="find-friends-state">2文字以上入力すると検索できます。</div>`;
+    return;
+  }
+
+  const seq=++findFriendsSeq;
+  box.innerHTML=`<div class="find-friends-state">検索しています…</div>`;
+
+  try{
+    const {data,error}=await sb.rpc("search_users_by_username",{p_query:q});
+
+    if(seq!==findFriendsSeq)return;
+    if(error)throw error;
+
+    const rows=(Array.isArray(data)?data:[])
+      .filter(row=>row.user_id!==currentAuthUser?.id);
+
+    rows.forEach(row=>{
+      remoteProfileToPerson({
+        id:row.user_id,
+        username:row.username,
+        display_name:row.display_name,
+        avatar_url:row.avatar_url,
+        bio:row.bio,
+        area:row.area
+      });
+    });
+
+    renderFindFriendsResults(rows);
+
+  }catch(error){
+    console.error("search users by username:",error);
+    box.innerHTML=`<div class="find-friends-state">ユーザー検索に失敗しました。もう一度お試しください。</div>`;
+  }
+}
+
+function renderFindFriendsResults(rows){
+  const box=$("findFriendsResults");
+  if(!box)return;
+
+  if(!rows.length){
+    box.innerHTML=`<div class="find-friends-state">該当するユーザーが見つかりませんでした。</div>`;
+    return;
+  }
+
+  box.innerHTML=rows.map(row=>{
+    const p=person(row.user_id);
+    const following=(state.followingIds||[]).includes(row.user_id);
+
+    return `
+      <div class="find-friends-row">
+        <button
+          class="find-friends-profile-btn"
+          type="button"
+          onclick="closeModal('findFriendsModal');openOtherProfile('${escjs(String(row.user_id))}')"
+        >
+          <div class="mini-avatar">${avatarHtml(p)}</div>
+          <div class="find-friends-copy">
+            <strong>${esc(p.name)}</strong>
+            <span>${esc(p.handle||"")}</span>
+          </div>
+        </button>
+
+        <button
+          class="find-friends-follow ${following?"following":""}"
+          type="button"
+          onclick="toggleFollowFromSearch('${escjs(String(row.user_id))}')"
+        >
+          ${following?"フォロー中":"フォロー"}
+        </button>
+      </div>
+    `;
+  }).join("");
+}
+
+async function toggleFollowFromSearch(userId){
+  if(!requireAuth("フォローするにはログインしてください。"))return;
+
+  const currentlyFollowing=(state.followingIds||[]).includes(userId);
+
+  try{
+    if(currentlyFollowing){
+      const {error}=await sb
+        .from("follows")
+        .delete()
+        .eq("follower_id",currentAuthUser.id)
+        .eq("followee_id",userId);
+
+      if(error)throw error;
+      state.followingIds=(state.followingIds||[]).filter(id=>id!==userId);
+      toast("フォローを外しました");
+
+    }else{
+      const {error}=await sb
+        .from("follows")
+        .insert({
+          follower_id:currentAuthUser.id,
+          followee_id:userId
+        });
+
+      if(error)throw error;
+      state.followingIds=[...new Set([...(state.followingIds||[]),userId])];
+      toast("フォローしました");
+    }
+
+    await loadFollowState();
+    await searchFriendsNow();
+
+  }catch(error){
+    console.error("toggle follow from search:",error);
+    toast("フォロー状態を変更できませんでした");
+  }
+}
+
+$("findFriendsInput")?.addEventListener("input",()=>{
+  clearTimeout(findFriendsTimer);
+
+  const q=normalizeFriendSearch($("findFriendsInput").value);
+  $("findFriendsInput").value=q;
+
+  if(q.length<2){
+    $("findFriendsResults").innerHTML=`<div class="find-friends-state">2文字以上入力すると検索できます。</div>`;
+    return;
+  }
+
+  findFriendsTimer=setTimeout(searchFriendsNow,350);
+});
+
+$("findFriendsInput")?.addEventListener("keydown",event=>{
+  if(event.key==="Enter"){
+    event.preventDefault();
+    clearTimeout(findFriendsTimer);
+    searchFriendsNow();
+  }
+});
 
 async function fetchFunGiverBreakdown(userId){
   if(!currentAuthUser || !isRealUserId(userId))return [];
