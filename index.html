@@ -12837,10 +12837,205 @@ a,
   padding:0 12px;
 }
 
+
+/* =========================================================
+   V25.16.0 — FUN GIVER BREAKDOWN
+   ========================================================= */
+
+.fun-total,
+.other-fun-total{
+  cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+
+.fun-total:active,
+.other-fun-total:active{
+  transform:scale(.99);
+}
+
+.fun-breakdown-hint{
+  margin-top:5px;
+  color:#8290A3;
+  font-size:8px;
+  font-weight:700;
+}
+
+.fun-privacy-option{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.fun-privacy-copy{
+  min-width:0;
+  display:grid;
+  gap:4px;
+}
+
+.fun-privacy-copy strong{
+  color:#0F172A;
+  font-size:11px;
+}
+
+.fun-privacy-copy span{
+  color:#64748B;
+  font-size:9px;
+  line-height:1.55;
+}
+
+.fun-privacy-toggle{
+  flex:0 0 auto;
+  width:42px;
+  height:24px;
+  position:relative;
+}
+
+.fun-privacy-toggle input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.fun-privacy-toggle i{
+  position:absolute;
+  inset:0;
+  border-radius:999px;
+  background:#CBD5E1;
+  transition:.18s ease;
+}
+
+.fun-privacy-toggle i::after{
+  content:"";
+  position:absolute;
+  top:3px;
+  left:3px;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 4px rgba(15,23,42,.20);
+  transition:.18s ease;
+}
+
+.fun-privacy-toggle input:checked + i{
+  background:#3B82F6;
+}
+
+.fun-privacy-toggle input:checked + i::after{
+  transform:translateX(18px);
+}
+
+#funBreakdownModal{
+  z-index:180;
+}
+
+.fun-breakdown-summary{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  padding:13px 2px 10px;
+}
+
+.fun-breakdown-summary-copy{
+  display:grid;
+  gap:3px;
+}
+
+.fun-breakdown-summary-copy strong{
+  font-size:13px;
+  color:#0F172A;
+}
+
+.fun-breakdown-summary-copy span{
+  font-size:9px;
+  color:#64748B;
+}
+
+.fun-breakdown-total{
+  display:flex;
+  align-items:baseline;
+  gap:3px;
+}
+
+.fun-breakdown-total strong{
+  font-size:24px;
+  color:#0F172A;
+}
+
+.fun-breakdown-total span{
+  font-size:9px;
+  color:#64748B;
+}
+
+.fun-breakdown-list{
+  display:grid;
+  border-top:1px solid #E9EEF5;
+}
+
+.fun-breakdown-row{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:11px 2px;
+  border:0;
+  border-bottom:1px solid #EEF2F6;
+  background:transparent;
+  text-align:left;
+}
+
+.fun-breakdown-row .mini-avatar{
+  width:38px!important;
+  height:38px!important;
+  flex:0 0 38px;
+}
+
+.fun-breakdown-person{
+  flex:1;
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+
+.fun-breakdown-person strong{
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  color:#0F172A;
+  font-size:11px;
+}
+
+.fun-breakdown-person span{
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  color:#8290A3;
+  font-size:9px;
+}
+
+.fun-breakdown-count{
+  flex:0 0 auto;
+  min-width:47px;
+  text-align:right;
+  color:#2563EB;
+  font-size:11px;
+  font-weight:900;
+}
+
+.fun-breakdown-empty{
+  padding:25px 10px;
+  text-align:center;
+  color:#8290A3;
+  font-size:9px;
+  line-height:1.7;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.15.4 detail/profile back navigation -->
+<!-- v25.16.0 fun giver breakdown + privacy setting -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -13162,11 +13357,12 @@ a,
 <button class="count-btn" onclick="showFollowList('following')"><strong id="followingCount">0</strong>フォロー中</button>
 <button class="count-btn" onclick="showMutuals()"><strong id="mutualCount">0</strong>友だち</button>
 </div>
-<div class="fun-total">
+<div class="fun-total" role="button" tabindex="0" onclick="openFunBreakdown(meId())" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openFunBreakdown(meId())}">
   <small>もらった楽しかった！</small>
   <p>一緒に集まった人から届いた合計</p>
   <div class="fun-total-number"><strong id="myFunTotal">0</strong><span>件</span></div>
 </div>
+<div class="fun-breakdown-hint">タップすると、誰から何回届いたか確認できます</div>
 </div>
 <div class="section-head"><div><div class="section-title">興味・関心</div><div class="section-note">やりたいことをプロフィールに表示</div></div><button class="text-btn" onclick="openWant()">追加</button></div>
 <div class="interest-grid" id="interestGrid"></div>
@@ -13405,6 +13601,34 @@ a,
 <div class="detail-panel" id="participants"><div class="list" id="participantList"></div></div>
 </div>
 </div>
+<!-- fun giver breakdown -->
+<div class="modal" id="funBreakdownModal" onclick="backdropClose(event,'funBreakdownModal')">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sheet-head">
+      <div>
+        <div class="sheet-title" id="funBreakdownTitle">楽しかった！の内訳</div>
+        <div class="sheet-sub" id="funBreakdownSub">誰から届いたか</div>
+      </div>
+      <button class="close-btn" onclick="closeModal('funBreakdownModal')" type="button">×</button>
+    </div>
+
+    <div class="fun-breakdown-summary">
+      <div class="fun-breakdown-summary-copy">
+        <strong id="funBreakdownName">—</strong>
+        <span id="funBreakdownVisibility">内訳を読み込んでいます</span>
+      </div>
+      <div class="fun-breakdown-total">
+        <strong id="funBreakdownTotal">0</strong><span>件</span>
+      </div>
+    </div>
+
+    <div class="fun-breakdown-list" id="funBreakdownList">
+      <div class="fun-breakdown-empty">読み込んでいます…</div>
+    </div>
+  </div>
+</div>
+
 <!-- profile edit -->
 <div class="modal" id="profileEditModal" onclick="backdropClose(event,'profileEditModal')">
 <div class="sheet">
@@ -13440,6 +13664,18 @@ a,
 </div>
 </div>
 <div class="profile-basic-note">正確な年齢や誕生日は表示しません。</div>
+</div>
+<div class="step">
+  <div class="fun-privacy-option">
+    <div class="fun-privacy-copy">
+      <strong>「楽しかった！」をくれた人を公開</strong>
+      <span>ONなら他の人も「誰から何回もらったか」を見られます。OFFでも合計件数は表示され、本人だけは内訳を確認できます。</span>
+    </div>
+    <label class="fun-privacy-toggle" aria-label="楽しかった！の内訳を公開">
+      <input id="editShowFunGivers" type="checkbox" checked/>
+      <i></i>
+    </label>
+  </div>
 </div>
 <div class="step">
 <div class="step-label">プロフィール画像</div>
@@ -14269,7 +14505,7 @@ async function loadNotifications(){
     if(actorIds.length){
       const {data:profiles,error:profileError}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests,show_fun_givers")
         .in("id",actorIds);
 
       if(profileError){
@@ -14566,6 +14802,7 @@ function remoteProfileToPerson(p){
     gender:p.gender||"",
     ageRange:p.age_range||"",
     interests:Array.isArray(p.interests)?p.interests:[],
+    showFunGivers:p.show_fun_givers!==false,
     fun:0,
     mutual:false,
     realUser:true,
@@ -14582,7 +14819,8 @@ function remoteProfileToPerson(p){
       avatar:item.avatar,
       banner:item.banner,
       gender:item.gender||"",
-      ageRange:item.ageRange||""
+      ageRange:item.ageRange||"",
+      showFunGivers:item.showFunGivers!==false
     });
   }
   return item;
@@ -15548,7 +15786,7 @@ async function loadEventsFromSupabase(){
     if(ownerIds.length){
       const {data:profilesData,error:profilesError}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests,show_fun_givers")
         .in("id",ownerIds);
 
       if(profilesError)throw profilesError;
@@ -16995,7 +17233,7 @@ async function ensurePeopleFromProfiles(ids){
   if(!unique.length)return;
   const {data,error}=await sb
     .from("profiles")
-    .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
+    .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests,show_fun_givers")
     .in("id",unique);
   if(error){console.error("load dm profiles:",error);return}
   (data||[]).forEach(remoteProfileToPerson);
@@ -17373,7 +17611,7 @@ async function openNewMessage(){
   try{
     const {data,error}=await sb
       .from("profiles")
-      .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
+      .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests,show_fun_givers")
       .neq("id",currentAuthUser.id)
       .order("display_name",{ascending:true});
 
@@ -17955,7 +18193,7 @@ async function loadFollowState(){
     if(allIds.length){
       const {data:profiles,error}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests,show_fun_givers")
         .in("id",allIds);
 
       if(error)throw error;
@@ -18051,6 +18289,122 @@ async function fetchReceivedFunCount(userId){
   }
 }
 
+
+async function fetchFunGiverBreakdown(userId){
+  if(!currentAuthUser || !isRealUserId(userId))return [];
+
+  const {data,error}=await sb.rpc("get_fun_giver_breakdown",{
+    p_user_id:userId
+  });
+
+  if(error)throw error;
+  return Array.isArray(data)?data:[];
+}
+
+async function fetchFunGiverVisibility(userId){
+  if(!isRealUserId(userId))return true;
+
+  const cached=person(userId);
+  if(typeof cached?.showFunGivers==="boolean"){
+    return cached.showFunGivers;
+  }
+
+  try{
+    const {data,error}=await sb
+      .from("profiles")
+      .select("show_fun_givers")
+      .eq("id",userId)
+      .maybeSingle();
+
+    if(error)throw error;
+    return data?.show_fun_givers!==false;
+  }catch(error){
+    console.warn("fun giver visibility:",error);
+    return true;
+  }
+}
+
+async function openFunBreakdown(userId){
+  if(!requireAuth("「楽しかった！」の内訳を見るにはログインしてください。"))return;
+  if(!isRealUserId(userId)){
+    toast("このユーザーは旧デモデータです");
+    return;
+  }
+
+  const target=person(userId);
+  const isOwn=userId===currentAuthUser?.id;
+
+  $("funBreakdownTitle").textContent="楽しかった！の内訳";
+  $("funBreakdownName").textContent=target?.name||"ユーザー";
+  $("funBreakdownVisibility").textContent="内訳を読み込んでいます";
+  $("funBreakdownTotal").textContent=String(target?.fun||0);
+  $("funBreakdownList").innerHTML=`<div class="fun-breakdown-empty">読み込んでいます…</div>`;
+
+  openModal("funBreakdownModal");
+
+  try{
+    const [rows,isPublic,total]=await Promise.all([
+      fetchFunGiverBreakdown(userId),
+      isOwn ? Promise.resolve(true) : fetchFunGiverVisibility(userId),
+      fetchReceivedFunCount(userId)
+    ]);
+
+    $("funBreakdownTotal").textContent=String(total);
+
+    if(!isOwn && !isPublic){
+      $("funBreakdownVisibility").textContent="このユーザーは内訳を非公開にしています";
+      $("funBreakdownList").innerHTML=`
+        <div class="fun-breakdown-empty">
+          合計件数のみ公開されています。
+        </div>
+      `;
+      return;
+    }
+
+    $("funBreakdownVisibility").textContent=isOwn
+      ? "自分には常に表示されます"
+      : "内訳を公開しています";
+
+    rows.forEach(row=>{
+      remoteProfileToPerson({
+        id:row.giver_id,
+        username:row.username,
+        display_name:row.display_name,
+        avatar_url:row.avatar_url
+      });
+    });
+
+    $("funBreakdownList").innerHTML=rows.length
+      ? rows.map(row=>{
+          const p=person(row.giver_id);
+          return `
+            <button
+              class="fun-breakdown-row"
+              type="button"
+              onclick="closeModal('funBreakdownModal');${row.giver_id===currentAuthUser?.id?"openMyProfile()":`openOtherProfile('${escjs(String(row.giver_id))}')`}"
+            >
+              <div class="mini-avatar">${avatarHtml(p)}</div>
+              <div class="fun-breakdown-person">
+                <strong>${esc(p.name)}</strong>
+                <span>${esc(p.handle||"")}</span>
+              </div>
+              <div class="fun-breakdown-count">${Number(row.fun_count||0)}回</div>
+            </button>
+          `;
+        }).join("")
+      : `<div class="fun-breakdown-empty">まだ「楽しかった！」は届いていません。</div>`;
+
+  }catch(error){
+    console.error("fun giver breakdown:",error);
+    $("funBreakdownVisibility").textContent="内訳を読み込めませんでした";
+    $("funBreakdownList").innerHTML=`
+      <div class="fun-breakdown-empty">
+        もう一度お試しください。
+      </div>
+    `;
+  }
+}
+
 async function renderOtherProfile(id){
   const box=$("otherProfileContent");
   if(!box)return;
@@ -18063,7 +18417,7 @@ async function renderOtherProfile(id){
     if(isRealUserId(id)){
       const {data,error}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests,show_fun_givers")
         .eq("id",id)
         .maybeSingle();
 
@@ -18132,11 +18486,18 @@ async function renderOtherProfile(id){
             </div>
           </div>
 
-          <div class="other-fun-total">
+          <div
+            class="other-fun-total"
+            role="button"
+            tabindex="0"
+            onclick="openFunBreakdown('${escjs(id)}')"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openFunBreakdown('${escjs(id)}')}"
+          >
             <small>もらった楽しかった！</small>
             <p>一緒に集まった人から届いた合計</p>
             <div class="other-fun-total-number"><strong>${receivedFunCount}</strong><span>件</span></div>
           </div>
+          <div class="fun-breakdown-hint">${p.showFunGivers===false?"合計のみ公開されています":"タップすると内訳を確認できます"}</div>
 
           <div class="follow-actions v24-4-24-actions">
             <button
@@ -18236,7 +18597,7 @@ async function showFollowList(type){
   try{
     const {data,error}=await sb
       .from("profiles")
-      .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
+      .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests,show_fun_givers")
       .in("id",ids);
 
     if(error)throw error;
@@ -18796,6 +19157,7 @@ function openProfileEdit(){
   $("editArea").value=m.area;
   $("editGender").value=m.gender||"";
   $("editAgeRange").value=m.ageRange||"";
+  $("editShowFunGivers").checked=m.showFunGivers!==false;
 
   const preview=$("profileImagePreview");
   const imagePlaceholder=$("profileImagePlaceholder");
@@ -18851,6 +19213,7 @@ $("profileEditForm").addEventListener("submit",async e=>{
   const newArea=$("editArea").value.trim();
   const newGender=$("editGender").value;
   const newAgeRange=$("editAgeRange").value;
+  const newShowFunGivers=$("editShowFunGivers").checked;
 
   if(!newName || !rawHandle){
     toast("名前とユーザー名を入力してください");
@@ -18920,12 +19283,13 @@ $("profileEditForm").addEventListener("submit",async e=>{
         area:newArea,
         gender:newGender||null,
         age_range:newAgeRange||null,
+        show_fun_givers:newShowFunGivers,
         avatar_url:nextAvatar,
         banner_url:nextBanner,
         interests:m.interests||[]
       })
       .eq("id",currentAuthUser.id)
-      .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
+      .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests,show_fun_givers")
       .single();
 
     if(result.error)throw result.error;
@@ -20600,7 +20964,7 @@ async function loadEventComments(ev){
     if(userIds.length){
       const {data:profiles,error:profileError}=await sb
         .from("profiles")
-        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests")
+        .select("id,username,display_name,avatar_url,banner_url,bio,area,gender,age_range,interests,show_fun_givers")
         .in("id",userIds);
 
       if(profileError)throw profileError;
@@ -21303,7 +21667,8 @@ function upsertLocalAuthAccount(user,profile){
     followers:existing.followers||0,
     following:existing.following||0,
     fun:existing.fun||0,
-    interests:Array.isArray(profile?.interests)?profile.interests:(existing.interests||[])
+    interests:Array.isArray(profile?.interests)?profile.interests:(existing.interests||[]),
+    showFunGivers:profile?.show_fun_givers!==false
   };
   if(!state.people.some(p=>p.id===id)){
     state.people.unshift({id,name:displayName,handle:"@"+username,fun:0,mutual:false});
@@ -21316,6 +21681,7 @@ function upsertLocalAuthAccount(user,profile){
     p.bio=profile?.bio||existing.bio||"";
     p.area=profile?.area||existing.area||"";
     p.interests=Array.isArray(profile?.interests)?profile.interests:(existing.interests||[]);
+    p.showFunGivers=profile?.show_fun_givers!==false;
     p.realUser=true;
     p.demoUser=false;
   }
