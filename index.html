@@ -13075,10 +13075,141 @@ a,
 .find-friends-follow.following{background:#FFFFFF;color:#2563EB}
 .find-friends-state{padding:24px 8px;text-align:center;color:#8290A3;font-size:9px;line-height:1.6}
 
+
+/* =========================================================
+   V25.18.0 — BLOCK / UNBLOCK
+   ========================================================= */
+
+.other-profile-topbar{
+  position:relative;
+}
+
+.other-profile-menu-btn{
+  margin-left:auto;
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border:1px solid #D8E1EC;
+  border-radius:50%;
+  background:#fff;
+  color:#0F172A;
+  font-size:18px;
+  font-weight:900;
+  line-height:1;
+}
+
+.safety-menu-list{
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+}
+
+.safety-menu-action{
+  width:100%;
+  min-height:46px;
+  padding:0 14px;
+  border:1px solid #E2E8F0;
+  border-radius:14px;
+  background:#fff;
+  color:#0F172A;
+  text-align:left;
+  font-size:11px;
+  font-weight:800;
+}
+
+.safety-menu-action.danger{
+  border-color:#FECACA;
+  background:#FFF7F7;
+  color:#B91C1C;
+}
+
+.safety-menu-note{
+  margin-top:8px;
+  color:#8290A3;
+  font-size:8.5px;
+  line-height:1.6;
+}
+
+.blocked-users-btn{
+  width:100%;
+  min-height:42px;
+  margin-top:10px;
+  border:1px solid #CBD5E1;
+  border-radius:14px;
+  background:#fff;
+  color:#0F172A;
+  font-size:10px;
+  font-weight:850;
+}
+
+.blocked-users-list{
+  display:grid;
+  margin-top:12px;
+  border-top:1px solid #EEF2F6;
+}
+
+.blocked-user-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:11px 0;
+  border-bottom:1px solid #EEF2F6;
+}
+
+.blocked-user-row .mini-avatar{
+  width:40px!important;
+  height:40px!important;
+  flex:0 0 40px;
+}
+
+.blocked-user-copy{
+  flex:1;
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+
+.blocked-user-copy strong{
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  color:#0F172A;
+  font-size:11px;
+}
+
+.blocked-user-copy span{
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  color:#8290A3;
+  font-size:9px;
+}
+
+.unblock-btn{
+  flex:0 0 auto;
+  min-height:32px;
+  padding:0 11px;
+  border:1px solid #CBD5E1;
+  border-radius:999px;
+  background:#fff;
+  color:#334155;
+  font-size:9px;
+  font-weight:850;
+}
+
+.blocked-users-empty{
+  padding:24px 8px;
+  text-align:center;
+  color:#8290A3;
+  font-size:9px;
+  line-height:1.65;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.17.0 find friends by username from profile -->
+<!-- v25.18.0 block-unblock safety UI -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -13839,6 +13970,7 @@ a,
 <button class="close-btn" onclick="closeModal('accountModal')">×</button>
 </div>
 <div class="list" id="accountList" style="margin-top:12px"></div>
+<button class="blocked-users-btn" onclick="openBlockedUsers()" type="button">ブロック管理</button>
 <button class="submit auth-logout-btn" onclick="logoutSupabase()" type="button">ログアウト</button>
 </div>
 </div>
@@ -13927,10 +14059,57 @@ a,
 <div class="sheet-title">プロフィール</div>
 <div class="sheet-sub">ユーザー情報</div>
 </div>
+<button
+  class="other-profile-menu-btn"
+  type="button"
+  onclick="openOtherProfileSafetyMenu()"
+  aria-label="その他の操作"
+>⋯</button>
 </div>
 <div class="other-profile-card other-profile-scroll" id="otherProfileContent"></div>
 </div>
 </div>
+<!-- other profile safety menu -->
+<div class="modal" id="otherProfileSafetyModal" onclick="backdropClose(event,'otherProfileSafetyModal')">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sheet-head">
+      <div>
+        <div class="sheet-title">このユーザーについて</div>
+        <div class="sheet-sub" id="otherProfileSafetyName">ユーザー</div>
+      </div>
+      <button class="close-btn" onclick="closeModal('otherProfileSafetyModal')" type="button">×</button>
+    </div>
+
+    <div class="safety-menu-list">
+      <button class="safety-menu-action danger" type="button" onclick="confirmBlockCurrentProfile()">
+        このユーザーをブロック
+      </button>
+    </div>
+
+    <div class="safety-menu-note">
+      ブロックすると、お互いをID検索から見つけられなくなります。募集・DM・コメント側にも順次同じ判定を適用します。
+    </div>
+  </div>
+</div>
+
+<!-- blocked users -->
+<div class="modal" id="blockedUsersModal" onclick="backdropClose(event,'blockedUsersModal')">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sheet-head">
+      <div>
+        <div class="sheet-title">ブロック管理</div>
+        <div class="sheet-sub">ブロックしたユーザーを確認・解除できます</div>
+      </div>
+      <button class="close-btn" onclick="closeModal('blockedUsersModal')" type="button">×</button>
+    </div>
+    <div class="blocked-users-list" id="blockedUsersList">
+      <div class="blocked-users-empty">読み込んでいます…</div>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="followListModal" onclick="backdropClose(event,'followListModal')">
 <div class="sheet">
 <div class="handle"></div>
@@ -18483,7 +18662,7 @@ async function toggleFollowFromSearch(userId){
         .from("follows")
         .delete()
         .eq("follower_id",currentAuthUser.id)
-        .eq("followee_id",userId);
+        .eq("following_id",userId);
 
       if(error)throw error;
       state.followingIds=(state.followingIds||[]).filter(id=>id!==userId);
@@ -18494,7 +18673,7 @@ async function toggleFollowFromSearch(userId){
         .from("follows")
         .insert({
           follower_id:currentAuthUser.id,
-          followee_id:userId
+          following_id:userId
         });
 
       if(error)throw error;
@@ -18645,6 +18824,174 @@ async function openFunBreakdown(userId){
         もう一度お試しください。
       </div>
     `;
+  }
+}
+
+
+async function usersAreBlocked(userA,userB){
+  if(!currentAuthUser || !isRealUserId(userA) || !isRealUserId(userB))return false;
+
+  try{
+    const {data,error}=await sb.rpc("users_are_blocked",{
+      p_user_a:userA,
+      p_user_b:userB
+    });
+    if(error)throw error;
+    return data===true;
+  }catch(error){
+    console.warn("users_are_blocked:",error);
+    return false;
+  }
+}
+
+function openOtherProfileSafetyMenu(){
+  if(!requireAuth("この操作にはログインしてください。"))return;
+
+  const id=state.currentOtherProfileId;
+  if(!isRealUserId(id) || id===currentAuthUser?.id){
+    toast("このユーザーには操作できません");
+    return;
+  }
+
+  const p=person(id);
+  $("otherProfileSafetyName").textContent=p?.name||"ユーザー";
+  openModal("otherProfileSafetyModal");
+}
+
+async function confirmBlockCurrentProfile(){
+  const id=state.currentOtherProfileId;
+  if(!currentAuthUser || !isRealUserId(id) || id===currentAuthUser.id)return;
+
+  const p=person(id);
+  const name=p?.name||"このユーザー";
+
+  const ok=window.confirm(
+    `${name}をブロックしますか？\n\nID検索などでお互いが表示されなくなります。`
+  );
+  if(!ok)return;
+
+  try{
+    const {error}=await sb
+      .from("blocks")
+      .insert({
+        blocker_id:currentAuthUser.id,
+        blocked_id:id
+      });
+
+    if(error && error.code!=="23505")throw error;
+
+    // 自分から相手へのフォローは解除
+    const followDelete=await sb
+      .from("follows")
+      .delete()
+      .eq("follower_id",currentAuthUser.id)
+      .eq("following_id",id);
+
+    if(followDelete.error){
+      console.warn("remove outgoing follow after block:",followDelete.error);
+    }
+
+    closeModal("otherProfileSafetyModal");
+    closeModal("otherProfileModal");
+
+    await loadFollowState();
+    toast(`${name}をブロックしました`);
+
+  }catch(error){
+    console.error("block user:",error);
+    toast("ブロックできませんでした");
+  }
+}
+
+async function fetchBlockedUsers(){
+  if(!currentAuthUser)return [];
+
+  const {data:blocks,error}=await sb
+    .from("blocks")
+    .select("blocked_id,created_at")
+    .eq("blocker_id",currentAuthUser.id)
+    .order("created_at",{ascending:false});
+
+  if(error)throw error;
+
+  const ids=(blocks||[]).map(x=>x.blocked_id).filter(isRealUserId);
+  if(!ids.length)return [];
+
+  const {data:profiles,error:profilesError}=await sb
+    .from("profiles")
+    .select("id,username,display_name,avatar_url")
+    .in("id",ids);
+
+  if(profilesError)throw profilesError;
+
+  const byId=new Map((profiles||[]).map(p=>[p.id,p]));
+  return ids.map(id=>byId.get(id)).filter(Boolean);
+}
+
+async function openBlockedUsers(){
+  if(!requireAuth("ブロック管理にはログインしてください。"))return;
+
+  closeModal("accountModal");
+  openModal("blockedUsersModal");
+  $("blockedUsersList").innerHTML=`<div class="blocked-users-empty">読み込んでいます…</div>`;
+
+  try{
+    const rows=await fetchBlockedUsers();
+
+    rows.forEach(remoteProfileToPerson);
+
+    $("blockedUsersList").innerHTML=rows.length
+      ? rows.map(row=>{
+          const p=person(row.id);
+          return `
+            <div class="blocked-user-row">
+              <div class="mini-avatar">${avatarHtml(p)}</div>
+              <div class="blocked-user-copy">
+                <strong>${esc(p.name)}</strong>
+                <span>${esc(p.handle||"")}</span>
+              </div>
+              <button
+                class="unblock-btn"
+                type="button"
+                onclick="unblockUser('${escjs(String(row.id))}')"
+              >解除</button>
+            </div>
+          `;
+        }).join("")
+      : `<div class="blocked-users-empty">ブロックしているユーザーはいません。</div>`;
+
+  }catch(error){
+    console.error("load blocked users:",error);
+    $("blockedUsersList").innerHTML=`
+      <div class="blocked-users-empty">ブロック一覧を読み込めませんでした。</div>
+    `;
+  }
+}
+
+async function unblockUser(userId){
+  if(!currentAuthUser || !isRealUserId(userId))return;
+
+  const p=person(userId);
+  const name=p?.name||"このユーザー";
+
+  const ok=window.confirm(`${name}のブロックを解除しますか？`);
+  if(!ok)return;
+
+  try{
+    const {error}=await sb
+      .from("blocks")
+      .delete()
+      .eq("blocker_id",currentAuthUser.id)
+      .eq("blocked_id",userId);
+
+    if(error)throw error;
+
+    toast(`${name}のブロックを解除しました`);
+    await openBlockedUsers();
+
+  }catch(error){
+    console.error("unblock user:",error);
+    toast("ブロックを解除できませんでした");
   }
 }
 
@@ -18814,6 +19161,14 @@ async function openOtherProfile(id){
 
   if(!window._profileReturnFromDetail){
     window._profileReturnEventId=null;
+  }
+
+  if(isRealUserId(id)){
+    const blocked=await usersAreBlocked(currentAuthUser.id,id);
+    if(blocked){
+      toast("このユーザーのプロフィールは表示できません");
+      return;
+    }
   }
 
   state.currentOtherProfileId=id;
