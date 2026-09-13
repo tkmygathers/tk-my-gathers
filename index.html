@@ -12610,10 +12610,120 @@ a,
   opacity:.5;
 }
 
+
+/* =========================================================
+   V25.15.1 — EVENT PARTICIPANT PROFILES
+   ========================================================= */
+
+.detail-participant-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:4px 2px 9px;
+  color:#64748B;
+  font-size:9px;
+  font-weight:800;
+}
+
+.detail-participant-summary strong{
+  color:#0F172A;
+  font-size:11px;
+}
+
+.detail-participant-row{
+  padding:10px 0 !important;
+  border:0 !important;
+  border-bottom:1px solid #EEF1F4 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+}
+
+.detail-participant-row:last-child{
+  border-bottom:0 !important;
+}
+
+.participant-profile-button{
+  flex:1;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:0;
+  border:0;
+  background:transparent;
+  text-align:left;
+  cursor:pointer;
+}
+
+.participant-profile-button .mini-avatar{
+  width:40px !important;
+  height:40px !important;
+  flex:0 0 40px;
+  font-size:10px !important;
+}
+
+.participant-profile-main{
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+
+.participant-profile-name-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+
+.participant-profile-name{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#0F172A;
+  font-size:11px;
+  font-weight:850;
+}
+
+.participant-owner-badge{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  min-height:20px;
+  padding:0 7px;
+  border-radius:999px;
+  background:#EFF6FF;
+  color:#2563EB;
+  font-size:7px;
+  font-weight:900;
+}
+
+.participant-profile-handle{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#8290A3;
+  font-size:9px;
+}
+
+.participant-open-mark{
+  flex:0 0 auto;
+  color:#A3ADBB;
+  font-size:16px;
+  line-height:1;
+}
+
+.participant-loading{
+  padding:22px 10px;
+  text-align:center;
+  color:#8290A3;
+  font-size:9px;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.15.0 username uniqueness UX + suggestions -->
+<!-- v25.15.1 participant profiles + visibility-aware participant list -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -20225,6 +20335,94 @@ function updateCommentComposer(ev){
   }
 }
 
+
+async function loadVisibleEventParticipants(ev){
+  if(!ev)return;
+
+  const list=$("participantList");
+  if(list){
+    list.innerHTML=`<div class="participant-loading">参加者を読み込んでいます…</div>`;
+  }
+
+  // Demo/local events keep using their local participant data.
+  if(ev.source!=="supabase"){
+    renderEventDetail();
+    return;
+  }
+
+  try{
+    const {data,error}=await sb.rpc("get_event_participants",{
+      p_event_id:ev.id
+    });
+
+    if(error)throw error;
+
+    const rows=Array.isArray(data)?data:[];
+
+    rows.forEach(row=>{
+      remoteProfileToPerson({
+        id:row.user_id,
+        username:row.username,
+        display_name:row.display_name,
+        avatar_url:row.avatar_url
+      });
+    });
+
+    ev.participantDetails=rows.map(row=>({
+      id:row.user_id,
+      role:row.role==="owner"?"owner":"member"
+    }));
+
+    ev.participants=[...new Set(rows.map(row=>row.user_id).filter(Boolean))];
+
+    // Keep the organizer present even if old data did not create
+    // an explicit event_members row for them.
+    if(ev.owner && !ev.participants.includes(ev.owner)){
+      ev.participants.unshift(ev.owner);
+      ev.participantDetails.unshift({
+        id:ev.owner,
+        role:"owner"
+      });
+    }
+
+    if(state.currentEventId===ev.id){
+      renderEventDetail();
+    }
+
+  }catch(error){
+    console.error("load event participants:",error);
+
+    if(list && state.currentEventId===ev.id){
+      list.innerHTML=`
+        <div class="comment-state">
+          参加者一覧を読み込めませんでした
+        </div>
+      `;
+    }
+  }
+}
+
+function eventParticipantDetailRows(ev){
+  const rows=Array.isArray(ev?.participantDetails)
+    ? ev.participantDetails.filter(row=>row?.id)
+    : [];
+
+  if(rows.length){
+    const seen=new Set();
+    return rows.filter(row=>{
+      const id=String(row.id);
+      if(seen.has(id))return false;
+      seen.add(id);
+      return true;
+    });
+  }
+
+  return eventParticipantIds(ev).map(id=>({
+    id,
+    role:id===ev.owner?"owner":"member"
+  }));
+}
+
 function openEvent(id){
   state.currentEventId=id;
   const e=state.events.find(x=>x.id===id);
@@ -20236,7 +20434,11 @@ function openEvent(id){
   $("detailMeta").innerHTML=`${eventIsGathered(e)?gatherStatusHtml(e):""}${gatherHostControlHtml(e)}${gatherFinalNoteHtml(e)}<div class="meta-line">場所　${esc(e.place)}</div><div class="meta-line">人数　${eventPeopleText(e)}</div><div class="meta-line">人数設定　${eventPeopleModeText(e)}</div><div class="meta-line">予算　${esc(formatBudgetLabel(e.budget))}</div><div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div><div class="visibility-note"><strong>公開範囲</strong><br>${esc(visibilityDescription(e.visibilityDb||e.visibility))}</div><div class="event-note">${esc(e.note)}</div><div class="event-tags">${publicEventTags(e).map(t=>`<span class="event-tag">${esc(t)}</span>`).join("")}</div>`;
   renderEventDetail();
   openModal("eventModal");
-  if(e.source==="supabase")loadEventComments(e);
+
+  if(e.source==="supabase"){
+    loadEventComments(e);
+    loadVisibleEventParticipants(e);
+  }
 }
 function renderEventDetail(){
   const e=state.events.find(x=>x.id===state.currentEventId);
@@ -20247,23 +20449,39 @@ function renderEventDetail(){
     return `<div class="comment-card"><div class="comment-user"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(c.time||"")}</div></div></div><div class="comment-text">${esc(c.text)}</div></div>`
   }).join("")||`<div class="comment-state">まだコメントはありません</div>`;
 
-  const participantIds=eventParticipantIds(e);
-  $("participantList").innerHTML=participantIds.length
-    ? `<div class="detail-participant-summary">参加者 ${participantIds.length}人</div>` +
-      participantIds.map(id=>{
+  const participantRows=eventParticipantDetailRows(e);
+  $("participantList").innerHTML=participantRows.length
+    ? `<div class="detail-participant-summary">
+         <strong>参加予定 ${participantRows.length}人</strong>
+         <span>タップでプロフィール</span>
+       </div>` +
+      participantRows.map(row=>{
+        const id=row.id;
         const p=person(id);
+        const isOwner=row.role==="owner" || id===e.owner;
+
         return `<div class="friend detail-participant-row">
-          <button type="button" class="friend-left participant-profile-button" onclick="openOtherProfile('${escjs(String(id))}')">
+          <button
+            type="button"
+            class="participant-profile-button"
+            onclick="closeModal('eventModal');openOtherProfile('${escjs(String(id))}')"
+            aria-label="${esc(p.name)}のプロフィールを見る"
+          >
             <div class="mini-avatar">${avatarHtml(p)}</div>
-            <div>
-              <div class="friend-name">${esc(p.name)}</div>
-              <div class="muted">${id===e.owner?"主催者 · ":""}${esc(p.handle||"")}</div>
+
+            <div class="participant-profile-main">
+              <div class="participant-profile-name-row">
+                <span class="participant-profile-name">${esc(p.name)}</span>
+                ${isOwner?`<span class="participant-owner-badge">主催者</span>`:""}
+              </div>
+              <div class="participant-profile-handle">${esc(p.handle||"")}</div>
             </div>
+
+            <span class="participant-open-mark" aria-hidden="true">›</span>
           </button>
-          ${id!==meId()?`<button class="small-btn" onclick="startChat('${escjs(String(id))}')">連絡</button>`:""}
         </div>`;
       }).join("")
-    : `<div class="comment-state">参加者情報はまだありません</div>`;
+    : `<div class="comment-state">まだ参加者はいません</div>`;
 
   updateCommentComposer(e);
 }
