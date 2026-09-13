@@ -13272,10 +13272,97 @@ a,
   opacity:.55;
 }
 
+
+/* =========================================================
+   V25.20.0 — COMMENT / DM REACTIONS
+   ========================================================= */
+
+.reaction-bar{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:4px;
+  margin-top:6px;
+}
+
+.reaction-chip,
+.reaction-add{
+  min-height:24px;
+  padding:0 7px;
+  border:1px solid #DDE5EF;
+  border-radius:999px;
+  background:#F8FAFC;
+  color:#334155;
+  font-size:10px;
+  line-height:1;
+}
+
+.reaction-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-weight:750;
+}
+
+.reaction-chip.mine{
+  border-color:#93C5FD;
+  background:#EFF6FF;
+  color:#1D4ED8;
+}
+
+.reaction-add{
+  min-width:28px;
+  font-weight:900;
+  color:#64748B;
+}
+
+.reaction-picker{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  margin-top:5px;
+  padding:5px 6px;
+  width:max-content;
+  max-width:100%;
+  border:1px solid #E2E8F0;
+  border-radius:12px;
+  background:#fff;
+  box-shadow:0 8px 22px rgba(15,23,42,.09);
+}
+
+.reaction-picker button{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  font-size:17px;
+}
+
+.reaction-picker button:active{
+  background:#F1F5F9;
+}
+
+.bubble .reaction-bar,
+.message-comment-bubble .reaction-bar{
+  justify-content:flex-start;
+}
+
+.bubble.me .reaction-bar{
+  justify-content:flex-end;
+}
+
+.v23-6-board-comment .reaction-bar,
+.comment-card .reaction-bar{
+  margin-left:0;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.19.0 report-user safety flow -->
+<!-- v25.20.0 comment-and-dm reactions -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -16350,6 +16437,170 @@ function cardDetailCommentPlaceholder(e){
   return "コメントを書く";
 }
 
+
+const REACTION_EMOJIS=["👍","😂","❤️","👏","😮"];
+const reactionCache={
+  comment:new Map(),
+  message:new Map()
+};
+let openReactionPickerKey=null;
+
+function reactionTargetValid(id){
+  return typeof id==="string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+}
+
+function reactionEntries(targetType,targetId){
+  return reactionCache[targetType]?.get(String(targetId))||[];
+}
+
+async function loadReactionsForTargets(targetType,targetIds){
+  if(!currentAuthUser)return;
+
+  const valid=[...new Set(
+    (targetIds||[])
+      .map(String)
+      .filter(reactionTargetValid)
+  )];
+
+  if(!valid.length)return;
+
+  try{
+    const {data,error}=await sb.rpc("get_reactions_for_targets",{
+      p_target_type:targetType,
+      p_target_ids:valid
+    });
+
+    if(error)throw error;
+
+    valid.forEach(id=>reactionCache[targetType].set(id,[]));
+
+    (data||[]).forEach(row=>{
+      const id=String(row.target_id);
+      const arr=reactionCache[targetType].get(id)||[];
+      arr.push({
+        emoji:row.emoji,
+        count:Number(row.reaction_count||0),
+        mine:row.reacted_by_me===true
+      });
+      reactionCache[targetType].set(id,arr);
+    });
+
+  }catch(error){
+    console.error("load reactions:",error);
+  }
+}
+
+function reactionHtml(targetType,targetId){
+  if(!reactionTargetValid(String(targetId||"")))return "";
+
+  const entries=reactionEntries(targetType,targetId);
+  const key=`${targetType}:${targetId}`;
+  const pickerOpen=openReactionPickerKey===key;
+
+  return `
+    <div class="reaction-bar">
+      ${entries
+        .filter(x=>x.count>0)
+        .map(x=>`
+          <button
+            class="reaction-chip ${x.mine?"mine":""}"
+            type="button"
+            onclick="event.stopPropagation();toggleReaction('${targetType}','${escjs(String(targetId))}','${escjs(x.emoji)}')"
+            aria-label="${esc(x.emoji)} ${x.count}件"
+          >
+            <span>${esc(x.emoji)}</span>
+            <span>${x.count}</span>
+          </button>
+        `).join("")}
+      <button
+        class="reaction-add"
+        type="button"
+        onclick="event.stopPropagation();toggleReactionPicker('${targetType}','${escjs(String(targetId))}')"
+        aria-label="リアクションを追加"
+      >＋</button>
+    </div>
+    ${pickerOpen?`
+      <div class="reaction-picker" onclick="event.stopPropagation()">
+        ${REACTION_EMOJIS.map(emoji=>`
+          <button
+            type="button"
+            onclick="toggleReaction('${targetType}','${escjs(String(targetId))}','${escjs(emoji)}')"
+            aria-label="${esc(emoji)}"
+          >${esc(emoji)}</button>
+        `).join("")}
+      </div>
+    `:""}
+  `;
+}
+
+function toggleReactionPicker(targetType,targetId){
+  if(!requireAuth("リアクションするにはログインしてください。"))return;
+
+  const key=`${targetType}:${targetId}`;
+  openReactionPickerKey=openReactionPickerKey===key?null:key;
+  rerenderReactionTarget(targetType);
+}
+
+function rerenderReactionTarget(targetType){
+  if(targetType==="message"){
+    renderChat();
+    return;
+  }
+
+  const detailEvent=resolveEventByAnyId(state.currentEventId);
+  if(detailEvent)renderEventDetail();
+
+  const cardEvent=resolveEventByAnyId(state.currentCardDetailId);
+  if(cardEvent)renderCardDetailComments(cardEvent);
+
+  if(state.currentMessageCommentEventId){
+    renderMessageCommentThread();
+  }
+}
+
+async function toggleReaction(targetType,targetId,emoji){
+  if(!requireAuth("リアクションするにはログインしてください。"))return;
+  if(!REACTION_EMOJIS.includes(emoji))return;
+  if(!reactionTargetValid(String(targetId)))return;
+
+  const current=reactionEntries(targetType,targetId).find(x=>x.emoji===emoji);
+  const alreadyMine=current?.mine===true;
+
+  try{
+    if(alreadyMine){
+      const {error}=await sb
+        .from("message_reactions")
+        .delete()
+        .eq("user_id",currentAuthUser.id)
+        .eq("target_type",targetType)
+        .eq("target_id",targetId)
+        .eq("emoji",emoji);
+
+      if(error)throw error;
+
+    }else{
+      const {error}=await sb
+        .from("message_reactions")
+        .insert({
+          user_id:currentAuthUser.id,
+          target_type:targetType,
+          target_id:targetId,
+          emoji
+        });
+
+      if(error && error.code!=="23505")throw error;
+    }
+
+    openReactionPickerKey=null;
+    await loadReactionsForTargets(targetType,[targetId]);
+    rerenderReactionTarget(targetType);
+
+  }catch(error){
+    console.error("toggle reaction:",error);
+    toast("リアクションを更新できませんでした");
+  }
+}
+
 function renderCardDetailComments(e){
   const list=$("cardDetailCommentList");
   const input=$("cardDetailCommentInput");
@@ -16372,6 +16623,7 @@ function renderCardDetailComments(e){
               </div>
             </div>
             <div class="v23-6-board-comment-text">${esc(c.text)}</div>
+            ${reactionHtml("comment",c.id)}
           </article>
         `;
       }).join("")
@@ -17807,6 +18059,7 @@ function renderMessageCommentThread(){
               <span class="message-comment-time">${esc(c.created_at?commentTimeLabel(c.created_at):(c.time||""))}</span>
             </div>
             <div class="message-comment-body">${esc(c.text||"")}</div>
+            ${reactionHtml("comment",c.id)}
           </div>
         </div>`;
       }).join("")
@@ -17946,6 +18199,8 @@ async function loadChatMessages(partnerId){
       time:dmTimeLabel(row.created_at),
       source:"supabase"
     }));
+
+    await loadReactionsForTargets("message",state.messages[partnerId].map(m=>m.id));
 
     const p=person(partnerId);
     $("chatName").textContent=p.name;
@@ -18106,7 +18361,7 @@ function renderChat(){
   if(!id)return;
   const msgs=state.messages[id]||[];
   $("chatMessages").innerHTML=msgs.length
-    ? msgs.map(m=>`<div class="bubble ${m.from===meId()?"me":"them"}">${esc(m.text)}<div style="font-size:9px;opacity:.7;margin-top:3px">${esc(dmTimeLabel(m.at)||m.time||"")}</div></div>`).join("")
+    ? msgs.map(m=>`<div class="bubble ${m.from===meId()?"me":"them"}">${esc(m.text)}<div style="font-size:9px;opacity:.7;margin-top:3px">${esc(dmTimeLabel(m.at)||m.time||"")}</div>${reactionHtml("message",m.id)}</div>`).join("")
     : `<div class="message-state">まだ会話はありません。最初のメッセージを送ってみよう。</div>`;
   $("chatMessages").scrollTop=$("chatMessages").scrollHeight;
 }
@@ -21757,6 +22012,8 @@ async function loadEventComments(ev){
       source:"supabase"
     }));
 
+    await loadReactionsForTargets("comment",ev.comments.map(c=>c.id));
+
     renderEventDetail();
     renderCardDetailComments(ev);
 
@@ -21909,7 +22166,7 @@ function renderEventDetail(){
 
   $("commentList").innerHTML=(e.comments||[]).map(c=>{
     const p=person(c.user);
-    return `<div class="comment-card"><div class="comment-user"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(c.time||"")}</div></div></div><div class="comment-text">${esc(c.text)}</div></div>`
+    return `<div class="comment-card"><div class="comment-user"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(c.time||"")}</div></div></div><div class="comment-text">${esc(c.text)}</div>${reactionHtml("comment",c.id)}</div>`
   }).join("")||`<div class="comment-state">まだコメントはありません</div>`;
 
   const participantRows=eventParticipantDetailRows(e);
