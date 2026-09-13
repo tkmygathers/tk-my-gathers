@@ -12776,10 +12776,71 @@ a,
   font-size:9px;
 }
 
+
+/* =========================================================
+   V25.15.4 — DETAIL / PROFILE BACK NAVIGATION
+   ========================================================= */
+
+.card-detail-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.card-detail-head-left{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+}
+
+.card-detail-back{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  min-height:34px;
+  padding:0 10px;
+  border:1px solid #E2E8F0;
+  border-radius:999px;
+  background:#FFFFFF;
+  color:#0F172A;
+  font-size:9px;
+  font-weight:850;
+}
+
+.card-detail-back span{
+  font-size:15px;
+  line-height:1;
+}
+
+.profile-return-event{
+  display:none;
+  margin:10px 14px 0;
+}
+
+.profile-return-event.show{
+  display:block;
+}
+
+.profile-return-event button{
+  width:100%;
+  min-height:40px;
+  border:1px solid #D9E3F0;
+  border-radius:12px;
+  background:#F8FAFC;
+  color:#0F172A;
+  font-size:10px;
+  font-weight:850;
+  text-align:left;
+  padding:0 12px;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.15.3 participant RPC UUID fix -->
+<!-- v25.15.4 detail/profile back navigation -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -13076,6 +13137,9 @@ a,
 <div class="mygathers-panel" id="mySavedPanel" hidden></div>
 </section>
 <section class="page" id="profile">
+<div class="profile-return-event" id="profileReturnEvent">
+  <button type="button" onclick="returnToEventFromOwnProfile()">← 募集に戻る</button>
+</div>
 <div class="profile-hero">
 <div class="profile-cover profile-banner" id="profileBanner"><div class="profile-banner-empty">BANNER</div></div>
 <div class="profile-hero-actions">
@@ -13541,7 +13605,7 @@ a,
 <div class="modal" id="otherProfileModal" onclick="backdropClose(event,'otherProfileModal')">
 <div class="sheet other-profile-sheet">
 <div class="other-profile-topbar">
-<button class="other-profile-back" type="button" onclick="closeModal('otherProfileModal')" aria-label="戻る">
+<button class="other-profile-back" type="button" onclick="handleOtherProfileBack()" aria-label="戻る">
 <span aria-hidden="true">←</span>
 </button>
 <div class="other-profile-topbar-copy">
@@ -13630,12 +13694,18 @@ a,
 </div>
 <div class="modal" id="cardDetailModal" onclick="backdropClose(event,'cardDetailModal')">
 <div class="sheet v23-5-1-detail-sheet">
-<div class="sheet-head v23-5-1-detail-head">
-<div>
-<div class="sheet-title">募集詳細</div>
-<div class="sheet-sub">内容を確認する</div>
+<div class="sheet-head v23-5-1-detail-head card-detail-head">
+<div class="card-detail-head-left">
+  <button class="card-detail-back" type="button" onclick="returnFromCardDetail()">
+    <span aria-hidden="true">←</span>
+    <b id="cardDetailBackLabel">戻る</b>
+  </button>
+  <div>
+    <div class="sheet-title">募集詳細</div>
+    <div class="sheet-sub">内容を確認する</div>
+  </div>
 </div>
-<button class="close-btn" onclick="closeModal('cardDetailModal')" type="button">×</button>
+<button class="close-btn" onclick="returnFromCardDetail()" type="button">×</button>
 </div>
 <div id="cardDetailContent"></div>
 </div>
@@ -14400,6 +14470,10 @@ function goHomeFromLogo(){
 
 function showPage(id){
   if((id==="messages"||id==="profile")&&!requireAuth("メッセージとマイページを使うにはログインしてください。"))return;
+
+  if(id!=="profile" && !window._openingCardDetailFromProfile){
+    $("profileReturnEvent")?.classList.remove("show");
+  }
   document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
   document.querySelectorAll(".nav-btn[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
   if(id==="home"){renderHome();initHomeHeroRotation()}
@@ -15779,6 +15853,83 @@ function switchCardDetailTab(tab){
   participants?.classList.toggle("active",tab==="participants");
 }
 
+
+function activeAppPageId(){
+  return document.querySelector(".page.active")?.id || "home";
+}
+
+function pageReturnLabel(pageId){
+  if(pageId==="discover")return "探すに戻る";
+  if(pageId==="mygathers")return "マイ募集に戻る";
+  if(pageId==="profile")return "プロフィールに戻る";
+  if(pageId==="messages")return "メッセージに戻る";
+  return "ホームに戻る";
+}
+
+function updateCardDetailBackLabel(){
+  const el=$("cardDetailBackLabel");
+  if(!el)return;
+  el.textContent=pageReturnLabel(window._cardDetailReturnPage||"home");
+}
+
+function returnFromCardDetail(){
+  closeModal("cardDetailModal");
+  window._profileReturnEventId=null;
+  window._profileReturnFromDetail=false;
+
+  // The original page remains underneath the modal. If another page
+  // became active meanwhile, restore the page that launched the detail.
+  const target=window._cardDetailReturnPage;
+  if(target && activeAppPageId()!==target){
+    showPage(target);
+  }
+}
+
+function openParticipantProfileFromDetail(userId){
+  const ev=resolveEventByAnyId(state.currentEventId);
+  if(!ev)return;
+
+  window._profileReturnEventId=ev.id;
+  window._profileReturnFromDetail=true;
+
+  closeModal("cardDetailModal");
+
+  if(userId===meId() || userId===currentAuthUser?.id){
+    renderProfile();
+    showPage("profile");
+    $("profileReturnEvent")?.classList.add("show");
+    return;
+  }
+
+  openOtherProfile(userId);
+}
+
+function handleOtherProfileBack(){
+  closeModal("otherProfileModal");
+
+  if(window._profileReturnFromDetail && window._profileReturnEventId){
+    const eventId=window._profileReturnEventId;
+    window._openingCardDetailFromProfile=true;
+    openCardDetail(eventId);
+    window._openingCardDetailFromProfile=false;
+    return;
+  }
+}
+
+function returnToEventFromOwnProfile(){
+  const eventId=window._profileReturnEventId;
+  $("profileReturnEvent")?.classList.remove("show");
+
+  if(!eventId){
+    showPage(window._cardDetailReturnPage||"home");
+    return;
+  }
+
+  window._openingCardDetailFromProfile=true;
+  openCardDetail(eventId);
+  window._openingCardDetailFromProfile=false;
+}
+
 function renderCardDetailParticipants(e){
   const list=$("cardDetailParticipantList");
   const count=$("cardDetailParticipantCount");
@@ -15800,7 +15951,7 @@ function renderCardDetailParticipants(e){
           <button
             type="button"
             class="participant-profile-button"
-            onclick="closeModal('cardDetailModal');openOtherProfile('${escjs(String(id))}')"
+            onclick="openParticipantProfileFromDetail('${escjs(String(id))}')"
             aria-label="${esc(p.name)}のプロフィールを見る"
           >
             <div class="mini-avatar">${avatarHtml(p)}</div>
@@ -15822,6 +15973,13 @@ function renderCardDetailParticipants(e){
 
 function openCardDetail(id){
   const e=resolveEventByAnyId(id);
+
+  if(!window._openingCardDetailFromProfile){
+    window._cardDetailReturnPage=activeAppPageId();
+    window._profileReturnEventId=null;
+    window._profileReturnFromDetail=false;
+    $("profileReturnEvent")?.classList.remove("show");
+  }
 
   if(!e){
     toast("募集を読み込めませんでした");
@@ -15967,6 +16125,7 @@ function openCardDetail(id){
   `;
 
   openModal("cardDetailModal");
+  updateCardDetailBackLabel();
 
   renderCardDetailComments(e);
   renderCardDetailParticipants(e);
@@ -18041,10 +18200,17 @@ async function renderOtherProfile(id){
 
 async function openOtherProfile(id){
   if(id===meId() || id===currentAuthUser?.id){
+    if(!window._profileReturnFromDetail){
+      $("profileReturnEvent")?.classList.remove("show");
+    }
     openMyProfile();
     return;
   }
   if(!requireAuth("プロフィールを見るにはログインしてください。"))return;
+
+  if(!window._profileReturnFromDetail){
+    window._profileReturnEventId=null;
+  }
 
   state.currentOtherProfileId=id;
   openModal("otherProfileModal");
