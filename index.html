@@ -12720,10 +12720,66 @@ a,
   font-size:9px;
 }
 
+
+/* =========================================================
+   V25.15.2 — ACTIVE CARD DETAIL PARTICIPANT TAB FIX
+   ========================================================= */
+
+.card-detail-tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px;
+  margin-top:14px;
+  padding:4px;
+  border:1px solid #E2E8F0;
+  border-radius:12px;
+  background:#F8FAFC;
+}
+
+.card-detail-tab{
+  min-height:36px;
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  color:#64748B;
+  font-size:10px;
+  font-weight:800;
+}
+
+.card-detail-tab.active{
+  background:#FFFFFF;
+  color:#0F172A;
+  box-shadow:0 1px 4px rgba(15,23,42,.08);
+}
+
+.card-detail-panel{
+  display:none;
+}
+
+.card-detail-panel.active{
+  display:block;
+}
+
+.card-detail-participant-list{
+  display:grid;
+  margin-top:10px;
+}
+
+.card-detail-participant-list .detail-participant-row{
+  margin:0;
+}
+
+.card-detail-participant-empty{
+  padding:22px 10px;
+  text-align:center;
+  color:#8290A3;
+  font-size:9px;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.15.1 participant profiles + visibility-aware participant list -->
+<!-- v25.15.2 active card detail participant tab fix -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -15710,6 +15766,60 @@ async function submitCardDetailComment(event,id){
   }
 }
 
+
+function switchCardDetailTab(tab){
+  document.querySelectorAll(".card-detail-tab").forEach(button=>{
+    button.classList.toggle("active",button.dataset.cardDetailTab===tab);
+  });
+
+  const comments=$("cardDetailCommentsPanel");
+  const participants=$("cardDetailParticipantsPanel");
+
+  comments?.classList.toggle("active",tab==="comments");
+  participants?.classList.toggle("active",tab==="participants");
+}
+
+function renderCardDetailParticipants(e){
+  const list=$("cardDetailParticipantList");
+  const count=$("cardDetailParticipantCount");
+  if(!list || !e)return;
+
+  const rows=eventParticipantDetailRows(e);
+
+  if(count){
+    count.textContent=`${rows.length}人`;
+  }
+
+  list.innerHTML=rows.length
+    ? rows.map(row=>{
+        const id=row.id;
+        const p=person(id);
+        const isOwner=row.role==="owner" || id===e.owner;
+
+        return `<div class="friend detail-participant-row">
+          <button
+            type="button"
+            class="participant-profile-button"
+            onclick="closeModal('cardDetailModal');openOtherProfile('${escjs(String(id))}')"
+            aria-label="${esc(p.name)}のプロフィールを見る"
+          >
+            <div class="mini-avatar">${avatarHtml(p)}</div>
+
+            <div class="participant-profile-main">
+              <div class="participant-profile-name-row">
+                <span class="participant-profile-name">${esc(p.name)}</span>
+                ${isOwner?`<span class="participant-owner-badge">主催者</span>`:""}
+              </div>
+              <div class="participant-profile-handle">${esc(p.handle||"")}</div>
+            </div>
+
+            <span class="participant-open-mark" aria-hidden="true">›</span>
+          </button>
+        </div>`;
+      }).join("")
+    : `<div class="card-detail-participant-empty">まだ参加者はいません</div>`;
+}
+
 function openCardDetail(id){
   const e=resolveEventByAnyId(id);
 
@@ -15790,35 +15900,68 @@ function openCardDetail(id){
           `}
         </div>
 
-        <section class="v23-6-board">
-          <div class="v23-6-board-head">
-            <div>
-              <span class="v23-6-board-label">BOARD</span>
-              <h4>コメント</h4>
+        <div class="card-detail-tabs">
+          <button
+            type="button"
+            class="card-detail-tab active"
+            data-card-detail-tab="comments"
+            onclick="switchCardDetailTab('comments')"
+          >コメント</button>
+          <button
+            type="button"
+            class="card-detail-tab"
+            data-card-detail-tab="participants"
+            onclick="switchCardDetailTab('participants')"
+          >参加者</button>
+        </div>
+
+        <div class="card-detail-panel active" id="cardDetailCommentsPanel">
+          <section class="v23-6-board">
+            <div class="v23-6-board-head">
+              <div>
+                <span class="v23-6-board-label">BOARD</span>
+                <h4>コメント</h4>
+              </div>
+              <span class="v23-6-board-count">${(e.comments||[]).length}件</span>
             </div>
-            <span class="v23-6-board-count">${(e.comments||[]).length}件</span>
-          </div>
 
-          <div id="cardDetailCommentList" class="v23-6-board-list">
-            <div class="v23-6-board-empty">コメントを読み込んでいます…</div>
-          </div>
+            <div id="cardDetailCommentList" class="v23-6-board-list">
+              <div class="v23-6-board-empty">コメントを読み込んでいます…</div>
+            </div>
 
-          <form class="v23-6-board-form" onsubmit="submitCardDetailComment(event,${arg})">
-            <textarea
-              id="cardDetailCommentInput"
-              rows="3"
-              maxlength="1000"
-              placeholder="${esc(cardDetailCommentPlaceholder(e))}"
-            ></textarea>
-            <button id="cardDetailCommentSubmit" type="submit">投稿</button>
-          </form>
+            <form class="v23-6-board-form" onsubmit="submitCardDetailComment(event,${arg})">
+              <textarea
+                id="cardDetailCommentInput"
+                rows="3"
+                maxlength="1000"
+                placeholder="${esc(cardDetailCommentPlaceholder(e))}"
+              ></textarea>
+              <button id="cardDetailCommentSubmit" type="submit">投稿</button>
+            </form>
 
-          ${
-            !currentAuthUser
-              ? `<div class="v23-6-board-help">ログインするとコメントできます。</div>`
-              : ""
-          }
-        </section>
+            ${
+              !currentAuthUser
+                ? `<div class="v23-6-board-help">ログインするとコメントできます。</div>`
+                : ""
+            }
+          </section>
+        </div>
+
+        <div class="card-detail-panel" id="cardDetailParticipantsPanel">
+          <section class="v23-6-board">
+            <div class="v23-6-board-head">
+              <div>
+                <span class="v23-6-board-label">MEMBERS</span>
+                <h4>参加者</h4>
+              </div>
+              <span class="v23-6-board-count" id="cardDetailParticipantCount">—</span>
+            </div>
+
+            <div id="cardDetailParticipantList" class="card-detail-participant-list">
+              <div class="card-detail-participant-empty">参加者を読み込んでいます…</div>
+            </div>
+          </section>
+        </div>
       </div>
     </article>
   `;
@@ -15826,9 +15969,11 @@ function openCardDetail(id){
   openModal("cardDetailModal");
 
   renderCardDetailComments(e);
+  renderCardDetailParticipants(e);
 
   if(e.source==="supabase"){
     loadEventComments(e);
+    loadVisibleEventParticipants(e);
   }
 }
 
@@ -20347,6 +20492,7 @@ async function loadVisibleEventParticipants(ev){
   // Demo/local events keep using their local participant data.
   if(ev.source!=="supabase"){
     renderEventDetail();
+    renderCardDetailParticipants(ev);
     return;
   }
 
@@ -20387,6 +20533,7 @@ async function loadVisibleEventParticipants(ev){
 
     if(state.currentEventId===ev.id){
       renderEventDetail();
+      renderCardDetailParticipants(ev);
     }
 
   }catch(error){
@@ -20395,6 +20542,15 @@ async function loadVisibleEventParticipants(ev){
     if(list && state.currentEventId===ev.id){
       list.innerHTML=`
         <div class="comment-state">
+          参加者一覧を読み込めませんでした
+        </div>
+      `;
+    }
+
+    const cardList=$("cardDetailParticipantList");
+    if(cardList && state.currentEventId===ev.id){
+      cardList.innerHTML=`
+        <div class="card-detail-participant-empty">
           参加者一覧を読み込めませんでした
         </div>
       `;
