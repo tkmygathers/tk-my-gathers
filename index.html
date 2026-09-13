@@ -12779,7 +12779,7 @@ a,
 </style>
 </head>
 <body>
-<!-- v25.15.2 active card detail participant tab fix -->
+<!-- v25.15.3 participant RPC UUID fix -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -20498,7 +20498,7 @@ async function loadVisibleEventParticipants(ev){
 
   try{
     const {data,error}=await sb.rpc("get_event_participants",{
-      p_event_id:ev.id
+      p_event_id:getSupabaseEventId(ev)
     });
 
     if(error)throw error;
