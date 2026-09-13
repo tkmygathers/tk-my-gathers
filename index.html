@@ -13286,16 +13286,6 @@ a,
 }
 
 .reaction-chip,
-.reaction-add{
-  min-height:24px;
-  padding:0 7px;
-  border:1px solid #DDE5EF;
-  border-radius:999px;
-  background:#F8FAFC;
-  color:#334155;
-  font-size:10px;
-  line-height:1;
-}
 
 .reaction-chip{
   display:inline-flex;
@@ -13310,11 +13300,6 @@ a,
   color:#1D4ED8;
 }
 
-.reaction-add{
-  min-width:28px;
-  font-weight:900;
-  color:#64748B;
-}
 
 .reaction-picker{
   display:flex;
@@ -13359,10 +13344,49 @@ a,
   margin-left:0;
 }
 
+
+/* =========================================================
+   V25.20.1 — LONG PRESS REACTIONS + DATE EMPHASIS
+   ========================================================= */
+
+.reaction-longpress-target{
+  -webkit-touch-callout:none;
+  user-select:none;
+}
+
+.reaction-picker.floating{
+  position:absolute;
+  z-index:20;
+  left:50%;
+  bottom:calc(100% + 7px);
+  transform:translateX(-50%);
+  margin:0;
+  white-space:nowrap;
+}
+
+.bubble,
+.message-comment-bubble,
+.v23-6-board-comment,
+.comment-card{
+  position:relative;
+}
+
+/* Date emphasis only — no card size/layout changes */
+.card-date-emphasis{
+  color:#0F172A !important;
+  font-weight:900 !important;
+}
+
+.fixed-card-meta .card-date-emphasis,
+.discover-card-meta .card-date-emphasis,
+.my-event-meta .card-date-emphasis{
+  letter-spacing:.01em;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.20.0 comment-and-dm reactions -->
+<!-- v25.20.1 longpress reactions + date emphasis -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -16498,29 +16522,25 @@ function reactionHtml(targetType,targetId){
   const pickerOpen=openReactionPickerKey===key;
 
   return `
-    <div class="reaction-bar">
-      ${entries
-        .filter(x=>x.count>0)
-        .map(x=>`
-          <button
-            class="reaction-chip ${x.mine?"mine":""}"
-            type="button"
-            onclick="event.stopPropagation();toggleReaction('${targetType}','${escjs(String(targetId))}','${escjs(x.emoji)}')"
-            aria-label="${esc(x.emoji)} ${x.count}件"
-          >
-            <span>${esc(x.emoji)}</span>
-            <span>${x.count}</span>
-          </button>
-        `).join("")}
-      <button
-        class="reaction-add"
-        type="button"
-        onclick="event.stopPropagation();toggleReactionPicker('${targetType}','${escjs(String(targetId))}')"
-        aria-label="リアクションを追加"
-      >＋</button>
-    </div>
+    ${entries.length?`
+      <div class="reaction-bar">
+        ${entries
+          .filter(x=>x.count>0)
+          .map(x=>`
+            <button
+              class="reaction-chip ${x.mine?"mine":""}"
+              type="button"
+              onclick="event.stopPropagation();toggleReaction('${targetType}','${escjs(String(targetId))}','${escjs(x.emoji)}')"
+              aria-label="${esc(x.emoji)} ${x.count}件"
+            >
+              <span>${esc(x.emoji)}</span>
+              <span>${x.count}</span>
+            </button>
+          `).join("")}
+      </div>
+    `:""}
     ${pickerOpen?`
-      <div class="reaction-picker" onclick="event.stopPropagation()">
+      <div class="reaction-picker floating" onclick="event.stopPropagation()">
         ${REACTION_EMOJIS.map(emoji=>`
           <button
             type="button"
@@ -16531,6 +16551,70 @@ function reactionHtml(targetType,targetId){
       </div>
     `:""}
   `;
+}
+
+function bindLongPressReactions(){
+  document.querySelectorAll("[data-reaction-type][data-reaction-id]").forEach(el=>{
+    if(el.dataset.reactionBound==="1")return;
+    el.dataset.reactionBound="1";
+
+    let timer=null;
+    let startX=0;
+    let startY=0;
+
+    const clear=()=>{
+      if(timer){
+        clearTimeout(timer);
+        timer=null;
+      }
+    };
+
+    const begin=(clientX,clientY)=>{
+      startX=clientX;
+      startY=clientY;
+      clear();
+
+      timer=setTimeout(()=>{
+        const type=el.dataset.reactionType;
+        const id=el.dataset.reactionId;
+
+        if(!requireAuth("リアクションするにはログインしてください。"))return;
+
+        openReactionPickerKey=`${type}:${id}`;
+        rerenderReactionTarget(type);
+
+        if(navigator.vibrate)navigator.vibrate(20);
+      },520);
+    };
+
+    el.addEventListener("touchstart",e=>{
+      if(e.target.closest("button,a,input,textarea,select"))return;
+      const t=e.touches?.[0];
+      if(t)begin(t.clientX,t.clientY);
+    },{passive:true});
+
+    el.addEventListener("touchmove",e=>{
+      const t=e.touches?.[0];
+      if(!t)return;
+      if(Math.abs(t.clientX-startX)>10 || Math.abs(t.clientY-startY)>10)clear();
+    },{passive:true});
+
+    el.addEventListener("touchend",clear,{passive:true});
+    el.addEventListener("touchcancel",clear,{passive:true});
+
+    el.addEventListener("mousedown",e=>{
+      if(e.button!==0)return;
+      if(e.target.closest("button,a,input,textarea,select"))return;
+      begin(e.clientX,e.clientY);
+    });
+
+    el.addEventListener("mousemove",e=>{
+      if(Math.abs(e.clientX-startX)>10 || Math.abs(e.clientY-startY)>10)clear();
+    });
+
+    el.addEventListener("mouseup",clear);
+    el.addEventListener("mouseleave",clear);
+  });
 }
 
 function toggleReactionPicker(targetType,targetId){
@@ -16563,33 +16647,14 @@ async function toggleReaction(targetType,targetId,emoji){
   if(!REACTION_EMOJIS.includes(emoji))return;
   if(!reactionTargetValid(String(targetId)))return;
 
-  const current=reactionEntries(targetType,targetId).find(x=>x.emoji===emoji);
-  const alreadyMine=current?.mine===true;
-
   try{
-    if(alreadyMine){
-      const {error}=await sb
-        .from("message_reactions")
-        .delete()
-        .eq("user_id",currentAuthUser.id)
-        .eq("target_type",targetType)
-        .eq("target_id",targetId)
-        .eq("emoji",emoji);
+    const {error}=await sb.rpc("toggle_message_reaction",{
+      p_target_type:targetType,
+      p_target_id:targetId,
+      p_emoji:emoji
+    });
 
-      if(error)throw error;
-
-    }else{
-      const {error}=await sb
-        .from("message_reactions")
-        .insert({
-          user_id:currentAuthUser.id,
-          target_type:targetType,
-          target_id:targetId,
-          emoji
-        });
-
-      if(error && error.code!=="23505")throw error;
-    }
+    if(error)throw error;
 
     openReactionPickerKey=null;
     await loadReactionsForTargets(targetType,[targetId]);
@@ -16614,7 +16679,7 @@ function renderCardDetailComments(e){
     ? comments.map(c=>{
         const p=person(c.user);
         return `
-          <article class="v23-6-board-comment">
+          <article class="v23-6-board-comment reaction-longpress-target" data-reaction-type="comment" data-reaction-id="${esc(c.id)}">
             <div class="v23-6-board-comment-head">
               <div class="mini-avatar">${avatarHtml(p)}</div>
               <div class="v23-6-board-comment-user">
@@ -16639,6 +16704,8 @@ function renderCardDetailComments(e){
     submit.disabled=!allowed;
     input.placeholder=cardDetailCommentPlaceholder(e);
   }
+
+  bindLongPressReactions();
 }
 
 async function submitCardDetailComment(event,id){
@@ -17130,7 +17197,7 @@ function eventCard(e){
         ${eventCardStatusHtml(e)}
 
         <div class="fixed-card-meta v24-4-17-meta">
-          <span>${dateLabel(e.date)} ${esc(e.time)}</span>
+          <span class="card-date-emphasis">${dateLabel(e.date)} ${esc(e.time)}</span>
           <span>${esc(e.place)}</span>
         </div>
 
@@ -17790,7 +17857,7 @@ function discoverCard(e){
       `:""}
 
       <div class="discover-card-meta">
-        <span>${dateLabel(e.date)} ${esc(e.time)}</span>
+        <span class="card-date-emphasis">${dateLabel(e.date)} ${esc(e.time)}</span>
         <span>${esc(e.place)}</span>
       </div>
 
@@ -18053,7 +18120,7 @@ function renderMessageCommentThread(){
         const mine=String(c.user)===String(meId());
         return `<div class="message-comment-item">
           <div class="mini-avatar">${avatarHtml(p)}</div>
-          <div class="message-comment-bubble ${mine?"me":""}">
+          <div class="message-comment-bubble reaction-longpress-target ${mine?"me":""}" data-reaction-type="comment" data-reaction-id="${esc(c.id)}">
             <div class="message-comment-byline">
               <span class="message-comment-author">${esc(p.name||"ユーザー")}</span>
               <span class="message-comment-time">${esc(c.created_at?commentTimeLabel(c.created_at):(c.time||""))}</span>
@@ -18078,6 +18145,8 @@ function renderMessageCommentThread(){
         :"この募集にはコメントできません";
   }
   if(button)button.disabled=!allowed;
+
+  bindLongPressReactions();
 
   if(list)list.scrollTop=list.scrollHeight;
 }
@@ -18361,8 +18430,9 @@ function renderChat(){
   if(!id)return;
   const msgs=state.messages[id]||[];
   $("chatMessages").innerHTML=msgs.length
-    ? msgs.map(m=>`<div class="bubble ${m.from===meId()?"me":"them"}">${esc(m.text)}<div style="font-size:9px;opacity:.7;margin-top:3px">${esc(dmTimeLabel(m.at)||m.time||"")}</div>${reactionHtml("message",m.id)}</div>`).join("")
+    ? msgs.map(m=>`<div class="bubble reaction-longpress-target ${m.from===meId()?"me":"them"}" data-reaction-type="message" data-reaction-id="${esc(m.id)}">${esc(m.text)}<div style="font-size:9px;opacity:.7;margin-top:3px">${esc(dmTimeLabel(m.at)||m.time||"")}</div>${reactionHtml("message",m.id)}</div>`).join("")
     : `<div class="message-state">まだ会話はありません。最初のメッセージを送ってみよう。</div>`;
+  bindLongPressReactions();
   $("chatMessages").scrollTop=$("chatMessages").scrollHeight;
 }
 
@@ -18689,7 +18759,7 @@ function myEventCard(e,mode){
           </div>`
         : (compactStatus?`<div class="my-event-status-tools"><div class="my-event-status-left">${compactStatus}</div></div>`:"")}
 
-      <div class="my-event-meta">${dateLabel(e.date)} ${esc(e.time)}<br>${esc(e.place)} · ${eventPeopleText(e)}</div>
+      <div class="my-event-meta"><span class="card-date-emphasis">${dateLabel(e.date)} ${esc(e.time)}</span><br>${esc(e.place)} · ${eventPeopleText(e)}</div>
       ${eventCardTimestamp(e)?`<div class="my-event-post-time">${esc(eventCardTimestamp(e))}</div>`:""}
       ${eventIsGathered(e)&&e.gatherNote?`<div class="my-gather-note-preview"><strong>最終メモ</strong><span>${esc(e.gatherNote)}</span></div>`:""}
       ${mode==="created"?`<div class="event-visibility-row">${visibilityBadgeHtml(e.visibilityDb||e.visibility)}</div>${gatherHostControlHtml(e)}`:""}
@@ -22166,7 +22236,7 @@ function renderEventDetail(){
 
   $("commentList").innerHTML=(e.comments||[]).map(c=>{
     const p=person(c.user);
-    return `<div class="comment-card"><div class="comment-user"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(c.time||"")}</div></div></div><div class="comment-text">${esc(c.text)}</div>${reactionHtml("comment",c.id)}</div>`
+    return `<div class="comment-card reaction-longpress-target" data-reaction-type="comment" data-reaction-id="${esc(c.id)}"><div class="comment-user"><div class="mini-avatar">${avatarHtml(p)}</div><div><div class="friend-name">${esc(p.name)}</div><div class="muted">${esc(c.time||"")}</div></div></div><div class="comment-text">${esc(c.text)}</div>${reactionHtml("comment",c.id)}</div>`
   }).join("")||`<div class="comment-state">まだコメントはありません</div>`;
 
   const participantRows=eventParticipantDetailRows(e);
@@ -22204,6 +22274,7 @@ function renderEventDetail(){
     : `<div class="comment-state">まだ参加者はいません</div>`;
 
   updateCommentComposer(e);
+  bindLongPressReactions();
 }
 function switchDetailTab(id){document.querySelectorAll(".detail-tab").forEach(b=>b.classList.toggle("active",b.dataset.detailtab===id));document.querySelectorAll(".detail-panel").forEach(p=>p.classList.toggle("active",p.id===id))}
 $("commentForm").addEventListener("submit",async e=>{
