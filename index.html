@@ -12519,10 +12519,101 @@ a,
   }
 }
 
+
+/* =========================================================
+   V25.15.0 — USERNAME AVAILABILITY
+   ========================================================= */
+
+.signup-username-wrap{
+  display:grid;
+  gap:6px;
+}
+
+.signup-username-input-wrap{
+  position:relative;
+}
+
+.signup-username-prefix{
+  position:absolute;
+  left:12px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#64748B;
+  font-size:12px;
+  font-weight:800;
+  pointer-events:none;
+}
+
+#signupUsername{
+  padding-left:28px !important;
+}
+
+.username-status{
+  min-height:18px;
+  font-size:9px;
+  line-height:1.5;
+  color:#64748B;
+}
+
+.username-status.checking{
+  color:#64748B;
+}
+
+.username-status.available{
+  color:#16805A;
+  font-weight:800;
+}
+
+.username-status.unavailable,
+.username-status.invalid{
+  color:#B4233B;
+  font-weight:800;
+}
+
+.username-rule{
+  margin-top:-2px;
+  color:#8A94A4;
+  font-size:8px;
+  line-height:1.5;
+}
+
+.username-suggestions{
+  display:none;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:2px;
+}
+
+.username-suggestions.show{
+  display:flex;
+}
+
+.username-suggestion-btn{
+  min-height:30px;
+  padding:0 10px;
+  border:1px solid #C9D8F0;
+  border-radius:999px;
+  background:#F4F8FF;
+  color:#2F63B7;
+  font:inherit;
+  font-size:8.5px;
+  font-weight:850;
+  cursor:pointer;
+}
+
+.username-suggestion-btn:active{
+  transform:scale(.98);
+}
+
+#signupForm .auth-main-btn:disabled{
+  cursor:not-allowed;
+  opacity:.5;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.14.2 compact preset picker + preview ratio match -->
+<!-- v25.15.0 username uniqueness UX + suggestions -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -13234,6 +13325,27 @@ a,
 <form aria-hidden="true" class="auth-form" hidden="" id="signupForm">
 <label>表示名</label>
 <input id="signupName" maxlength="30" placeholder="例：しゅうぞう" required=""/>
+
+<div class="signup-username-wrap">
+  <label>ユーザーID</label>
+  <div class="signup-username-input-wrap">
+    <span class="signup-username-prefix">@</span>
+    <input
+      autocomplete="username"
+      id="signupUsername"
+      maxlength="20"
+      minlength="3"
+      placeholder="shuzo"
+      required=""
+      spellcheck="false"
+      autocapitalize="none"
+    />
+  </div>
+  <div class="username-rule">英小文字・数字・_ のみ / 3〜20文字</div>
+  <div class="username-status" id="signupUsernameStatus">ユーザーIDを入力してください</div>
+  <div class="username-suggestions" id="signupUsernameSuggestions"></div>
+</div>
+
 <label>メールアドレス</label>
 <input autocomplete="email" id="signupEmail" placeholder="you@example.com" required="" type="email"/>
 <label>パスワード</label>
@@ -20434,11 +20546,178 @@ function finishAuthSuccess(){
   setAuthMessage("");
 }
 
+
+let signupUsernameCheckTimer=null;
+let signupUsernameCheckSeq=0;
+let signupUsernameIsAvailable=false;
+
+function normalizeSignupUsername(value){
+  return String(value||"")
+    .trim()
+    .replace(/^@+/,"")
+    .toLowerCase();
+}
+
+function isValidSignupUsername(value){
+  return /^[a-z0-9_]{3,20}$/.test(value);
+}
+
+function setSignupUsernameStatus(text,type=""){
+  const el=$("signupUsernameStatus");
+  if(!el)return;
+  el.textContent=text||"";
+  el.className="username-status"+(type?" "+type:"");
+}
+
+function clearSignupUsernameSuggestions(){
+  const box=$("signupUsernameSuggestions");
+  if(!box)return;
+  box.innerHTML="";
+  box.classList.remove("show");
+}
+
+function renderSignupUsernameSuggestions(items){
+  const box=$("signupUsernameSuggestions");
+  if(!box)return;
+
+  const values=[...new Set((items||[])
+    .map(normalizeSignupUsername)
+    .filter(isValidSignupUsername))]
+    .slice(0,3);
+
+  if(!values.length){
+    clearSignupUsernameSuggestions();
+    return;
+  }
+
+  box.innerHTML=values.map(value=>`
+    <button
+      class="username-suggestion-btn"
+      type="button"
+      onclick="chooseSignupUsernameSuggestion('${escjs(value)}')"
+    >@${esc(value)}</button>
+  `).join("");
+
+  box.classList.add("show");
+}
+
+function chooseSignupUsernameSuggestion(value){
+  const input=$("signupUsername");
+  if(!input)return;
+  input.value=normalizeSignupUsername(value);
+  checkSignupUsernameNow();
+  input.focus();
+}
+
+function updateSignupSubmitState(){
+  const button=$("signupForm")?.querySelector(".auth-main-btn");
+  if(!button)return;
+  const username=normalizeSignupUsername($("signupUsername")?.value);
+  button.disabled=!!username && (!isValidSignupUsername(username) || !signupUsernameIsAvailable);
+}
+
+async function checkSignupUsernameNow(){
+  const input=$("signupUsername");
+  if(!input)return false;
+
+  const normalized=normalizeSignupUsername(input.value);
+  input.value=normalized;
+  signupUsernameIsAvailable=false;
+  clearSignupUsernameSuggestions();
+
+  if(!normalized){
+    setSignupUsernameStatus("ユーザーIDを入力してください","");
+    updateSignupSubmitState();
+    return false;
+  }
+
+  if(!isValidSignupUsername(normalized)){
+    setSignupUsernameStatus("英小文字・数字・_ を使って3〜20文字で入力してください","invalid");
+    updateSignupSubmitState();
+    return false;
+  }
+
+  const seq=++signupUsernameCheckSeq;
+  setSignupUsernameStatus("使用できるか確認しています…","checking");
+  updateSignupSubmitState();
+
+  try{
+    const {data,error}=await sb.rpc("check_username_availability",{
+      p_username:normalized
+    });
+
+    if(seq!==signupUsernameCheckSeq)return false;
+    if(error)throw error;
+
+    const row=Array.isArray(data)?data[0]:data;
+    const available=!!row?.available;
+
+    signupUsernameIsAvailable=available;
+
+    if(available){
+      setSignupUsernameStatus(`@${normalized} は使用できます`,"available");
+      clearSignupUsernameSuggestions();
+    }else{
+      setSignupUsernameStatus(`@${normalized} はすでに使われています`,"unavailable");
+      renderSignupUsernameSuggestions(row?.suggestions||[]);
+    }
+
+    updateSignupSubmitState();
+    return available;
+
+  }catch(error){
+    console.error("username availability:",error);
+    signupUsernameIsAvailable=false;
+    setSignupUsernameStatus("ユーザーIDを確認できませんでした。もう一度お試しください。","invalid");
+    updateSignupSubmitState();
+    return false;
+  }
+}
+
+function scheduleSignupUsernameCheck(){
+  const input=$("signupUsername");
+  if(!input)return;
+
+  const normalized=normalizeSignupUsername(input.value);
+  input.value=normalized;
+  signupUsernameIsAvailable=false;
+  clearTimeout(signupUsernameCheckTimer);
+
+  if(!normalized){
+    setSignupUsernameStatus("ユーザーIDを入力してください","");
+    updateSignupSubmitState();
+    return;
+  }
+
+  if(!isValidSignupUsername(normalized)){
+    setSignupUsernameStatus("英小文字・数字・_ を使って3〜20文字で入力してください","invalid");
+    updateSignupSubmitState();
+    return;
+  }
+
+  setSignupUsernameStatus("使用できるか確認しています…","checking");
+  updateSignupSubmitState();
+
+  signupUsernameCheckTimer=setTimeout(checkSignupUsernameNow,420);
+}
+
+$("signupUsername")?.addEventListener("input",scheduleSignupUsernameCheck);
+$("signupUsername")?.addEventListener("blur",()=>{
+  if(isValidSignupUsername(normalizeSignupUsername($("signupUsername")?.value))){
+    checkSignupUsernameNow();
+  }
+});
+
 function authFriendlyMessage(error){
   const msg=(error?.message||"").toLowerCase();
   if(msg.includes("invalid login credentials"))return "メールアドレスかパスワードが違います。";
   if(msg.includes("email not confirmed"))return "確認メールのリンクを押してからログインしてください。";
   if(msg.includes("user already registered"))return "このメールアドレスはすでに登録されています。";
+  if(
+    msg.includes("profiles_username_unique_ci") ||
+    msg.includes("duplicate key") ||
+    msg.includes("unique constraint")
+  )return "このユーザーIDはすでに使われています。別のIDを選んでください。";
   if(msg.includes("password"))return "パスワードを確認してください。";
   return error?.message||"エラーが発生しました。";
 }
@@ -20446,6 +20725,27 @@ async function loadSupabaseProfile(user){
   const {data,error}=await sb.from("profiles").select("*").eq("id",user.id).maybeSingle();
   if(error){console.error("profile load:",error);return null}
   return data;
+}
+
+async function syncAuthUsernameToProfile(user,profile){
+  const desired=normalizeSignupUsername(user?.user_metadata?.username);
+  if(!desired || !isValidSignupUsername(desired) || !profile)return profile;
+  if(String(profile.username||"").toLowerCase()===desired)return profile;
+
+  try{
+    const {data,error}=await sb
+      .from("profiles")
+      .update({username:desired})
+      .eq("id",user.id)
+      .select("*")
+      .single();
+
+    if(error)throw error;
+    return data||profile;
+  }catch(error){
+    console.error("sync auth username:",error);
+    return profile;
+  }
 }
 function upsertLocalAuthAccount(user,profile){
   const id=user.id;
@@ -20502,6 +20802,8 @@ async function activateSupabaseUser(user){
       await new Promise(r=>setTimeout(r,350));
       profile=await loadSupabaseProfile(user);
     }
+
+    profile=await syncAuthUsernameToProfile(user,profile);
 
     upsertLocalAuthAccount(user,profile);
 
@@ -20573,22 +20875,58 @@ $("loginForm").addEventListener("submit",async e=>{
 });
 $("signupForm").addEventListener("submit",async e=>{
   e.preventDefault();
+
   const button=e.submitter;
-  button.disabled=true;
-  setAuthMessage("アカウントを作成しています…");
   const display_name=$("signupName").value.trim();
+  const username=normalizeSignupUsername($("signupUsername").value);
   const email=$("signupEmail").value.trim();
   const password=$("signupPassword").value;
+
+  if(!isValidSignupUsername(username)){
+    setSignupUsernameStatus("英小文字・数字・_ を使って3〜20文字で入力してください","invalid");
+    $("signupUsername").focus();
+    return;
+  }
+
+  button.disabled=true;
+  setAuthMessage("ユーザーIDを最終確認しています…");
+
+  const available=await checkSignupUsernameNow();
+  if(!available){
+    button.disabled=false;
+    setAuthMessage("使用できるユーザーIDを選んでください。","error");
+    $("signupUsername").focus();
+    return;
+  }
+
+  button.disabled=true;
+  setAuthMessage("アカウントを作成しています…");
+
   const {data,error}=await sb.auth.signUp({
     email,
     password,
     options:{
-      data:{display_name},
+      data:{
+        display_name,
+        username
+      },
       emailRedirectTo:"https://tkmygathers.github.io/tk-my-gathers/"
     }
   });
-  button.disabled=false;
-  if(error){setAuthMessage(authFriendlyMessage(error),"error");return}
+
+  if(error){
+    button.disabled=false;
+    setAuthMessage(authFriendlyMessage(error),"error");
+    if(
+      String(error?.message||"").toLowerCase().includes("duplicate") ||
+      String(error?.message||"").toLowerCase().includes("unique")
+    ){
+      signupUsernameIsAvailable=false;
+      await checkSignupUsernameNow();
+    }
+    return;
+  }
+
   if(data.session && data.user){
     finishAuthSuccess();
     await activateSupabaseUser(data.user);
@@ -20596,8 +20934,10 @@ $("signupForm").addEventListener("submit",async e=>{
   }else{
     switchAuthMode("login");
     $("loginEmail").value=email;
-    setAuthMessage("確認メールを送りました。メール内のリンクを押したあと、この画面からログインしてください。","success");
+    setAuthMessage(`確認メールを送りました。@${username} で登録を進めています。メール内のリンクを押したあと、この画面からログインしてください。`,"success");
   }
+
+  button.disabled=false;
 });
 async function initSupabaseAuth(){
   if(!window.supabase){
