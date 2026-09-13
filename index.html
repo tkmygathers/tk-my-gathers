@@ -13206,10 +13206,76 @@ a,
   line-height:1.65;
 }
 
+
+/* =========================================================
+   V25.19.0 — REPORT USER
+   ========================================================= */
+
+.report-form{
+  display:grid;
+  gap:12px;
+  margin-top:12px;
+}
+
+.report-field{
+  display:grid;
+  gap:6px;
+}
+
+.report-field label{
+  color:#0F172A;
+  font-size:10px;
+  font-weight:850;
+}
+
+.report-field select,
+.report-field textarea{
+  width:100%;
+  border:1px solid #D8E1EC;
+  border-radius:14px;
+  background:#fff;
+  color:#0F172A;
+  font-size:11px;
+  outline:none;
+}
+
+.report-field select{
+  min-height:44px;
+  padding:0 12px;
+}
+
+.report-field textarea{
+  min-height:110px;
+  padding:11px 12px;
+  resize:vertical;
+  line-height:1.6;
+}
+
+.report-help{
+  color:#8290A3;
+  font-size:8.5px;
+  line-height:1.6;
+}
+
+.report-submit{
+  width:100%;
+  min-height:44px;
+  border:0;
+  border-radius:14px;
+  background:#0F172A;
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+}
+
+.report-submit:disabled{
+  opacity:.55;
+}
+
 </style>
 </head>
 <body>
-<!-- v25.18.0 block-unblock safety UI -->
+<!-- v25.19.0 report-user safety flow -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -14082,6 +14148,9 @@ a,
     </div>
 
     <div class="safety-menu-list">
+      <button class="safety-menu-action" type="button" onclick="openReportCurrentProfile()">
+        このユーザーを通報
+      </button>
       <button class="safety-menu-action danger" type="button" onclick="confirmBlockCurrentProfile()">
         このユーザーをブロック
       </button>
@@ -14089,6 +14158,52 @@ a,
 
     <div class="safety-menu-note">
       ブロックすると、お互いをID検索から見つけられなくなります。募集・DM・コメント側にも順次同じ判定を適用します。
+    </div>
+  </div>
+</div>
+
+<!-- report user -->
+<div class="modal" id="reportUserModal" onclick="backdropClose(event,'reportUserModal')">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sheet-head">
+      <div>
+        <div class="sheet-title">ユーザーを通報</div>
+        <div class="sheet-sub" id="reportUserName">対象ユーザー</div>
+      </div>
+      <button class="close-btn" onclick="closeModal('reportUserModal')" type="button">×</button>
+    </div>
+
+    <div class="report-form">
+      <div class="report-field">
+        <label for="reportReason">通報理由</label>
+        <select id="reportReason">
+          <option value="">選択してください</option>
+          <option value="harassment">迷惑行為・嫌がらせ</option>
+          <option value="inappropriate">不適切な内容</option>
+          <option value="impersonation">なりすまし</option>
+          <option value="threat">危険・脅迫</option>
+          <option value="spam">スパム・勧誘</option>
+          <option value="other">その他</option>
+        </select>
+      </div>
+
+      <div class="report-field">
+        <label for="reportDetails">詳細</label>
+        <textarea
+          id="reportDetails"
+          maxlength="1000"
+          placeholder="状況が分かる範囲で入力してください。"
+        ></textarea>
+      </div>
+
+      <div class="report-help">
+        通報内容は運営確認用として保存されます。通報しただけでは相手は自動的にブロックされません。
+      </div>
+
+      <button class="report-submit" id="reportSubmitBtn" type="button" onclick="submitUserReport()">
+        通報を送信
+      </button>
     </div>
   </div>
 </div>
@@ -18827,6 +18942,70 @@ async function openFunBreakdown(userId){
   }
 }
 
+
+
+function openReportCurrentProfile(){
+  if(!requireAuth("通報するにはログインしてください。"))return;
+
+  const id=state.currentOtherProfileId;
+  if(!isRealUserId(id) || id===currentAuthUser?.id){
+    toast("このユーザーは通報できません");
+    return;
+  }
+
+  const p=person(id);
+
+  $("reportUserName").textContent=p?.name||"ユーザー";
+  $("reportReason").value="";
+  $("reportDetails").value="";
+  $("reportSubmitBtn").disabled=false;
+
+  closeModal("otherProfileSafetyModal");
+  openModal("reportUserModal");
+}
+
+async function submitUserReport(){
+  if(!currentAuthUser)return;
+
+  const id=state.currentOtherProfileId;
+  if(!isRealUserId(id) || id===currentAuthUser.id){
+    toast("このユーザーは通報できません");
+    return;
+  }
+
+  const reason=$("reportReason").value;
+  const details=$("reportDetails").value.trim();
+
+  if(!reason){
+    toast("通報理由を選んでください");
+    return;
+  }
+
+  const btn=$("reportSubmitBtn");
+  btn.disabled=true;
+
+  try{
+    const {error}=await sb
+      .from("reports")
+      .insert({
+        reporter_id:currentAuthUser.id,
+        reported_user_id:id,
+        reason,
+        details:details||null
+      });
+
+    if(error)throw error;
+
+    closeModal("reportUserModal");
+    toast("通報を受け付けました");
+
+  }catch(error){
+    console.error("submit report:",error);
+    toast("通報を送信できませんでした");
+  }finally{
+    btn.disabled=false;
+  }
+}
 
 async function usersAreBlocked(userA,userB){
   if(!currentAuthUser || !isRealUserId(userA) || !isRealUserId(userB))return false;
