@@ -13788,6 +13788,61 @@ a,
   }
 }
 
+
+/* =========================================================
+   V25.21.2 — PROFILE ACTION BUTTON SIZE FIX
+   ========================================================= */
+
+.profile-hero-actions{
+  position:static !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  flex-wrap:nowrap !important;
+  gap:6px !important;
+  width:100% !important;
+  margin:12px auto 0 !important;
+  padding:0 8px !important;
+  transform:none !important;
+}
+
+.profile-hero-actions button,
+.profile-hero-btn,
+.profile-find-friends-btn{
+  position:static !important;
+  flex:0 1 auto !important;
+  width:auto !important;
+  min-width:0 !important;
+  min-height:30px !important;
+  height:30px !important;
+  padding:0 9px !important;
+  margin:0 !important;
+  border-radius:999px !important;
+  font-size:8.5px !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+@media (max-width:480px){
+  .profile-hero-actions{
+    gap:5px !important;
+    margin-top:13px !important;
+    padding:0 4px !important;
+  }
+
+  .profile-hero-actions button,
+  .profile-hero-btn,
+  .profile-find-friends-btn{
+    min-height:28px !important;
+    height:28px !important;
+    padding:0 7px !important;
+    font-size:7.8px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -13800,7 +13855,7 @@ a,
   </div>
 </div>
 
-<!-- v25.21.1 white-base + rooftop splash -->
+<!-- v25.21.2 profile action button size fix -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
