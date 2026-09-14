@@ -13762,13 +13762,6 @@ a,
   transform:translateY(-8vh);
 }
 
-.app-splash-logo{
-  width:min(48vw,190px);
-  max-height:110px;
-  object-fit:contain;
-  filter:brightness(0) invert(1);
-  opacity:.97;
-}
 
 .app-splash-copy{
   color:rgba(255,255,255,.90);
@@ -13779,13 +13772,31 @@ a,
 }
 
 @media (max-width:480px){
-  .app-splash-logo{
-    width:min(52vw,178px);
-  }
+  
 
-  .app-splash-copy{
-    font-size:11px;
-  }
+.app-splash-wordmark{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  color:#FFFFFF;
+  text-align:center;
+  text-shadow:0 2px 18px rgba(0,0,0,.28);
+}
+
+.app-splash-wordmark span:first-child{
+  font-size:24px;
+  font-weight:950;
+  letter-spacing:.10em;
+  line-height:1;
+}
+
+.app-splash-wordmark span:last-child{
+  margin-top:4px;
+  font-size:20px;
+  font-weight:850;
+  letter-spacing:.12em;
+  line-height:1.1;
 }
 
 </style>
@@ -13795,12 +13806,15 @@ a,
   <div class="app-splash-image"></div>
   <div class="app-splash-overlay"></div>
   <div class="app-splash-content">
-    <img src="tk_logo.png" alt="TK MY GATHERS" class="app-splash-logo">
+    <div class="app-splash-wordmark" aria-label="TK MY GATHERS">
+  <span>TK</span>
+  <span>MY GATHERS</span>
+</div>
     <div class="app-splash-copy">遊びが、つながる。</div>
   </div>
 </div>
 
-<!-- v25.21.4 original profile + splash click-or-3sec -->
+<!-- v25.21.5 splash wordmark fix -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
