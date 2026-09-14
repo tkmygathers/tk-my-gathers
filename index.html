@@ -13855,7 +13855,7 @@ a,
   </div>
 </div>
 
-<!-- v25.21.2 profile action button size fix -->
+<!-- v25.21.3 splash click-or-3sec -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -23501,24 +23501,23 @@ document.addEventListener("DOMContentLoaded",()=>{
   const splash=document.getElementById("appSplash");
   if(!splash)return;
 
+  let finished=false;
+
   const hideSplash=()=>{
-    if(!splash.isConnected)return;
+    if(finished)return;
+    finished=true;
+
     splash.classList.add("is-hidden");
+
     setTimeout(()=>{
       if(splash.isConnected)splash.remove();
     },430);
   };
 
-  try{
-    if(sessionStorage.getItem("tkmg_splash_seen")==="1"){
-      splash.remove();
-      return;
-    }
-    sessionStorage.setItem("tkmg_splash_seen","1");
-  }catch(e){}
+  splash.addEventListener("click",hideSplash,{once:true});
+  splash.addEventListener("touchend",hideSplash,{once:true,passive:true});
 
-  setTimeout(hideSplash,1250);
-  setTimeout(hideSplash,2600);
+  setTimeout(hideSplash,3000);
 });
 </script>
 
