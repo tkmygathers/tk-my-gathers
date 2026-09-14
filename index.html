@@ -14096,7 +14096,7 @@ a,
   </div>
 </div>
 
-<!-- v25.22.0 splash + message/profile visual refinement -->
+<!-- v25.22.1 splash startup fix -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -15143,31 +15143,7 @@ a,
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 
-(function(){
-  const splash=document.getElementById("appSplash");
-  if(!splash)return;
 
-  const hideSplash=()=>{
-    splash.classList.add("is-hidden");
-    setTimeout(()=>splash.remove(),450);
-  };
-
-  if(sessionStorage.getItem("tkmg_splash_seen")==="1"){
-    splash.style.display="none";
-    splash.remove();
-    return;
-  }
-
-  sessionStorage.setItem("tkmg_splash_seen","1");
-
-  if(document.readyState==="complete"){
-    setTimeout(hideSplash,950);
-  }else{
-    window.addEventListener("load",()=>setTimeout(hideSplash,950),{once:true});
-  }
-
-  setTimeout(hideSplash,2200);
-})();
 
 
 document.addEventListener("DOMContentLoaded",()=>{
@@ -23764,5 +23740,35 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const splash=document.getElementById("appSplash");
+  if(!splash)return;
+
+  const hideSplash=()=>{
+    if(!splash.isConnected)return;
+    splash.classList.add("is-hidden");
+    setTimeout(()=>{
+      if(splash.isConnected)splash.remove();
+    },450);
+  };
+
+  try{
+    if(sessionStorage.getItem("tkmg_splash_seen")==="1"){
+      splash.remove();
+      return;
+    }
+
+    sessionStorage.setItem("tkmg_splash_seen","1");
+  }catch(e){
+    console.warn("splash sessionStorage:",e);
+  }
+
+  setTimeout(hideSplash,950);
+  setTimeout(hideSplash,2200);
+});
+</script>
+
 </body>
 </html>
