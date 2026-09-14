@@ -13714,10 +13714,389 @@ a,
   }
 }
 
+
+/* =========================================================
+   V25.22.0 — VISUAL REFINEMENT
+   Discover/search cards remain unchanged.
+   ========================================================= */
+
+/* ---------- Splash ---------- */
+.app-splash{
+  position:fixed;
+  inset:0;
+  z-index:20000;
+  display:grid;
+  place-items:center;
+  background:
+    radial-gradient(circle at 50% 20%,rgba(59,130,246,.16),transparent 30%),
+    linear-gradient(180deg,#08111F 0%,#0B1422 55%,#0F172A 100%);
+  opacity:1;
+  visibility:visible;
+  transition:opacity .38s ease,visibility .38s ease;
+}
+
+.app-splash.is-hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+.app-splash-inner{
+  display:grid;
+  place-items:center;
+  gap:7px;
+  transform:translateY(-5vh);
+}
+
+.app-splash-mark{
+  font-size:34px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:-.06em;
+  color:#F8FAFC;
+}
+
+.app-splash-title{
+  font-size:18px;
+  line-height:1;
+  font-weight:850;
+  letter-spacing:.14em;
+  color:#F8FAFC;
+}
+
+.app-splash-copy{
+  margin-top:14px;
+  font-size:10px;
+  font-weight:650;
+  letter-spacing:.04em;
+  color:#94A3B8;
+}
+
+/* ---------- Messages ---------- */
+#messagesPage,
+#chatModal .sheet,
+#messageCommentModal .sheet{
+  background:#F8FAFC;
+}
+
+.message-list,
+.chat-list{
+  background:transparent;
+}
+
+.message-item,
+.message-row{
+  border-radius:0 !important;
+  box-shadow:none !important;
+  border-left:0 !important;
+  border-right:0 !important;
+  border-top:0 !important;
+  border-bottom:1px solid #E2E8F0 !important;
+  background:transparent !important;
+}
+
+.chat-top,
+.message-thread-head,
+#chatModal .sheet-head{
+  border-bottom:1px solid #E2E8F0;
+  background:rgba(248,250,252,.96);
+  backdrop-filter:blur(12px);
+}
+
+#chatMessages{
+  padding-top:14px;
+  padding-bottom:18px;
+}
+
+.bubble{
+  max-width:78%;
+  padding:10px 12px;
+  border-radius:16px;
+  box-shadow:none !important;
+  font-size:11px;
+  line-height:1.55;
+}
+
+.bubble.them{
+  background:#E9EEF5 !important;
+  color:#0F172A !important;
+  border-bottom-left-radius:6px;
+}
+
+.bubble.me{
+  background:#2563EB !important;
+  color:#FFFFFF !important;
+  border-bottom-right-radius:6px;
+}
+
+.chat-input-wrap,
+.message-comment-composer{
+  border-top:1px solid #E2E8F0;
+  background:#F8FAFC;
+  box-shadow:none !important;
+}
+
+.chat-input-wrap input,
+.message-comment-composer input{
+  border:1px solid #CBD5E1 !important;
+  border-radius:999px !important;
+  background:#FFFFFF !important;
+  box-shadow:none !important;
+}
+
+.reaction-chip{
+  min-height:21px;
+  padding:0 6px;
+  background:#F8FAFC;
+  border-color:#D7E0EA;
+  font-size:9px;
+}
+
+.bubble.me .reaction-chip{
+  background:rgba(255,255,255,.15);
+  border-color:rgba(255,255,255,.28);
+  color:#fff;
+}
+
+/* ---------- Profile ---------- */
+#profilePage{
+  background:#F8FAFC;
+}
+
+.profile-hero{
+  overflow:visible;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  background:#F8FAFC !important;
+  border:0 !important;
+}
+
+.profile-hero-cover{
+  height:118px !important;
+  border-radius:0 !important;
+  background:
+    linear-gradient(180deg,rgba(15,23,42,.10),rgba(15,23,42,.22)),
+    var(--profile-banner,linear-gradient(135deg,#0F172A,#1E293B)) !important;
+}
+
+.profile-hero-main{
+  padding:0 18px 14px !important;
+  background:#F8FAFC;
+}
+
+.profile-avatar-wrap{
+  margin-top:-38px !important;
+}
+
+.profile-avatar,
+.profile-avatar img{
+  width:76px !important;
+  height:76px !important;
+  border-radius:50% !important;
+}
+
+.profile-avatar{
+  border:4px solid #F8FAFC !important;
+  box-shadow:none !important;
+}
+
+.profile-hero-name{
+  margin-top:10px;
+  color:#0F172A !important;
+  font-size:18px !important;
+  font-weight:900 !important;
+  letter-spacing:-.02em;
+}
+
+.profile-hero-handle{
+  color:#64748B !important;
+  font-size:10px !important;
+}
+
+.profile-hero-bio{
+  margin-top:10px !important;
+  color:#334155 !important;
+  font-size:10px !important;
+  line-height:1.65 !important;
+}
+
+.profile-hero-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:12px !important;
+}
+
+.profile-hero-btn,
+.profile-find-friends-btn{
+  min-height:34px !important;
+  padding:0 11px !important;
+  border:1px solid #CBD5E1 !important;
+  border-radius:10px !important;
+  background:#FFFFFF !important;
+  color:#0F172A !important;
+  box-shadow:none !important;
+  font-size:9px !important;
+  font-weight:800 !important;
+}
+
+.profile-find-friends-btn{
+  border-color:#93C5FD !important;
+  color:#1D4ED8 !important;
+  background:#EFF6FF !important;
+}
+
+.profile-stats,
+.profile-stat-row{
+  margin:0 !important;
+  padding:14px 18px !important;
+  border-top:1px solid #E2E8F0 !important;
+  border-bottom:1px solid #E2E8F0 !important;
+  border-radius:0 !important;
+  background:#F8FAFC !important;
+  box-shadow:none !important;
+}
+
+.profile-stat,
+.profile-stat-item{
+  background:transparent !important;
+  box-shadow:none !important;
+  border:0 !important;
+}
+
+.profile-stat strong,
+.profile-stat-item strong{
+  color:#0F172A !important;
+  font-size:15px !important;
+}
+
+.profile-stat span,
+.profile-stat-item span{
+  color:#64748B !important;
+  font-size:8.5px !important;
+}
+
+.fun-total{
+  margin-top:12px !important;
+  padding:13px 14px !important;
+  border:1px solid #E2E8F0 !important;
+  border-radius:12px !important;
+  background:#FFFFFF !important;
+  box-shadow:none !important;
+}
+
+.profile-section,
+.profile-card,
+.profile-panel{
+  border-radius:0 !important;
+  border-left:0 !important;
+  border-right:0 !important;
+  box-shadow:none !important;
+}
+
+.profile-section-title{
+  color:#475569 !important;
+  font-size:9px !important;
+  font-weight:800 !important;
+  letter-spacing:.04em;
+}
+
+/* Other user profile */
+#otherProfileModal .sheet{
+  background:#F8FAFC;
+}
+
+.other-profile-topbar{
+  border-bottom:1px solid #E2E8F0;
+}
+
+.other-profile-menu-btn{
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+.other-profile-main,
+.other-profile-body{
+  background:#F8FAFC;
+}
+
+/* ---------- My page/account ---------- */
+#accountModal .sheet,
+#blockedUsersModal .sheet,
+#findFriendsModal .sheet,
+#funBreakdownModal .sheet{
+  background:#F8FAFC;
+}
+
+#accountList{
+  border-top:1px solid #E2E8F0;
+}
+
+#accountList .list-item,
+#accountList .row,
+.blocked-user-row,
+.find-friends-row,
+.fun-breakdown-row{
+  border-radius:0 !important;
+  border-left:0 !important;
+  border-right:0 !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  border-bottom:1px solid #E2E8F0 !important;
+}
+
+.blocked-users-btn{
+  border-radius:10px !important;
+  box-shadow:none !important;
+}
+
+/* ---------- General de-AI cleanup, excluding discover/card ---------- */
+.sheet{
+  box-shadow:0 -12px 40px rgba(15,23,42,.12);
+}
+
+.sheet-head{
+  background:#F8FAFC;
+}
+
+.sheet-title{
+  color:#0F172A;
+  font-weight:900;
+  letter-spacing:-.01em;
+}
+
+.sheet-sub{
+  color:#64748B;
+}
+
+.close-btn{
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+/* Keep discover and recruitment card geometry intact */
+.discover-card,
+.discover-card-image,
+.fixed-card,
+.event-card,
+.my-event-card{
+  /* intentionally untouched */
+}
+
 </style>
 </head>
 <body>
-<!-- v25.21.0 auth UI refresh -->
+<div id="appSplash" class="app-splash" aria-hidden="true">
+  <div class="app-splash-inner">
+    <div class="app-splash-mark">TK</div>
+    <div class="app-splash-title">MY GATHERS</div>
+    <div class="app-splash-copy">遊びが、つながる。</div>
+  </div>
+</div>
+
+<!-- v25.22.0 splash + message/profile visual refinement -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -14763,6 +15142,34 @@ a,
 </div>
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+
+(function(){
+  const splash=document.getElementById("appSplash");
+  if(!splash)return;
+
+  const hideSplash=()=>{
+    splash.classList.add("is-hidden");
+    setTimeout(()=>splash.remove(),450);
+  };
+
+  if(sessionStorage.getItem("tkmg_splash_seen")==="1"){
+    splash.style.display="none";
+    splash.remove();
+    return;
+  }
+
+  sessionStorage.setItem("tkmg_splash_seen","1");
+
+  if(document.readyState==="complete"){
+    setTimeout(hideSplash,950);
+  }else{
+    window.addEventListener("load",()=>setTimeout(hideSplash,950),{once:true});
+  }
+
+  setTimeout(hideSplash,2200);
+})();
+
+
 document.addEventListener("DOMContentLoaded",()=>{
   setupBudgetInput();
 });
