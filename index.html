@@ -13716,20 +13716,16 @@ a,
 
 
 /* =========================================================
-   V25.22.0 — VISUAL REFINEMENT
-   Discover/search cards remain unchanged.
+   V25.21.1 — WHITE BASE + SPLASH ONLY
+   App UI stays on the original white-base design.
    ========================================================= */
 
-/* ---------- Splash ---------- */
 .app-splash{
   position:fixed;
   inset:0;
-  z-index:20000;
-  display:grid;
-  place-items:center;
-  background:
-    radial-gradient(circle at 50% 20%,rgba(59,130,246,.16),transparent 30%),
-    linear-gradient(180deg,#08111F 0%,#0B1422 55%,#0F172A 100%);
+  z-index:30000;
+  overflow:hidden;
+  background:#081522;
   opacity:1;
   visibility:visible;
   transition:opacity .38s ease,visibility .38s ease;
@@ -13741,362 +13737,70 @@ a,
   pointer-events:none;
 }
 
-.app-splash-inner{
-  display:grid;
-  place-items:center;
-  gap:7px;
-  transform:translateY(-5vh);
+.app-splash-image{
+  position:absolute;
+  inset:0;
+  background:url("tk_splash_rooftop_tokyo.png") center 62%/cover no-repeat;
+  transform:scale(1.01);
 }
 
-.app-splash-mark{
-  font-size:34px;
-  line-height:1;
-  font-weight:950;
-  letter-spacing:-.06em;
-  color:#F8FAFC;
+.app-splash-overlay{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg,rgba(4,12,20,.22) 0%,rgba(4,12,20,.08) 42%,rgba(4,12,20,.60) 100%);
 }
 
-.app-splash-title{
-  font-size:18px;
-  line-height:1;
-  font-weight:850;
-  letter-spacing:.14em;
-  color:#F8FAFC;
+.app-splash-content{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  transform:translateY(-8vh);
+}
+
+.app-splash-logo{
+  width:min(48vw,190px);
+  max-height:110px;
+  object-fit:contain;
+  filter:brightness(0) invert(1);
+  opacity:.97;
 }
 
 .app-splash-copy{
-  margin-top:14px;
-  font-size:10px;
-  font-weight:650;
-  letter-spacing:.04em;
-  color:#94A3B8;
+  color:rgba(255,255,255,.90);
+  font-size:12px;
+  font-weight:750;
+  letter-spacing:.08em;
+  text-shadow:0 1px 12px rgba(0,0,0,.25);
 }
 
-/* ---------- Messages ---------- */
-#messagesPage,
-#chatModal .sheet,
-#messageCommentModal .sheet{
-  background:#F8FAFC;
-}
+@media (max-width:480px){
+  .app-splash-logo{
+    width:min(52vw,178px);
+  }
 
-.message-list,
-.chat-list{
-  background:transparent;
-}
-
-.message-item,
-.message-row{
-  border-radius:0 !important;
-  box-shadow:none !important;
-  border-left:0 !important;
-  border-right:0 !important;
-  border-top:0 !important;
-  border-bottom:1px solid #E2E8F0 !important;
-  background:transparent !important;
-}
-
-.chat-top,
-.message-thread-head,
-#chatModal .sheet-head{
-  border-bottom:1px solid #E2E8F0;
-  background:rgba(248,250,252,.96);
-  backdrop-filter:blur(12px);
-}
-
-#chatMessages{
-  padding-top:14px;
-  padding-bottom:18px;
-}
-
-.bubble{
-  max-width:78%;
-  padding:10px 12px;
-  border-radius:16px;
-  box-shadow:none !important;
-  font-size:11px;
-  line-height:1.55;
-}
-
-.bubble.them{
-  background:#E9EEF5 !important;
-  color:#0F172A !important;
-  border-bottom-left-radius:6px;
-}
-
-.bubble.me{
-  background:#2563EB !important;
-  color:#FFFFFF !important;
-  border-bottom-right-radius:6px;
-}
-
-.chat-input-wrap,
-.message-comment-composer{
-  border-top:1px solid #E2E8F0;
-  background:#F8FAFC;
-  box-shadow:none !important;
-}
-
-.chat-input-wrap input,
-.message-comment-composer input{
-  border:1px solid #CBD5E1 !important;
-  border-radius:999px !important;
-  background:#FFFFFF !important;
-  box-shadow:none !important;
-}
-
-.reaction-chip{
-  min-height:21px;
-  padding:0 6px;
-  background:#F8FAFC;
-  border-color:#D7E0EA;
-  font-size:9px;
-}
-
-.bubble.me .reaction-chip{
-  background:rgba(255,255,255,.15);
-  border-color:rgba(255,255,255,.28);
-  color:#fff;
-}
-
-/* ---------- Profile ---------- */
-#profilePage{
-  background:#F8FAFC;
-}
-
-.profile-hero{
-  overflow:visible;
-  border-radius:0 !important;
-  box-shadow:none !important;
-  background:#F8FAFC !important;
-  border:0 !important;
-}
-
-.profile-hero-cover{
-  height:118px !important;
-  border-radius:0 !important;
-  background:
-    linear-gradient(180deg,rgba(15,23,42,.10),rgba(15,23,42,.22)),
-    var(--profile-banner,linear-gradient(135deg,#0F172A,#1E293B)) !important;
-}
-
-.profile-hero-main{
-  padding:0 18px 14px !important;
-  background:#F8FAFC;
-}
-
-.profile-avatar-wrap{
-  margin-top:-38px !important;
-}
-
-.profile-avatar,
-.profile-avatar img{
-  width:76px !important;
-  height:76px !important;
-  border-radius:50% !important;
-}
-
-.profile-avatar{
-  border:4px solid #F8FAFC !important;
-  box-shadow:none !important;
-}
-
-.profile-hero-name{
-  margin-top:10px;
-  color:#0F172A !important;
-  font-size:18px !important;
-  font-weight:900 !important;
-  letter-spacing:-.02em;
-}
-
-.profile-hero-handle{
-  color:#64748B !important;
-  font-size:10px !important;
-}
-
-.profile-hero-bio{
-  margin-top:10px !important;
-  color:#334155 !important;
-  font-size:10px !important;
-  line-height:1.65 !important;
-}
-
-.profile-hero-actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
-  margin-top:12px !important;
-}
-
-.profile-hero-btn,
-.profile-find-friends-btn{
-  min-height:34px !important;
-  padding:0 11px !important;
-  border:1px solid #CBD5E1 !important;
-  border-radius:10px !important;
-  background:#FFFFFF !important;
-  color:#0F172A !important;
-  box-shadow:none !important;
-  font-size:9px !important;
-  font-weight:800 !important;
-}
-
-.profile-find-friends-btn{
-  border-color:#93C5FD !important;
-  color:#1D4ED8 !important;
-  background:#EFF6FF !important;
-}
-
-.profile-stats,
-.profile-stat-row{
-  margin:0 !important;
-  padding:14px 18px !important;
-  border-top:1px solid #E2E8F0 !important;
-  border-bottom:1px solid #E2E8F0 !important;
-  border-radius:0 !important;
-  background:#F8FAFC !important;
-  box-shadow:none !important;
-}
-
-.profile-stat,
-.profile-stat-item{
-  background:transparent !important;
-  box-shadow:none !important;
-  border:0 !important;
-}
-
-.profile-stat strong,
-.profile-stat-item strong{
-  color:#0F172A !important;
-  font-size:15px !important;
-}
-
-.profile-stat span,
-.profile-stat-item span{
-  color:#64748B !important;
-  font-size:8.5px !important;
-}
-
-.fun-total{
-  margin-top:12px !important;
-  padding:13px 14px !important;
-  border:1px solid #E2E8F0 !important;
-  border-radius:12px !important;
-  background:#FFFFFF !important;
-  box-shadow:none !important;
-}
-
-.profile-section,
-.profile-card,
-.profile-panel{
-  border-radius:0 !important;
-  border-left:0 !important;
-  border-right:0 !important;
-  box-shadow:none !important;
-}
-
-.profile-section-title{
-  color:#475569 !important;
-  font-size:9px !important;
-  font-weight:800 !important;
-  letter-spacing:.04em;
-}
-
-/* Other user profile */
-#otherProfileModal .sheet{
-  background:#F8FAFC;
-}
-
-.other-profile-topbar{
-  border-bottom:1px solid #E2E8F0;
-}
-
-.other-profile-menu-btn{
-  border:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-}
-
-.other-profile-main,
-.other-profile-body{
-  background:#F8FAFC;
-}
-
-/* ---------- My page/account ---------- */
-#accountModal .sheet,
-#blockedUsersModal .sheet,
-#findFriendsModal .sheet,
-#funBreakdownModal .sheet{
-  background:#F8FAFC;
-}
-
-#accountList{
-  border-top:1px solid #E2E8F0;
-}
-
-#accountList .list-item,
-#accountList .row,
-.blocked-user-row,
-.find-friends-row,
-.fun-breakdown-row{
-  border-radius:0 !important;
-  border-left:0 !important;
-  border-right:0 !important;
-  box-shadow:none !important;
-  background:transparent !important;
-  border-bottom:1px solid #E2E8F0 !important;
-}
-
-.blocked-users-btn{
-  border-radius:10px !important;
-  box-shadow:none !important;
-}
-
-/* ---------- General de-AI cleanup, excluding discover/card ---------- */
-.sheet{
-  box-shadow:0 -12px 40px rgba(15,23,42,.12);
-}
-
-.sheet-head{
-  background:#F8FAFC;
-}
-
-.sheet-title{
-  color:#0F172A;
-  font-weight:900;
-  letter-spacing:-.01em;
-}
-
-.sheet-sub{
-  color:#64748B;
-}
-
-.close-btn{
-  border:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-}
-
-/* Keep discover and recruitment card geometry intact */
-.discover-card,
-.discover-card-image,
-.fixed-card,
-.event-card,
-.my-event-card{
-  /* intentionally untouched */
+  .app-splash-copy{
+    font-size:11px;
+  }
 }
 
 </style>
 </head>
 <body>
 <div id="appSplash" class="app-splash" aria-hidden="true">
-  <div class="app-splash-inner">
-    <div class="app-splash-mark">TK</div>
-    <div class="app-splash-title">MY GATHERS</div>
+  <div class="app-splash-image"></div>
+  <div class="app-splash-overlay"></div>
+  <div class="app-splash-content">
+    <img src="tk_logo.png" alt="TK MY GATHERS" class="app-splash-logo">
     <div class="app-splash-copy">遊びが、つながる。</div>
   </div>
 </div>
 
-<!-- v25.22.1 splash startup fix -->
+<!-- v25.21.1 white-base + rooftop splash -->
 <main class="shell">
 <header class="topbar">
 <div class="toprow">
@@ -15142,10 +14846,6 @@ a,
 </div>
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-
-
-
-
 document.addEventListener("DOMContentLoaded",()=>{
   setupBudgetInput();
 });
@@ -23751,7 +23451,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     splash.classList.add("is-hidden");
     setTimeout(()=>{
       if(splash.isConnected)splash.remove();
-    },450);
+    },430);
   };
 
   try{
@@ -23759,14 +23459,11 @@ document.addEventListener("DOMContentLoaded",()=>{
       splash.remove();
       return;
     }
-
     sessionStorage.setItem("tkmg_splash_seen","1");
-  }catch(e){
-    console.warn("splash sessionStorage:",e);
-  }
+  }catch(e){}
 
-  setTimeout(hideSplash,950);
-  setTimeout(hideSplash,2200);
+  setTimeout(hideSplash,1250);
+  setTimeout(hideSplash,2600);
 });
 </script>
 
